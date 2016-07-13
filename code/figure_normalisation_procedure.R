@@ -1,0 +1,286 @@
+####################################################################################
+## PLOT FIGURE ABOUT NORMALISATION FOR COMBIMS-PAPER
+## Plot boxplots for different steps in data pre-processing
+## And normalisation statistics
+##
+## Panel A: Boxplot with the log2-transformed Phospho-Data for all Phosphos for all Donors throughout all Conditions
+## Panel B: Boxplot with the log2 fold change in respect to the medium condition
+## Panel C: Boxplot with Hill-transformed data
+## 
+## In these three Panels, highlight the data points by patient with identifier KI044
+##
+## Panel D: Barplot depicting, in how many patients the respective Phospho was found to
+##          be upregulated, downregulated or not significantly regulated at all
+##          plus a last bar with overall-values
+####################################################################################
+
+
+## Load Packages
+library(CellNOptR)
+library(reshape2)
+library(ggplot2)
+library(gridBase)
+
+
+####################################################################################################################
+## READ DATA #######################################################################################################
+####################################################################################################################
+
+
+## Vector with patients to include into analysis
+Patients = as.character(read.csv("../files/annotations_169_patients.csv")$ID)
+
+####################################################################################################################
+## merged raw data
+####################################################################################################################
+
+## Function to read the raw merged data, yield matrix as output
+read_phospho_data_raw_merged <- function(Patient){
+  
+  ## Read MIDAS file and turn it into CNO list
+  M = readMIDAS(paste("../data/phosphos_merged/", Patient, "_phosphos_midas.csv", sep=""), verbose=F)
+  CNO_List = makeCNOlist(M, subfield = T, verbose=F)
+  
+  ## Extract Data from CNOlist (wihtout BSA and PE, which were used as internal technical control)
+  Matrix = CNO_List$valueSignals[[2]][,-c(18,19)]
+  
+  ## Name rows and columns with the phospho proteins and the stimuli, without BSA and PE
+  rownames(Matrix) <- CNO_List$namesStimuli
+  colnames(Matrix) <- CNO_List$namesSignals[-c(18,19)]
+  
+  return(Matrix)
+}
+
+####################################################################################################################
+
+## Prepare Matrix for data
+
+Temp = read_phospho_data_raw_merged(Patients[1])
+M = melt(Temp)
+Stimuli = M$Var1
+Phosphos = M$Var2
+# Hack
+levels(Phosphos)[13] = 'MK03'
+
+Matrix_merged = matrix(data = NA, nrow = length(Patients), ncol = length(Temp))
+rownames(Matrix_merged) = Patients
+
+## Fill Matrices with data
+for (p in 1:length(Patients)){
+  Temp = read_phospho_data_raw_merged(Patients[p])
+  Matrix_merged[p,] = as.vector(Temp)
+}
+
+####################################################################################################################
+## merged log2
+####################################################################################################################
+
+Matrix_log = log(Matrix_merged, base=2)
+
+####################################################################################################################
+## log2FC
+####################################################################################################################
+
+Matrix_FC = Matrix_log
+
+## Calculate Fold Change compared to Medium
+medium = 1
+for (i in 1:dim(Matrix_FC)[2]){
+  if (Stimuli[i] == 'medium'){
+    medium = i
+  } else {
+    Matrix_FC[,i] = Matrix_FC[,i] - Matrix_FC[,medium]
+  } 
+}
+Matrix_FC[, which(Stimuli == 'medium')] = rep(0, dim(Matrix_FC)[1])
+
+####################################################################################################################
+## Hill Transformed
+####################################################################################################################
+
+## Function to read the normalised, Hill transformed Data
+read_phospho_data_normalised <- function(Patient){
+  
+  ## Read MIDAS file and turn it into CNO list
+  M = readMIDAS(paste("../data/phosphos_normalised/", Patient, ".csv", sep=""), verbose=F)
+  CNO_List = makeCNOlist(M, subfield = T, verbose=F)
+  
+  ## Extract Data from CNOlist
+  Matrix = rbind(CNO_List$valueSignals[[1]][1,], CNO_List$valueSignals[[2]])
+  
+  ## Name rows and columns with the phospho proteins and the stimuli, without BSA and PE
+  rownames(Matrix) <- c('medium', CNO_List$namesStimuli)
+  colnames(Matrix) <- CNO_List$namesSignals
+  
+  return(Matrix)
+}
+
+## Prepare Matrix for data
+Matrix_Hill = Matrix_FC
+
+## Fill Matrices with data
+for (p in 1:length(Patients)){
+  Temp = read_phospho_data_normalised(Patients[p])
+  Matrix_Hill[p,] = as.vector(Temp)
+}
+## For Barplots later we need an unchanged matrix with the Hill transformed data
+Matrix_Hill_2 = Matrix_Hill
+
+## Invert negative regulation again, to show up and down-regulation in boxplots
+medium = 1
+for (i in 1:dim(Matrix_Hill)[2]){
+  if (Stimuli[i] == 'medium'){
+    medium = i
+  } else {
+    Matrix_Hill[,i] = Matrix_Hill[,i] - Matrix_Hill[,medium]
+  } 
+}
+Matrix_Hill[, which(Stimuli == 'medium')] = rep(0, dim(Matrix_Hill)[1])
+
+
+####################################################################################################################
+## Dalek says: "ORDER!!!!" 
+## For the boxplots
+Melted = melt(Matrix_log)
+names(Melted) = c('Stimulus', 'Phospho', 'Value')
+Melted$Stimulus = rep(Stimuli, each = length(Patients))
+Melted$Phospho = rep(Phosphos, each = length(Patients))
+Melted$Patients = rep(Patients, dim(Matrix_log)[2])  
+
+## Reorder according to mean
+m = sapply(levels(Melted$Phospho), function(x){mean(subset(Melted$Value, Melted$Phospho == x), na.rm=T)})
+sorted_by_means = sort(m)
+
+
+
+####################################################################################################################
+## PREPARE BARPLOTS ################################################################################################
+####################################################################################################################
+
+
+## New Matrix to save the information about up-regulation or down-regulation
+Regulation = matrix(data=0, ncol = length(levels(Phosphos)), nrow = 3)
+colnames(Regulation) = levels(Phosphos)
+rownames(Regulation) = c('phosphorylated', 'dephosphorylated', 'None')
+
+Melted = melt(Matrix_Hill_2)
+names(Melted) = c('Stimulus', 'Phospho', 'Value')
+Melted$Stimulus = rep(Stimuli, each = length(Patients))
+Melted$Phospho = rep(Phosphos, each = length(Patients))
+Melted$Patients = rep(Patients, dim(Matrix_Hill)[2])  
+
+for (p in levels(Phosphos)){
+  for (p2 in Patients){
+    Temp = subset(Melted, Melted$Phospho == p & Melted$Patients == p2)
+    
+    if (!is.na(Temp$Value[1]) & Temp$Value[1] == 1){
+      Regulation[2,which(colnames(Regulation)==p)] = Regulation[2,which(colnames(Regulation)==p)] + 1
+    } else {
+      if (sd(Temp$Value, na.rm=T) == 0){
+        Regulation[3,which(colnames(Regulation)==p)] = Regulation[3,which(colnames(Regulation)==p)] + 1
+      } else {
+        Regulation[1,which(colnames(Regulation)==p)] = Regulation[1,which(colnames(Regulation)==p)] + 1
+      }
+    }
+  }
+}
+
+## Get Percentages
+Regulation = Regulation/169
+
+
+## Add last column with Total
+Regulation = cbind(Regulation, rowSums(Regulation))
+colnames(Regulation)[18] = 'Total'
+Regulation[,18] = Regulation[,18]/sum(Regulation[,18])
+
+####################################################################################################################
+## Function to plot Boxplots
+####################################################################################################################
+plotBoxplot = function(Matrix, ylim, vp){
+  
+  ## Melt Matrix and change Information in melted Dataframe
+  Melted = melt(Matrix)
+  names(Melted) = c('Stimulus', 'Phospho', 'Value')
+  Melted$Stimulus = rep(Stimuli, each = length(Patients))
+  Melted$Phospho = rep(Phosphos, each = length(Patients))
+  Melted$Patients = rep(Patients, dim(Matrix)[2])
+  Melted$KI044 = rep(FALSE, length.out = length(Melted$Patients))
+  Melted$KI044[which(Melted$Patients == 'KI044')] = TRUE
+  
+  ## Relevel to order it according to mean
+  Melted$Phospho = factor(Melted$Phospho, names(sorted_by_means))
+  
+  ## Plot in ggplot Object
+  p = ggplot(Melted, aes(x = Phospho, y = Value)) +
+    theme_bw() + xlab("") + ylab("Value") + ylim(ylim) +
+    ## Tilted x Axis ticks
+    theme(axis.text.x = element_text(family = 'sans', size=10, angle = 45, hjust = 1)) +
+    ## Remove Outliers from the boxplots
+    geom_boxplot(outlier.size = 0) + 
+    ## Jitter data points on boxplots
+    geom_point(position = position_jitter(width=0.2), colour='black', alpha=0.2, size=0.5)
+  
+  ## Plot Patient KI044 on top
+  Sub_Melted = subset(Melted, Melted$KI044 == TRUE)
+  p = p + geom_point(data= Sub_Melted, colour = 'orange', position = position_jitter(width=0.2), size= 1)
+  
+  ## Output
+  print(p, vp=vp)
+}
+
+
+
+####################################################################################################################
+## PLOT BOXPLOTS ###################################################################################################
+####################################################################################################################
+
+
+## Divert output into pdf
+pdf("../figures/figure_data_normalisation.pdf", width=15, height=12)
+vp1 = viewport(x = 0.25, y = 0.75, h = 0.5, w = 0.5)
+vp2 = viewport(x = 0.75, y = 0.75, h = 0.5, w = 0.5)
+vp3 = viewport(x = 0.25, y = 0.25, h = 0.5, w = 0.5)
+vp4 = viewport(x = 0.75, y = 0.25, h = 0.5, w = 0.5)
+####################################################################################################################
+## Panel A: log2 Data
+####################################################################################################################
+
+plotBoxplot(Matrix_log, ylim=c(6,16), vp1)
+
+####################################################################################################################
+## Panel B: log2 FC
+####################################################################################################################
+plotBoxplot(Matrix_FC, ylim=c(-7,7), vp2)
+
+####################################################################################################################
+## Panel C: Hill transformed
+####################################################################################################################
+plotBoxplot(Matrix_Hill, ylim=c(-1,1), vp3)
+
+
+####################################################################################################################
+## PLOT BARPLOT ####################################################################################################
+####################################################################################################################
+
+
+## Transform into Dataframe
+Melted = melt(Regulation)
+names(Melted) = c('Significance', 'Phospho', 'Value')
+
+## Relevel according to mean
+Melted$Phospho = factor(Melted$Phospho, c(names(sorted_by_means), 'Total'))
+Melted$Significance = factor(Melted$Significance, c('phosphorylated', 'None', 'dephosphorylated'))
+Melted$cut = c(rep('Phospho-Proteins', 51), rep('Total',3))
+
+p = ggplot(Melted, aes(x = Phospho, y = Value, fill = Significance)) + 
+  geom_bar(stat='identity', alpha=0.6) + 
+  xlab("") + ylab("Percentage") + 
+  scale_fill_manual(values = c('steelblue1', 'grey75', 'gold')) +
+  facet_grid(~cut, scales = "free_x", space='free', margins=F) +
+  theme_bw() + theme(strip.background=element_rect(fill=NA, size=0), strip.text = element_text(size = 0), panel.margin=unit(2, 'lines')) +
+  theme(axis.text.x = element_text(family = 'sans', size=10, angle = 45, hjust = 1), legend.position = 'bottom')
+print(p,  vp = vp4)
+
+
+dev.off()
