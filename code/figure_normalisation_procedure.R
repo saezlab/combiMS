@@ -63,10 +63,12 @@ levels(Phosphos)[13] = 'MK03'
 Matrix_merged = matrix(data = NA, nrow = length(Patients), ncol = length(Temp))
 rownames(Matrix_merged) = Patients
 
+pb = txtProgressBar(min = 0, max =length(Patients), initial = 0) 
 ## Fill Matrices with data
 for (p in 1:length(Patients)){
   Temp = read_phospho_data_raw_merged(Patients[p])
   Matrix_merged[p,] = as.vector(Temp)
+  setTxtProgressBar(pb, (pb$getVal()+1))
 }
 
 ####################################################################################################################
@@ -115,11 +117,12 @@ read_phospho_data_normalised <- function(Patient){
 
 ## Prepare Matrix for data
 Matrix_Hill = Matrix_FC
-
+pb = txtProgressBar(min = 0, max = length(Patients), initial = 0) 
 ## Fill Matrices with data
 for (p in 1:length(Patients)){
   Temp = read_phospho_data_normalised(Patients[p])
   Matrix_Hill[p,] = as.vector(Temp)
+  setTxtProgressBar(pb, (pb$getVal()+1))
 }
 ## For Barplots later we need an unchanged matrix with the Hill transformed data
 Matrix_Hill_2 = Matrix_Hill
@@ -166,6 +169,7 @@ Melted$Stimulus = rep(Stimuli, each = length(Patients))
 Melted$Phospho = rep(Phosphos, each = length(Patients))
 Melted$Patients = rep(Patients, dim(Matrix_Hill)[2])  
 
+pb = txtProgressBar(min = 0, max = length(levels(Phosphos))*length(Patients), initial = 0) 
 for (p in levels(Phosphos)){
   for (p2 in Patients){
     Temp = subset(Melted, Melted$Phospho == p & Melted$Patients == p2)
@@ -179,6 +183,7 @@ for (p in levels(Phosphos)){
         Regulation[1,which(colnames(Regulation)==p)] = Regulation[1,which(colnames(Regulation)==p)] + 1
       }
     }
+    setTxtProgressBar(pb, (pb$getVal()+1))
   }
 }
 
@@ -210,7 +215,7 @@ plotBoxplot = function(Matrix, ylim, ylabel){
   
   ## Plot in ggplot Object
   p = ggplot(Melted, aes(x = Phospho, y = Value)) +
-    theme_bw() + xlab("") + ylab(ylabel) + ylim(ylim) +
+    theme_bw() + xlab("") + ylab(ylabel) + ylim(ylim) + theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.border = element_blank(), axis.line.x = element_line(), axis.line.y = element_line()) + 
     ## Tilted x Axis ticks
     theme(axis.text.x = element_text(family = 'sans', size=8, angle = 45, hjust = 1), axis.title.y=element_text(family='sans', size=8), axis.text.y=element_text(family='sans', size=8)) +
     ## Remove Outliers from the boxplots
@@ -254,13 +259,13 @@ names(Melted) = c('Significance', 'Phospho', 'Value')
 
 ## Relevel according to mean
 Melted$Phospho = factor(Melted$Phospho, c(names(sorted_by_means), 'Total'))
-Melted$Significance = factor(Melted$Significance, c('phosphorylated', 'None', 'dephosphorylated'))
+Melted$Significance = factor(Melted$Significance, c('phosphorylated', 'dephosphorylated', 'None'))
 Melted$cut = c(rep('Phospho-Proteins', 51), rep('Total',3))
 
 p4 = ggplot(Melted, aes(x = Phospho, y = Value, fill = Significance)) + 
   geom_bar(stat='identity', alpha=0.6) + 
   xlab("") + ylab("Percentage") + 
-  scale_fill_manual(values = c('steelblue1', 'grey75', 'gold')) +
+  scale_fill_manual(values = c('steelblue1', 'gold', 'grey75')) +
   facet_grid(~cut, scales = "free_x", space='free', margins=F) +
   theme_classic() + theme(strip.background=element_blank(), strip.text.x = element_blank()) + 
   theme(axis.text.x = element_text(family = 'sans', size=8, angle = 45, hjust = 1), 
