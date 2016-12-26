@@ -236,16 +236,19 @@ g1 = one_sample(ListPhosphos, annotations)
 # Compare with model interactions 
 # So far its still manual and crude, but maybe worth looking into...?
 temp = g1$data
-temp$interaction = FALSE
+temp$interaction_in_model = FALSE
 for (g in names(model_interactions)){
   temp_model = model_interactions[[g]]
   for (i in 1:dim(temp_model)[1]){
-    temp[which(temp$b == as.character(temp_model[i, 1]) & temp$a == as.character(temp_model[i, 2]) & temp$group == g),'interaction'] = TRUE
+    temp[which(temp$b == as.character(temp_model[i, 1]) & temp$a == as.character(temp_model[i, 2]) & temp$group == g),'interaction_in_model'] = TRUE
   }
 }
-g = ggplot(temp, aes(x=logFC, y=log.p.value, colour=interaction)) + 
+
+temp$group = factor(temp$group, c('H', 'EGCG', 'FTY', 'IFNb', 'GAL', 'NTZ', 'U'))
+
+g = ggplot(temp, aes(x=logFC, y=log.p.value, colour=interaction_in_model)) + 
   facet_grid(~group) + 
-  geom_point() + 
+  geom_point(alpha=0.8) + 
   theme(legend.position='none') +
   scale_colour_manual(values=c('#d8dcd6', '#fd3c06')) +
   theme_bw()
