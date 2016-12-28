@@ -55,9 +55,13 @@ temp2[which(temp2$variable == 'Disease.Subtype'),'variable'] = 'Disease.Subtype2
 temp2$variable = factor(temp2$variable)
 
 # Variable for facet grid splitting
-plot_df$split= 2
+plot_df$split= 4
 temp$split = 1
 temp2$split = 1
+temp[which(temp$variable == 'Disease.Subtype'), 'split'] = 3
+temp2[which(temp2$variable == 'Disease.Subtype2'), 'split'] = 3
+temp[which(temp$variable == 'condition'), 'split'] = 2
+temp2[which(temp2$variable == 'condition2'), 'split'] = 2
 colnames(plot_df) = c('Patients', 'Model_Interactions', 'value', 'split')
 colnames(temp) = c('Patients', 'Model_Interactions', 'value', 'split')
 colnames(temp2) = c('Patients', 'Model_Interactions', 'value', 'split')
@@ -88,9 +92,9 @@ heatmap_median_models = ggplot(plot_df, aes(x=Model_Interactions, y=Patients)) +
   theme(strip.background=element_blank(), strip.text= element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(),
         axis.ticks = element_blank(), axis.line.y = element_blank(), legend.text = element_text(size=5), axis.line.x = element_blank(),
         panel.spacing.x = unit(1, 'pt')) + 
-  scale_fill_manual(values=c("white", 'navy', 'burlywood', 'tomato', 'forestgreen', 'white',
-                             "white", 'green', 'yellow', 'orange','white',
-                             "white", 'green', 'red', 'red', 'red', 'red', 'red','white',
+  scale_fill_manual(values=c("white", '#DB7D59', '#EAB983', '#515D82', '#8CA889', 'white',
+                             "white", '#407FB7', '#8DC060', '#FABE50','white',
+                             "white", '#407FB7', '#ED6A5A', '#F4F1BB', '#9BC1BC', '#5CA4A9', '#E6EBE0','white',
                              "white", 'black', 'grey90'),
                     drop=FALSE) +
   guides(fill=guide_legend(ncol=1, keywidth = .6, keyheight = .6, title=''))
@@ -186,7 +190,7 @@ plot_df$Group = factor(plot_df$Group, sorted_groups)
 boxplot_similarity = ggplot(plot_df) + 
   geom_boxplot(notch=T,aes(x=Group, y=Similarity, fill=Group), outlier.alpha = 0.2, outlier.stroke = 0) +
   theme_classic() + 
-  scale_fill_manual(values=c('#ECEDED', '#646567', '#407FB7', '#2D7F83', '#00B1B7', '#8DC060', '#D0D95C', '#FABE50', '#A8859E', '#834E75')) + 
+  scale_fill_manual(values=c('#ECEDED', '#646567', '#407FB7', '#B65256', '#9B91C1', '#834E75', '#2D7F83', '#00B1B7', '#FDD48F', '#FABE50')) + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.title.x = element_blank()) +
   theme(legend.position = 'none') + 
   ylim(c(0.5, 1))
