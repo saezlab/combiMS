@@ -20,7 +20,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 # ###########################################################################################################
 # Load and clean annotation data
 # ###########################################################################################################
-annot=read.csv("../../files/annot169pat_v2.csv",header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
+annot=read.csv("../../files/annotations/annot169pat_v2.csv",header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
 
 # ************************************ 
 # add some fields to annotation for ggplot
@@ -41,7 +41,7 @@ rm(annot2)
 # ##########################################################################################################
 # PART A OF FIGURE
 # ##########################################################################################################
-load('../../files/allMedianModels.RData')
+load('../../files/median_models/allMedianModels.RData')
 
 # Merge annotation data (twice, so that it is broader) with model interactions
 plot_df = melt(allMedianNetworks)
@@ -91,6 +91,7 @@ heatmap_median_models = ggplot(plot_df, aes(x=Model_Interactions, y=Patients)) +
   xlab('Model Interactions (1-186)') + ylab('Patients (1-169)') +
   theme(strip.background=element_blank(), strip.text= element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(),
         axis.ticks = element_blank(), axis.line.y = element_blank(), legend.text = element_text(size=5), axis.line.x = element_blank(),
+        axis.text = element_text(size=5),
         panel.spacing.x = unit(1, 'pt')) + 
   scale_fill_manual(values=c("white", '#DB7D59', '#EAB983', '#515D82', '#8CA889', 'white',
                              "white", '#407FB7', '#8DC060', '#FABE50','white',
@@ -106,11 +107,11 @@ heatmap_median_models = ggplot(plot_df, aes(x=Model_Interactions, y=Patients)) +
 # ##########################################################################################################
 # load annotation file and similarity BETWEEN matrix
 # ####################################################################################################################
-load("../../files/similarityMatrix.RData")
+load("../../files/similarity/similarityMatrix.RData")
 
 # ************************************ 
 # include similarities WITHIN
-load('../../files/similarityWITHINMeans.RData')
+load('../../files/similarity/similarityWITHINMeans.RData')
 for (i in 1:dim(similarityMatrix)[1]){
   similarityMatrix[i,i]=means_within[i]
 }
@@ -190,7 +191,7 @@ plot_df$Group = factor(plot_df$Group, sorted_groups)
 boxplot_similarity = ggplot(plot_df) + 
   geom_boxplot(notch=T,aes(x=Group, y=Similarity, fill=Group), outlier.alpha = 0.2, outlier.stroke = 0) +
   theme_classic() + 
-  scale_fill_manual(values=c('#ECEDED', '#646567', '#407FB7', '#B65256', '#9B91C1', '#834E75', '#2D7F83', '#00B1B7', '#FDD48F', '#FABE50')) + 
+  scale_fill_manual(values=c('#ECEDED', '#ECEDED', '#407FB7', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#FDD48F', '#FABE50')) + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.title.x = element_blank()) +
   theme(legend.position = 'none') + 
   ylim(c(0.5, 1))
@@ -200,6 +201,6 @@ boxplot_similarity = ggplot(plot_df) +
 # ###################################################################################################################################################
 pdf("../../figures/figure_similarity.pdf", width=7, height=3.5, onefile = FALSE)
 
-plot_grid(heatmap_median_models, boxplot_similarity, labels=c('A', 'B'))
+plot_grid(heatmap_median_models, boxplot_similarity, labels=c('A', 'B'), label_size = 14)
 
 dev.off()
