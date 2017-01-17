@@ -65,7 +65,7 @@ DonorsWithPhospho = list.files('../../../data/phosphos_normalised/')
 DonorsWithPhospho = gsub(".csv", '', DonorsWithPhospho)
 
 ## Annotations
-annotations = read.table('../../../files/annotations_169_patients.csv', header = T, row.names=1, sep=',')
+annotations = read.table('../../../files/annotations/annotations_169_patients.csv', header = T, row.names=1, sep=',')
 
 # Hack for nicer annotation
 annotations$Group = as.character(annotations$Group)
