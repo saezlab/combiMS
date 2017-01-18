@@ -24,7 +24,7 @@ model_interactions = list(FTY = data.frame(t(matrix(data=c(c('ANTICD3', 'STAT5')
                                                            c('LPS', 'MK12'), c('LPS', 'HSPB1'), c('LPS', 'IKBA'), c('LPS', 'TF65'), c('LPS', 'MKO3'),
                                                            c('INS', 'AKT1'), c('INS', 'MP2K1'),
                                                            c('REBIF', 'STAT6')), nrow=2))), 
-                          GAL = data.frame(t(matrix(data=c(c('TNFA', 'MK12'), c('TNFA', 'MKO3'), 
+                          GA = data.frame(t(matrix(data=c(c('TNFA', 'MK12'), c('TNFA', 'MKO3'), 
                                                            c('LPS', 'MKO3'), c('POLYIC', 'MKO3'), c('IL1A', 'MKO3'),
                                                            c('INS', 'AKT1'), c('BDNF', 'AKT1'),
                                                            c('CONA', 'AKT1'), c('CONA', 'STAT1'),
@@ -69,7 +69,7 @@ annotations = read.table('../../../files/annotations/annotations_169_patients.cs
 
 # Hack for nicer annotation
 annotations$Group = as.character(annotations$Group)
-group_temp = list('GAL', 'H', 'U', 'U', 'IFNb', 'FTY', 'EGCG', 'NTZ')
+group_temp = list('GA', 'H', 'U', 'U', 'IFNb', 'FTY', 'EGCG', 'NTZ')
 names(group_temp) = c("Glatiramer", "Healthy", "Untreated", "PPMS", "Interferon B", "Fingolimod", "EGCG", "Natalizumab")
 
 for (i in 1:dim(annotations)[1]){
@@ -186,67 +186,52 @@ names(ListPhosphos)  <- DonorsWithPhospho
 # #######################################################################################################################################
 # # Function for wilcoxon-test
 # #######################################################################################################################################
-one_sample = function(DataList, annot, wilcoxon = TRUE){
-  res = data.frame(row.names = c('a', 'b', 'group', 'logFC', 'p.value'))
-  Temp = DataList[[1]]
-  iter_1 = colnames(Temp)
-  iter_2 = row.names(Temp)
-  pb = txtProgressBar(min = 0, max = length(iter_1)*length(iter_2), initial = 0)
-  for (i1 in iter_1){
-    for (i2 in iter_2){
-      if (i1 == i2){
-        next()
-      }
-      Y = as.matrix(sapply(names(DataList), FUN=function(d, a, b){DataList[[d]][a, b]}, a=i2, b=i1))
-      
-      for (g in unique(annot$Group)){
-        test = Y[row.names(annot)[which(annot$Group == g)],]
-        test = test[!is.na(test)]
-        if (length(test) == 0){next()}
-        
-        w = wilcox.test(test)
-        res[[(length(res)+1)]] = c(i1, i2, g, median(test), w$p.value)
-        
-      }
-      setTxtProgressBar(pb, (pb$getVal()+1))
+
+res = data.frame(row.names = c('a', 'b', 'group', 'logFC', 'p.value'))
+pb = txtProgressBar(min = 0, max = length(Stimuli)*length(Phosphos), initial = 0)
+for (stim in Stimuli){
+  for (phos in Phosphos){
+    if (stim == phos){
+      next()
     }
+    Y = as.matrix(sapply(names(ListPhosphos), FUN=function(d, a, b){ListPhosphos[[d]][a, b]}, b=phos, a=stim))
+      
+    for (g in unique(annotations$Group)){
+      test = Y[row.names(annotations)[which(annotations$Group == g)],]
+      test = test[!is.na(test)]
+      
+      if (length(test) == 0){next()}
+      
+      w = wilcox.test(test)
+      res[[(length(res)+1)]] = c(stim, phos, g, median(test), w$p.value)
+    }
+  setTxtProgressBar(pb, (pb$getVal()+1))
   }
-  res = as.data.frame(t(res))
-  res$logFC = as.numeric(as.character(res$logFC))
-  res$p.value = as.numeric(as.character(res$p.value))
-  res$adj.p.value = p.adjust(res$p.value, method='fdr')
-  res$log.p.value = -log10(res$adj.p.value)
-  res[['threshold']] = res$log.p.value > 1.3
-  g = ggplot(res, aes(x=logFC, y=log.p.value, colour=threshold)) + 
-    geom_point() + 
-    theme_bw() + 
-    facet_grid(~group) + 
-    scale_colour_manual(values=c('#95a3a6', '#fd3c06')) +
-    theme(legend.position='none')
-  return(list(plot=g, data=res))
+}
+res = as.data.frame(t(res))
+
+res$logFC = as.numeric(as.character(res$logFC))
+res$p.value = as.numeric(as.character(res$p.value))
+
+res$adj.p.value = res$p.value
+for (g in unique(annotations$Group)){
+  res[which(res$group == g),'adj.p.value'] = p.adjust(res[which(res$group == g),'adj.p.value'], method='fdr')
 }
 
-# #######################################################################################################################################
-# # Run one-sample tests
-# #######################################################################################################################################
-g1 = one_sample(ListPhosphos, annotations)
-# g1 = one_sample(ListPhospho_zs, annotations)
-# g2 = one_sample(ListPhosphos_n, annotations)
+res$log.p.value = -log10(res$adj.p.value)
+res[['threshold']] = res$log.p.value > 1.3
 
-# Compare with model interactions 
-# So far its still manual and crude, but maybe worth looking into...?
-temp = g1$data
-temp$interaction_in_model = FALSE
+res$interaction_in_model = FALSE
 for (g in names(model_interactions)){
   temp_model = model_interactions[[g]]
   for (i in 1:dim(temp_model)[1]){
-    temp[which(temp$b == as.character(temp_model[i, 1]) & temp$a == as.character(temp_model[i, 2]) & temp$group == g),'interaction_in_model'] = TRUE
+    res[which(res$a == as.character(temp_model[i, 1]) & res$b == as.character(temp_model[i, 2]) & res$group == g),'interaction_in_model'] = TRUE
   }
 }
 
-temp$group = factor(temp$group, c('H', 'EGCG', 'FTY', 'IFNb', 'GAL', 'NTZ', 'U'))
+res$group = factor(res$group, c('H', 'EGCG', 'FTY', 'IFNb', 'GA', 'NTZ', 'U'))
 
-g = ggplot(temp, aes(x=logFC, y=log.p.value, colour=interaction_in_model)) + 
+g = ggplot(res, aes(x=logFC, y=log.p.value, colour=interaction_in_model)) + 
   facet_grid(~group) + 
   geom_point(alpha=0.8) + 
   theme(legend.position='none') +
@@ -254,66 +239,122 @@ g = ggplot(temp, aes(x=logFC, y=log.p.value, colour=interaction_in_model)) +
   theme_bw()
 print(g)
 
-# ############################################################################################################################################
-# Compute Confusion matrices for the different groups
-# ############################################################################################################################################
-results_all = data.frame(row.names=c('Sensitivity', 'Specificity', 'Group'))
 
-for (cut_off in seq(.05, .95, 0.01)){
-  for (g in unique(g1$data$group)){
-    if (g == 'H'){next()}
-    if (g == 'U'){next()}
-    temp = g1$data[which(g1$data$group == g),]
-    temp$interaction = FALSE
-    temp_model = model_interactions[[g]]
-    for (i in 1:dim(temp_model)[1]){
-      temp[which(temp$b == as.character(temp_model[i, 1]) & temp$a == as.character(temp_model[i, 2]) & temp$group == g),'interaction'] = TRUE
-    }
-    temp$p.value.rank = rank(temp$adj.p.value, ties.method = 'average')
-    temp$tp = temp$p.value.rank < dim(temp)[1] * cut_off
-  
-    true_positives = length(which(temp$interaction & temp$tp))
-    false_positives = length(which(!temp$interaction & temp$tp))
-    false_negative = length(which(temp$interaction & !temp$tp))
-    true_negatives = length(which(!temp$interaction & !temp$tp))
-  
-  
-    Sensitivity = true_positives/(true_positives+false_negative)
-    Specificity = true_negatives/(true_negatives+false_positives)
-    
-    results_all[[(length(results_all)+1)]] = c(Sensitivity, 1-Specificity, g)
-  }
+# #############################################################################################################################################
+# nice Volcano plots
+# ############################################################################################################################################
+
+# split by group
+IFN = res[which(res$group == 'IFNb'),]
+EGCG = res[which(res$group == 'EGCG'),]
+FTY = res[which(res$group == 'FTY'),]
+GAL = res[which(res$group == 'GA'),]
+NTZ = res[which(res$group == 'NTZ'),]
+
+# make nice volcanos for each group
+plot_volcano = function(temp){
+  g = ggplot(temp, aes(x=logFC, y=log.p.value)) + 
+    geom_point(alpha=0.8, colour='#8EBAE5', stroke=0) + 
+    geom_point(data=temp[which(temp$interaction_in_model),], colour='#D85C41', size=2.1, stroke=0) + 
+    xlab('log(FC)') + ylab('-log10(pvalue)') +
+    xlim(-3,3) + ylim(0,5) +
+    theme_classic() +
+    geom_vline(xintercept = 0, linetype='dotted', alpha=.8) + 
+    geom_hline(yintercept = 2, linetype='dotted', alpha=.8)
+  return(g)
 }
 
-res = as.data.frame(t(results_all))
-res$Sensitivity = as.numeric(as.character(res$Sensitivity))
-res$Specificity = as.numeric(as.character((res$Specificity)))
-g = ggplot(res, aes(y=Sensitivity, x=Specificity, color=Group)) + geom_line() + xlim(0, 1) + ylim(0, 1) + geom_abline(slope = 1, intercept = 0, linetype=2) + theme_bw()
-print(g)
 
-cut_off=.2
-for (g in unique(g1$data$group)){
-  if (g == 'H'){next()}
-  if (g == 'U'){next()}
-  temp = g1$data[which(g1$data$group == g),]
-  temp$interaction = FALSE
-  temp_model = model_interactions[[g]]
-  for (i in 1:dim(temp_model)[1]){
-    temp[which(temp$b == as.character(temp_model[i, 1]) & temp$a == as.character(temp_model[i, 2]) & temp$group == g),'interaction'] = TRUE
-  }
-  temp$p.value.rank = rank(temp$adj.p.value, ties.method = 'average')
-  temp$tp = temp$p.value.rank < dim(temp)[1] * cut_off
-  
-  true_positives = length(which(temp$interaction & temp$tp))
-  false_positives = length(which(!temp$interaction & temp$tp))
-  false_negative = length(which(temp$interaction & !temp$tp))
-  true_negatives = length(which(!temp$interaction & !temp$tp))
-  
-  
-  Sensitivity = true_positives/(true_positives+false_negative)
-  Specificity = true_negatives/(true_negatives+false_positives)
-  print(g)
-  print(Sensitivity)
-  print(Specificity)
+g.IFN = ggplot(IFN, aes(x=logFC, y=log.p.value, color=interaction_in_model)) + 
+  geom_point(alpha=0.8, stroke=0) + 
+  geom_point(data=IFN[which(IFN$interaction_in_model),], size=3, show.legend = TRUE, stroke=0) + 
+  xlab('log(FC)') + ylab('-log10(pvalue)') +
+  xlim(-3,3) +
+  theme_classic() +
+  geom_vline(xintercept = 0, linetype='dotted', alpha=.8) +
+  geom_hline(yintercept = 2, linetype='dotted', alpha=.8) +
+  scale_color_manual('Interaction', values=c('#8EBAE5', '#D85C41'), labels=c('not in \n model', 'in model'))
 
-}
+
+
+
+g.EGCG = plot_volcano(EGCG)
+g.NTZ = plot_volcano(NTZ)
+g.GAL = plot_volcano(GAL)
+g.FTY = plot_volcano(FTY)
+
+
+# combine volcanos with cowplot in a nice grid
+library(cowplot)
+left_col <- plot_grid(g.NTZ, g.EGCG, g.GAL, g.FTY, labels = c('NTZ', 'EGCG', 'GA', 'FTY'), ncol=2, nrow=2, align='h', label_size = 10, hjust = c(-2, -1.3, -2.5, -2), vjust=c(2,1.8,1.8,1.9))
+
+pdf("../../../figures/figure_statistics.pdf", width=7, height=3.5, onefile = FALSE)
+
+plot_grid(g.IFN, left_col, labels = c('IFN', ''), ncol = 2, scale = c(0.85,1))
+
+dev.off()
+
+# # ############################################################################################################################################
+# # Compute Confusion matrices for the different groups
+# # ############################################################################################################################################
+# results_all = data.frame(row.names=c('Sensitivity', 'Specificity', 'Group'))
+# 
+# for (cut_off in seq(.05, .95, 0.01)){
+#   for (g in unique(g1$data$group)){
+#     if (g == 'H'){next()}
+#     if (g == 'U'){next()}
+#     temp = g1$data[which(g1$data$group == g),]
+#     temp$interaction = FALSE
+#     temp_model = model_interactions[[g]]
+#     for (i in 1:dim(temp_model)[1]){
+#       temp[which(temp$b == as.character(temp_model[i, 1]) & temp$a == as.character(temp_model[i, 2]) & temp$group == g),'interaction'] = TRUE
+#     }
+#     temp$p.value.rank = rank(temp$adj.p.value, ties.method = 'average')
+#     temp$tp = temp$p.value.rank < dim(temp)[1] * cut_off
+#   
+#     true_positives = length(which(temp$interaction & temp$tp))
+#     false_positives = length(which(!temp$interaction & temp$tp))
+#     false_negative = length(which(temp$interaction & !temp$tp))
+#     true_negatives = length(which(!temp$interaction & !temp$tp))
+#   
+#   
+#     Sensitivity = true_positives/(true_positives+false_negative)
+#     Specificity = true_negatives/(true_negatives+false_positives)
+#     
+#     results_all[[(length(results_all)+1)]] = c(Sensitivity, 1-Specificity, g)
+#   }
+# }
+# 
+# res = as.data.frame(t(results_all))
+# res$Sensitivity = as.numeric(as.character(res$Sensitivity))
+# res$Specificity = as.numeric(as.character((res$Specificity)))
+# g = ggplot(res, aes(y=Sensitivity, x=Specificity, color=Group)) + geom_line() + xlim(0, 1) + ylim(0, 1) + geom_abline(slope = 1, intercept = 0, linetype=2) + theme_bw()
+# print(g)
+# 
+# cut_off=.2
+# for (g in unique(g1$data$group)){
+#   if (g == 'H'){next()}
+#   if (g == 'U'){next()}
+#   temp = g1$data[which(g1$data$group == g),]
+#   temp$interaction = FALSE
+#   temp_model = model_interactions[[g]]
+#   for (i in 1:dim(temp_model)[1]){
+#     temp[which(temp$b == as.character(temp_model[i, 1]) & temp$a == as.character(temp_model[i, 2]) & temp$group == g),'interaction'] = TRUE
+#   }
+#   temp$p.value.rank = rank(temp$adj.p.value, ties.method = 'average')
+#   temp$tp = temp$p.value.rank < dim(temp)[1] * cut_off
+#   
+#   true_positives = length(which(temp$interaction & temp$tp))
+#   false_positives = length(which(!temp$interaction & temp$tp))
+#   false_negative = length(which(temp$interaction & !temp$tp))
+#   true_negatives = length(which(!temp$interaction & !temp$tp))
+#   
+#   
+#   Sensitivity = true_positives/(true_positives+false_negative)
+#   Specificity = true_negatives/(true_negatives+false_positives)
+#   print(g)
+#   print(Sensitivity)
+#   print(Specificity)
+# 
+# }
+
