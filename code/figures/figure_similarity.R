@@ -31,7 +31,7 @@ annot2[which(annot2$Group=='PPMS' & annot2$Treatment=='no'),'Group']='Untreated'
 annot2[which(annot2$Group=='PPMS' & annot2$Treatment!='no'),'Group']=annot2[which(annot2$Group=='PPMS' & annot2$Treatment!='no'),'Treatment']
 annot2[which(annot2$Group=='Gilenya'),'Group']='FTY'
 annot2[which(annot2$Group=='Fingolimod'),'Group']='FTY'
-annot2[which(annot2$Group=='Glatiramer'),'Group']='GAL'
+annot2[which(annot2$Group=='Glatiramer'),'Group']='GA'
 annot2[which(annot2$Group=='Interferon B'),'Group']='IFNb'
 annot2[which(annot2$Group=='Natalizumab'),'Group']='NTZ'
 annot2[which(annot2$Disease.Subtype == ''), 'Disease.Subtype'] = 'healthy'
@@ -187,7 +187,7 @@ sub_all$Grid = 'All'
 plot_df_2 = rbind(sub_same_group_similarity, sub_self_similarity, sub_IFN, sub_all)
 
 ## Reorder Groups
-sorted_groups = c('All', 'Self', 'Healthy', 'EGCG', 'FTY', 'IFNb', 'GAL', 'NTZ', 'RR Untreated', 'Untreated')
+sorted_groups = c('All', 'Self', 'Healthy', 'EGCG', 'FTY', 'IFNb', 'GA', 'NTZ', 'RR Untreated', 'Untreated')
 plot_df_2$Group = factor(plot_df_2$Group, sorted_groups)
 
 boxplot_similarity = ggplot(plot_df_2) + 
