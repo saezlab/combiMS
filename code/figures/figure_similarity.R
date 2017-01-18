@@ -35,6 +35,8 @@ annot2[which(annot2$Group=='Glatiramer'),'Group']='GAL'
 annot2[which(annot2$Group=='Interferon B'),'Group']='IFNb'
 annot2[which(annot2$Group=='Natalizumab'),'Group']='NTZ'
 annot2[which(annot2$Disease.Subtype == ''), 'Disease.Subtype'] = 'healthy'
+annot2[which(annot2$Disease.Subtype == 'SP'), 'Disease.Subtype'] = substring(annot2[which(annot2$Disease.Subtype == 'SP'), 'Category'], 1, 2)
+annot2[which(annot2$Disease.Subtype == 'PR'), 'Disease.Subtype'] = substring(annot2[which(annot2$Disease.Subtype == 'PR'), 'Category'], 1, 2)
 annot=annot2
 rm(annot2)
 
@@ -78,7 +80,7 @@ plot_df$Model_Interactions = factor(plot_df$Model_Interactions, levels = c(level
 # reorder for legend
 plot_df$value = factor(plot_df$value, levels = c('Center', 'CH', 'KI', 'IB', 'UZ', '',
                                                  'Condition', 'Healthy', 'Treated', 'Untreated', ' ',
-                                                 'Subtype', 'healthy', 'CIS', 'RR', 'PR', 'PP', 'SP', '  ',
+                                                 'Subtype', 'healthy', 'CIS', 'RR', 'PP', '  ',
                                                  'Interaction', 'active', 'inactive'))
 
 # #########################################################################################################################
@@ -90,12 +92,12 @@ heatmap_median_models = ggplot(plot_df, aes(x=Model_Interactions, y=Patients)) +
   geom_tile(aes(fill=value)) + 
   xlab('Model Interactions (1-186)') + ylab('Patients (1-169)') +
   theme(strip.background=element_blank(), strip.text= element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(),
-        axis.ticks = element_blank(), axis.line.y = element_blank(), legend.text = element_text(size=5), axis.line.x = element_blank(),
-        axis.text = element_text(size=5),
+        axis.ticks = element_blank(), axis.line.y = element_blank(), legend.text = element_text(size=6), axis.line.x = element_blank(),
+        axis.title = element_text(size=9),
         panel.spacing.x = unit(1, 'pt')) + 
-  scale_fill_manual(values=c("white", '#DB7D59', '#EAB983', '#515D82', '#8CA889', 'white',
+  scale_fill_manual(values=c("white", '#2D7F83', '#B65256', '#D0D95C', '#9B91C1', 'white',
                              "white", '#407FB7', '#8DC060', '#FABE50','white',
-                             "white", '#407FB7', '#ED6A5A', '#F4F1BB', '#9BC1BC', '#5CA4A9', '#E6EBE0','white',
+                             "white", '#407FB7', '#E69679', '#89CCCF','#A8859E', 'white',
                              "white", 'black', 'grey90'),
                     drop=FALSE) +
   guides(fill=guide_legend(ncol=1, keywidth = .6, keyheight = .6, title=''))
@@ -182,13 +184,13 @@ sub_all$Grid = 'All'
 # So non-overlapping notches strongly suggest that medians are significantly different
 # This is the case for RR untreated vis RR IFNb
 
-plot_df = rbind(sub_same_group_similarity, sub_self_similarity, sub_IFN, sub_all)
+plot_df_2 = rbind(sub_same_group_similarity, sub_self_similarity, sub_IFN, sub_all)
 
 ## Reorder Groups
 sorted_groups = c('All', 'Self', 'Healthy', 'EGCG', 'FTY', 'IFNb', 'GAL', 'NTZ', 'RR Untreated', 'Untreated')
-plot_df$Group = factor(plot_df$Group, sorted_groups)
+plot_df_2$Group = factor(plot_df_2$Group, sorted_groups)
 
-boxplot_similarity = ggplot(plot_df) + 
+boxplot_similarity = ggplot(plot_df_2) + 
   geom_boxplot(notch=T,aes(x=Group, y=Similarity, fill=Group), outlier.alpha = 0.2, outlier.stroke = 0) +
   theme_classic() + 
   scale_fill_manual(values=c('#ECEDED', '#ECEDED', '#407FB7', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#FDD48F', '#FABE50')) + 
