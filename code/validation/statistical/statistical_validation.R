@@ -254,26 +254,29 @@ NTZ = res[which(res$group == 'NTZ'),]
 # make nice volcanos for each group
 plot_volcano = function(temp){
   g = ggplot(temp, aes(x=logFC, y=log.p.value)) + 
-    geom_point(alpha=0.8, colour='#8EBAE5', stroke=0) + 
-    geom_point(data=temp[which(temp$interaction_in_model),], colour='#D85C41', size=2.1, stroke=0) + 
-    xlab('log(FC)') + ylab('-log10(pvalue)') +
+    geom_point(alpha=0.8, colour='#8EBAE5', stroke=0, size=1) + 
+    geom_point(data=temp[which(temp$interaction_in_model),], colour='#D85C41', size=2, stroke=0) + 
+    xlab('log(FC)') + ylab(expression('Adj. p-value (-log'['10']*')')) +
     xlim(-3,3) + ylim(0,5) +
     theme_classic() +
+    theme(axis.title = element_text(size=8)) + 
     geom_vline(xintercept = 0, linetype='dotted', alpha=.8) + 
-    geom_hline(yintercept = 2, linetype='dotted', alpha=.8)
+    geom_hline(yintercept = 2, linetype='dotted', alpha=.8) +
+    geom_hline(yintercept = 1.3, linetype='dotted', alpha=.5)
   return(g)
 }
 
 
 g.IFN = ggplot(IFN, aes(x=logFC, y=log.p.value, color=interaction_in_model)) + 
   geom_point(alpha=0.8, stroke=0) + 
-  geom_point(data=IFN[which(IFN$interaction_in_model),], size=3, show.legend = TRUE, stroke=0) + 
-  xlab('log(FC)') + ylab('-log10(pvalue)') +
+  geom_point(data=IFN[which(IFN$interaction_in_model),], size=2.5, show.legend = TRUE, stroke=0) + 
+  xlab('log(FC)') + ylab(expression('Adj. p-value (-log'['10']*')')) +
   xlim(-3,3) +
   theme_classic() +
   geom_vline(xintercept = 0, linetype='dotted', alpha=.8) +
   geom_hline(yintercept = 2, linetype='dotted', alpha=.8) +
-  scale_color_manual('Interaction', values=c('#8EBAE5', '#D85C41'), labels=c('not in \n model', 'in model'))
+  geom_hline(yintercept = 1.3, linetype='dotted', alpha=.5) +
+  scale_color_manual('Interaction', values=c('#8EBAE5', '#D85C41'), labels=c('not in\nmodel', 'in model'))
 
 
 
