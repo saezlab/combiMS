@@ -232,7 +232,7 @@ left_col <- plot_grid(g.NTZ, g.EGCG, g.GAL, g.FTY, labels = c('NTZ', 'EGCG', 'GA
 
 pdf("../../../figures/figure_statistics.pdf", width=7, height=3.5, onefile = FALSE)
 
-plot_grid(g.IFN, left_col, labels = c('IFN', ''), ncol = 2, scale = c(0.85,1))
+plot_grid(g.IFN, left_col, labels = c('IFNb', ''), ncol = 2, scale = c(0.85,1))
 
 dev.off()
 
