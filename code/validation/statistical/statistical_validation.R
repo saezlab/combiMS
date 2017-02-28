@@ -76,43 +76,6 @@ for (i in 1:dim(annotations)[1]){
   annotations[i, 'Group'] = group_temp[[annotations[i, 'Group']]]
 }
 
-# #####################################################################################################################################
-# Convert pkn into igraph object and find all possible Stimulus-Readout pairs
-# #####################################################################################################################################
-
-# pknmodel = readSIF('../../../files/combiMS_pkn_cut.sif')
-# cnolist = readMIDAS('../../../data/phosphos_normalised/CH003.csv')
-# cnolist = makeCNOlist(cnolist, subfield = FALSE)
-# 
-# # convert to igraph object
-# edges <- pknmodel$interMat
-# adjacency = matrix(0, nrow(edges), nrow(edges))
-# for(i in 1:ncol(edges)){
-#   startIdx = which(edges[, i]==-1)
-#   endIdx = which(edges[, i]==1)
-#   
-#   adjacency[startIdx, endIdx] = 1
-# }
-# rownames(adjacency) <- colnames(adjacency) <- rownames(edges)
-# 
-# netGraph <- graph.adjacency(adjacency, mode = "directed")
-# 
-# connectivity = matrix(data=NA, ncol=length(cnolist$namesSignals), nrow=length(cnolist$namesStimuli))
-# row.names(connectivity) = toupper(cnolist$namesStimuli)
-# colnames(connectivity) = cnolist$namesSignals
-# 
-# for (stim in toupper(cnolist$namesStimuli)){
-#   for (sig in cnolist$namesSignals){
-#     if (length(all_shortest_paths(netGraph, from=stim, to=sig)$res) == 0){
-#       connectivity[which(row.names(connectivity) == stim), which(colnames(connectivity) == sig)] = 0
-#     } else {
-#       connectivity[which(row.names(connectivity) == stim), which(colnames(connectivity) == sig)] = length(all_shortest_paths(netGraph, from=stim, to=sig)$res[[1]])
-#     }
-#   }
-# }
-# colnames(connectivity)[13] = 'MK03'
-# possible_interactions = melt(connectivity)
-# possible_interactions[['interaction']] = paste(possible_interactions$Var1, possible_interactions$Var2, sep='_')
 
 # #######################################################################################################################################
 # # Prepare Metadata, such as Stimuli and Phospho-information
@@ -138,50 +101,14 @@ ListPhosphos = lapply(DonorsWithPhospho, FUN = function(donor){
   Temp = sapply(1:dim(Temp)[2], FUN = function(column){Temp[,column] = Temp[,column] - Temp[1,column]})
   ## Delete medium condition
   Temp = Temp[-1,]
-  ## Compute Z-scores
-  # Temp = sapply(1:dim(Temp)[2], FUN = function(column){Temp[,column] = (Temp[,column] - mean(Temp[,column], na.rm=T))/sd(Temp[,column], na.rm=T)})
   ## name rows and columns
   rownames(Temp) = Stimuli
   colnames(Temp) = Phosphos
   return(Temp)
 })
-# ################# 
-# ListPhospho_zs = lapply(DonorsWithPhospho, FUN = function(donor){
-#   ## Load Data
-#   Temp = readMIDAS(paste0("../../../data/phosphos_merged/", donor, '_phosphos_midas.csv'), verbose=F)$dataMatrix;
-#   Temp = Temp[-1,]
-#   Temp = as.matrix(Temp[,which(grepl('DV:', colnames(Temp)))]);
-#   Temp = Temp[,-c(18,19)]
-#   ## Log-transform data
-#   Temp = log(Temp, base=2)
-#   ## Compute fold change compared to the medium condition (first row)
-#   Temp = sapply(1:dim(Temp)[2], FUN = function(column){Temp[,column] = Temp[,column] - Temp[1,column]})
-#   ## Delete medium condition
-#   Temp = Temp[-1,]
-#   ## Compute Z-scores
-#   Temp = sapply(1:dim(Temp)[2], FUN = function(column){Temp[,column] = (Temp[,column] - mean(Temp[,column], na.rm=T))/sd(Temp[,column], na.rm=T)})
-#   ## name rows and columns
-#   rownames(Temp) = Stimuli
-#   colnames(Temp) = Phosphos
-#   return(Temp)
-# })
 
-# # Load normalised phospho-data
-# ListPhosphos_n = lapply(DonorsWithPhospho, FUN = function(donor){
-#   ## Load Data
-#   Temp = readMIDAS(paste("~/Documents/combiMS/data/phosphos_normalised/", donor, '.csv', sep=""), verbose=F)$dataMatrix;
-#   Temp = as.matrix(Temp[,which(grepl('DV:', colnames(Temp)))]);
-#   ## Delete medium condition
-#   Temp = Temp[-1,]
-#   ## name rows and columns
-#   rownames(Temp) = Stimuli
-#   colnames(Temp) = Phosphos
-#   return(Temp)
-# })
-# 
 names(ListPhosphos)  <- DonorsWithPhospho
-# names(ListPhospho_zs)  <- DonorsWithPhospho
-# names(ListPhosphos_n) <- DonorsWithPhospho
+
 
 # #######################################################################################################################################
 # # Function for wilcoxon-test
@@ -231,18 +158,10 @@ for (g in names(model_interactions)){
 
 res$group = factor(res$group, c('H', 'EGCG', 'FTY', 'IFNb', 'GA', 'NTZ', 'U'))
 
-g = ggplot(res, aes(x=logFC, y=log.p.value, colour=interaction_in_model)) + 
-  facet_grid(~group) + 
-  geom_point(alpha=0.8) + 
-  theme(legend.position='none') +
-  scale_colour_manual(values=c('#d8dcd6', '#fd3c06')) +
-  theme_bw()
-print(g)
 
-
-# #############################################################################################################################################
-# nice Volcano plots
-# ############################################################################################################################################
+# #######################################################################################################################################
+# Fisher's exact test to test the ratio between statistically significant yes/no and interaction in model yes/no
+# #######################################################################################################################################
 
 # split by group
 IFN = res[which(res$group == 'IFNb'),]
@@ -250,6 +169,26 @@ EGCG = res[which(res$group == 'EGCG'),]
 FTY = res[which(res$group == 'FTY'),]
 GAL = res[which(res$group == 'GA'),]
 NTZ = res[which(res$group == 'NTZ'),]
+
+test_with_fisher = function(df){
+  matrix_test = matrix(c(length(which((df$threshold == TRUE) & df$interaction_in_model == TRUE)),
+                         length(which((df$threshold == FALSE) & df$interaction_in_model == TRUE)),
+                         length(which((df$threshold == TRUE) & df$interaction_in_model == FALSE)),
+                         length(which((df$threshold == FALSE) & df$interaction_in_model == FALSE))), nrow=2)
+  fisher_res = fisher.test(matrix_test)
+  print(matrix_test)
+  return(fisher_res)
+}
+
+test_with_fisher(IFN)
+test_with_fisher(GAL)
+test_with_fisher(NTZ)
+test_with_fisher(FTY)
+test_with_fisher(EGCG)
+
+# #############################################################################################################################################
+# nice Volcano plots
+# ############################################################################################################################################
 
 # make nice volcanos for each group
 plot_volcano = function(temp){
@@ -297,67 +236,41 @@ plot_grid(g.IFN, left_col, labels = c('IFN', ''), ncol = 2, scale = c(0.85,1))
 
 dev.off()
 
-# # ############################################################################################################################################
-# # Compute Confusion matrices for the different groups
-# # ############################################################################################################################################
-# results_all = data.frame(row.names=c('Sensitivity', 'Specificity', 'Group'))
-# 
-# for (cut_off in seq(.05, .95, 0.01)){
-#   for (g in unique(g1$data$group)){
-#     if (g == 'H'){next()}
-#     if (g == 'U'){next()}
-#     temp = g1$data[which(g1$data$group == g),]
-#     temp$interaction = FALSE
-#     temp_model = model_interactions[[g]]
-#     for (i in 1:dim(temp_model)[1]){
-#       temp[which(temp$b == as.character(temp_model[i, 1]) & temp$a == as.character(temp_model[i, 2]) & temp$group == g),'interaction'] = TRUE
-#     }
-#     temp$p.value.rank = rank(temp$adj.p.value, ties.method = 'average')
-#     temp$tp = temp$p.value.rank < dim(temp)[1] * cut_off
-#   
-#     true_positives = length(which(temp$interaction & temp$tp))
-#     false_positives = length(which(!temp$interaction & temp$tp))
-#     false_negative = length(which(temp$interaction & !temp$tp))
-#     true_negatives = length(which(!temp$interaction & !temp$tp))
-#   
-#   
-#     Sensitivity = true_positives/(true_positives+false_negative)
-#     Specificity = true_negatives/(true_negatives+false_positives)
-#     
-#     results_all[[(length(results_all)+1)]] = c(Sensitivity, 1-Specificity, g)
-#   }
-# }
-# 
-# res = as.data.frame(t(results_all))
-# res$Sensitivity = as.numeric(as.character(res$Sensitivity))
-# res$Specificity = as.numeric(as.character((res$Specificity)))
-# g = ggplot(res, aes(y=Sensitivity, x=Specificity, color=Group)) + geom_line() + xlim(0, 1) + ylim(0, 1) + geom_abline(slope = 1, intercept = 0, linetype=2) + theme_bw()
-# print(g)
-# 
-# cut_off=.2
-# for (g in unique(g1$data$group)){
-#   if (g == 'H'){next()}
-#   if (g == 'U'){next()}
-#   temp = g1$data[which(g1$data$group == g),]
-#   temp$interaction = FALSE
-#   temp_model = model_interactions[[g]]
-#   for (i in 1:dim(temp_model)[1]){
-#     temp[which(temp$b == as.character(temp_model[i, 1]) & temp$a == as.character(temp_model[i, 2]) & temp$group == g),'interaction'] = TRUE
-#   }
-#   temp$p.value.rank = rank(temp$adj.p.value, ties.method = 'average')
-#   temp$tp = temp$p.value.rank < dim(temp)[1] * cut_off
-#   
-#   true_positives = length(which(temp$interaction & temp$tp))
-#   false_positives = length(which(!temp$interaction & temp$tp))
-#   false_negative = length(which(temp$interaction & !temp$tp))
-#   true_negatives = length(which(!temp$interaction & !temp$tp))
-#   
-#   
-#   Sensitivity = true_positives/(true_positives+false_negative)
-#   Specificity = true_negatives/(true_negatives+false_positives)
-#   print(g)
-#   print(Sensitivity)
-#   print(Specificity)
-# 
-# }
 
+# #####################################################################################################################################
+# Convert pkn into igraph object and find all possible Stimulus-Readout pairs
+# #####################################################################################################################################
+
+# pknmodel = readSIF('../../../files/combiMS_pkn_cut.sif')
+# cnolist = readMIDAS('../../../data/phosphos_normalised/CH003.csv')
+# cnolist = makeCNOlist(cnolist, subfield = FALSE)
+# 
+# # convert to igraph object
+# edges <- pknmodel$interMat
+# adjacency = matrix(0, nrow(edges), nrow(edges))
+# for(i in 1:ncol(edges)){
+#   startIdx = which(edges[, i]==-1)
+#   endIdx = which(edges[, i]==1)
+#   
+#   adjacency[startIdx, endIdx] = 1
+# }
+# rownames(adjacency) <- colnames(adjacency) <- rownames(edges)
+# 
+# netGraph <- graph.adjacency(adjacency, mode = "directed")
+# 
+# connectivity = matrix(data=NA, ncol=length(cnolist$namesSignals), nrow=length(cnolist$namesStimuli))
+# row.names(connectivity) = toupper(cnolist$namesStimuli)
+# colnames(connectivity) = cnolist$namesSignals
+# 
+# for (stim in toupper(cnolist$namesStimuli)){
+#   for (sig in cnolist$namesSignals){
+#     if (length(all_shortest_paths(netGraph, from=stim, to=sig)$res) == 0){
+#       connectivity[which(row.names(connectivity) == stim), which(colnames(connectivity) == sig)] = 0
+#     } else {
+#       connectivity[which(row.names(connectivity) == stim), which(colnames(connectivity) == sig)] = length(all_shortest_paths(netGraph, from=stim, to=sig)$res[[1]])
+#     }
+#   }
+# }
+# colnames(connectivity)[13] = 'MK03'
+# possible_interactions = melt(connectivity)
+# possible_interactions[['interaction']] = paste(possible_interactions$Var1, possible_interactions$Var2, sep='_')
