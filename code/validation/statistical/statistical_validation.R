@@ -244,16 +244,17 @@ all_groups = rbind(IFN, EGCG, FTY, GAL, NTZ)
 
 all_groups$group = factor(all_groups$group, c('IFNb', 'NTZ', 'FTY', 'GA', 'EGCG'))  
 
-g = ggplot(all_groups, aes(x=logFC, y=log.p.value, color=interaction_in_model, shape=factor(group))) + 
-  geom_point(alpha=0.8, stroke=.5) + 
-  geom_point(data=all_groups[which(all_groups$interaction_in_model),], size=2.5, show.legend = TRUE, stroke=.5) + 
-  xlab(expression('log'['2']*'(FC)')) + ylab(expression('Adj. p-value (-log'['10']*')')) +
+g = ggplot(all_groups, aes(x=logFC, y=log.p.value, color=interaction_in_model, fill=interaction_in_model, shape=factor(group))) + 
+  geom_point(alpha=0.8, stroke=0.5) + 
+  geom_point(data=all_groups[which(all_groups$interaction_in_model),], size=2.5, show.legend = TRUE, stroke=0.5) + 
+  xlab(expression('log'['2']*'(FC)')) + ylab(expression('-log'['10']*'(Adj. p-value)')) +
   xlim(-3,3) +
   theme_classic() +
   geom_vline(xintercept = 0, linetype='dotted', alpha=.8) +
   geom_hline(yintercept = 2, linetype='dotted', alpha=.8) +
   geom_hline(yintercept = 1.3, linetype='dotted', alpha=.5) +
-  scale_shape_discrete('Group', solid=T) +
+  scale_shape_manual('Subgroup', values=c(21, 22, 23, 24, 25)) +
+  scale_fill_manual(values=c('#8EBAE5', '#D85C41'), guide=FALSE) +
   scale_color_manual('Interaction', values=c('#8EBAE5', '#D85C41'), labels=c('not in\nmodel', 'in model'))
 
 
@@ -266,7 +267,7 @@ g1 = ggplot(all_groups, aes(x=log.p.value, colour=interaction_in_model, fill=int
   geom_density() + 
   facet_wrap(~group, ncol=1, scales = "free") +
   theme_classic() + theme(legend.position='none', axis.text=element_text(size=6)) + 
-  xlab(expression('Adj. p-value (-log'['10']*')')) + ylab('Density') + 
+  xlab(expression('-log'['10']*'(Adj. p-value)')) + ylab('Density') + 
   scale_color_manual('Interaction', values=c('#8EBAE5','black', '#D85C41'), labels=c('not in\nmodel', 'in model', 'none')) +
   theme(strip.background=element_blank(), strip.text.x = element_blank()) +
   scale_fill_manual('Interaction', values=alpha(c( '#8EBAE5', 'black', '#D85C41'),0.3), labels=c('not in\nmodel', 'in model', 'none')) +
@@ -282,6 +283,3 @@ pdf("../../../figures/figure_statistics.pdf", width=7, height=3.5, onefile = FAL
 plot_grid(g, g1, labels = c('A', 'B'), ncol = 2)
 
 dev.off()
-
-
-

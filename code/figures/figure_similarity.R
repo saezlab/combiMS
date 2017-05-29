@@ -81,7 +81,7 @@ plot_df$Model_Interactions = factor(plot_df$Model_Interactions, levels = c(level
 plot_df$value = factor(plot_df$value, levels = c('Center', 'CH', 'KI', 'IB', 'UZ', '',
                                                  'Condition', 'Healthy', 'Treated', 'Untreated', ' ',
                                                  'Subtype', 'healthy', 'CIS', 'RR', 'PP', '  ',
-                                                 'Interaction', 'active', 'inactive'))
+                                                 'Reaction', 'active', 'inactive'))
 
 # #########################################################################################################################
 # Plot as Ggplot heatmap
@@ -90,7 +90,7 @@ plot_df$value = factor(plot_df$value, levels = c('Center', 'CH', 'KI', 'IB', 'UZ
 heatmap_median_models = ggplot(plot_df, aes(x=Model_Interactions, y=Patients)) + 
   facet_grid(~split, scales = "free_x", space='free', margins=FALSE) + 
   geom_tile(aes(fill=value)) + 
-  xlab('Model Interactions (1-186)') + ylab('Patients (1-169)') +
+  xlab('Model Reactions (1-186)') + ylab('Patients (1-169)') +
   theme(strip.background=element_blank(), strip.text= element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(),
         axis.ticks = element_blank(), axis.line.y = element_blank(), legend.text = element_text(size=6), axis.line.x = element_blank(),
         axis.title = element_text(size=9),

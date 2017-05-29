@@ -26,19 +26,19 @@ library(cowplot) # Version 0.6.2
 ## READ DATA #######################################################################################################
 
 ## Set working directory - make sure to update this line for use on your own computer
-setwd('~/Documents/combiMS/')
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 ## Vector with patients to include into analysis
-Patients = as.character(read.csv("./files/annotations_169_patients.csv")$ID)
+Patients = as.character(read.csv("../../files/annotations/annot169pat_v2.csv")$ID)
 
-####################################################################################################################
+###################################################################################################################
 ## merged raw data
 
 ## Function to read the raw merged data, yield matrix as output
 read_phospho_data_raw_merged <- function(Patient){
   
   ## Read MIDAS file and turn it into CNO list
-  M = readMIDAS(paste("./data/phosphos_merged/", Patient, "_phosphos_midas.csv", sep=""), verbose=F)
+  M = readMIDAS(paste("../../data/phosphos_merged/", Patient, "_phosphos_midas.csv", sep=""), verbose=F)
   CNO_List = makeCNOlist(M, subfield = T, verbose=F)
   
   ## Extract Data from CNOlist (wihtout BSA and PE, which were used as internal technical control)
@@ -102,7 +102,7 @@ Matrix_FC[, which(Stimuli == 'medium')] = rep(0, dim(Matrix_FC)[1])
 read_phospho_data_normalised <- function(Patient){
   
   ## Read MIDAS file and turn it into CNO list
-  M = readMIDAS(paste("./data/phosphos_normalised/", Patient, ".csv", sep=""), verbose=F)
+  M = readMIDAS(paste("../../data/phosphos_normalised/", Patient, ".csv", sep=""), verbose=F)
   CNO_List = makeCNOlist(M, subfield = T, verbose=F)
   
   ## Extract Data from CNOlist
@@ -215,17 +215,21 @@ plotBoxplot = function(Matrix, ylim, ylabel){
   
   ## Plot in ggplot Object
   p = ggplot(Melted, aes(x = Phospho, y = Value)) +
-    theme_bw() + xlab("") + ylab(ylabel) + ylim(ylim) + theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.border = element_blank(), axis.line.x = element_line(), axis.line.y = element_line()) + 
+    theme_classic() + xlab("") + ylab(ylabel) + ylim(ylim) + theme(panel.grid.major=element_blank(), 
+                                                                   panel.grid.minor=element_blank(), 
+                                                                   panel.border = element_blank(), 
+                                                                   axis.line.x = element_line(), axis.line.y = element_line()) + 
     ## Tilted x Axis ticks
-    theme(axis.text.x = element_text(family = 'sans', size=8, angle = 45, hjust = 1), axis.title.y=element_text(family='sans', size=8), axis.text.y=element_text(family='sans', size=8)) +
+    theme(axis.text.x = element_text(family = 'sans', size=8, angle = 45, hjust = 1), 
+          axis.title.y=element_text(family='sans', size=8), axis.text.y=element_text(family='sans', size=8)) +
     ## Remove Outliers from the boxplots
     geom_boxplot(outlier.shape=NA) + 
     ## Jitter data points on boxplots
-    geom_point(position=position_jitter(width=0.5), colour='black', alpha=0.2, size=0.01, shape=16)
+    geom_point(position=position_jitter(width=0.2), colour='black', alpha=0.2, size=0.01, shape=16)
   
   ## Plot Patient KI044 on top
   Sub_Melted = subset(Melted, Melted$KI044 == TRUE)
-  p = p + geom_point(data= Sub_Melted, colour = 'orange', position = position_jitter(width=0.2), size= .25)
+  p = p + geom_point(data= Sub_Melted, colour = 'orange', position = position_jitter(width=0.15), size= .25)
   
   ## Output
   return(p)
@@ -236,16 +240,14 @@ plotBoxplot = function(Matrix, ylim, ylabel){
 ####################################################################################################################
 ## PLOT BOXPLOTS ###################################################################################################
 
-## Divert output into pdf
-pdf("./figures/figure_data_normalisation.pdf", width=7, height=5.6, onefile = FALSE)
 ####################################################################################################################
 ## Panel A: log2 Data
 ####################################################################################################################
-p1 = plotBoxplot(Matrix_log, ylim=c(6, 16), ylabel='log2(AUF)')
+p1 = plotBoxplot(Matrix_log, ylim=c(6, 16), ylabel=expression('log'['2']*'(MFI)'))
 ####################################################################################################################
 ## Panel B: log2 FC
 ####################################################################################################################
-p2 = plotBoxplot(Matrix_FC, ylim=c(-7,7), ylabel='log2(Fold Change)')
+p2 = plotBoxplot(Matrix_FC, ylim=c(-7,7), ylabel=expression('log'['2']*'(Fold Change)'))
 ####################################################################################################################
 ## Panel C: Hill transformed
 ####################################################################################################################
@@ -254,7 +256,7 @@ p3 = plotBoxplot(Matrix_Hill, ylim=c(-1,1), ylabel='Normalized Value')
 ## PLOT BARPLOT ####################################################################################################
 
 ## Transform into Dataframe
-Melted = melt(Regulation)
+Melted = melt(Regulation*100)
 names(Melted) = c('Significance', 'Phospho', 'Value')
 
 ## Relevel according to mean
@@ -264,7 +266,7 @@ Melted$cut = c(rep('Phospho-Proteins', 51), rep('Total',3))
 
 p4 = ggplot(Melted, aes(x = Phospho, y = Value, fill = Significance)) + 
   geom_bar(stat='identity', alpha=0.6) + 
-  xlab("") + ylab("Percentage") + 
+  xlab("") + ylab("Percentage [%]") + 
   scale_fill_manual(values = c('steelblue1', 'gold', 'grey75')) +
   facet_grid(~cut, scales = "free_x", space='free', margins=F) +
   theme_classic() + theme(strip.background=element_blank(), strip.text.x = element_blank()) + 
@@ -276,6 +278,9 @@ p4 = ggplot(Melted, aes(x = Phospho, y = Value, fill = Significance)) +
 ####################################################################################################################
 ## PLOT ALL WITH COWPLOT ###########################################################################################
 ####################################################################################################################
+
+## Divert output into pdf
+pdf("../../figures/figure_data_normalisation.pdf", width=7, height=5.6, onefile = FALSE)
 
 plot_grid(p1, p2, p3, p4, labels=c('A', 'B', 'C', 'D'))
 
