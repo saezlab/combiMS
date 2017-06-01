@@ -8,21 +8,32 @@
 # **************************************************
 # ************which phenotype do we want to map on top of model?
 # **************************************************
-thisMode='mean'
-phenotypeNwsFigure_folder='/Users/marti/Documents/R/combiMS/phenotypeNws/'
-phenotypes=c('Healthy','MS','PPMS','RRMS','Gilenya','IFNb','Copaxone','EGCG','Tysabri')
-i=1
-thisPhenotype=phenotypes[i]
-interactionWeights=read.table(paste0(phenotypeNwsFigure_folder,thisPhenotype,thisMode,'.csv'),sep=',')
 
+# *************** load packages
+library(CellNOptR)
+
+# *************** set working directory for relative paths
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+# *************** created by the file phenotypeNetwork.R
+thisMode='median'
+phenotypeNwsFigure_folder='../../files/group_models/'
+phenotypes=c('Healthy',# 'MS','PPMS','RRMS',
+             'Gilenya','IFNb','Copaxone','EGCG','Tysabri')
+for (i in 1:length(phenotypes)){
+thisPhenotype=phenotypes[i]
+cat(paste0("*********Calculating the network files for: ", thisPhenotype, '\n'))
+
+
+interactionWeights=read.table(paste0(phenotypeNwsFigure_folder,thisPhenotype,thisMode,'.csv'),sep=',')
 
 
 # **************************************************
 # ************load anotation to map patients to groups
 # **************************************************
-data_folder="/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/normalized/secondRoundProcessedMidas/"
+data_folder="../../data/phosphos_processed/"
 filenames=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-annot=read.csv("/Users/marti/Documents/R/combiMS/modelling/annot169pat_v2.csv",header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
+annot=read.csv("../../files/annotations/annot169pat_v2.csv",header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
 numPat=length(filenames)
 filenames2=filenames
 for (j in 1:numPat){
@@ -37,19 +48,20 @@ annot2$Category[which(annot2$Category=='PPMS fast')]='PPMS'
 #test if all 169 are correctly labeled
 length(which(annot2$Category=='PPMS')) + length(which(annot2$Category=='RRMS')) + length(which(annot2$Category=='healthy'))
 length(which(annot2$Category=='RRMS' & annot2$condition=='Untreated')) + length(which(annot2$Category=='PPMS' & annot2$condition=='Untreated')) + length(which(annot2$condition=='Treated')) + length(which(annot2$condition=='Healthy'))
+
 # *************************************************
 # ************load model and midas for annotation
 # **************************************************
 patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-full_model_path='/Users/marti/Documents/R/combiMS/combiMSplane.sif'
-model_path='/Users/marti/Documents/R/combiMS/combiMSplaneCUT.sif'
+full_model_path='../../files/model/combiMSplane.sif'
+model_path='../../files/model/combiMSplaneCUT.sif'
 fileName=patientData[1]
 midas=CNOlist(paste(data_folder,fileName,sep=""))
 model=readSIF(model_path)
 full_model=readSIF(full_model_path)
 numInteractions=length(model$reacID)
 sprintf("*********After compressing: %s nodes and %s reactions",length(model$namesSpecies),numInteractions)
-
+# [1] "*********After compressing: 83 nodes and 186 reactions"
 
 
 # **************************************************
@@ -124,7 +136,7 @@ colnames(interactionWeightsRewriten)=c('weight','start','end','id','type')
 #if phenotype is drug, add defective interactions
 drugs=c('Gilenya','IFNb','Copaxone','EGCG','Tysabri')
 if(thisPhenotype %in% drugs){
-drugScores_folder='/Users/marti/Documents/R/combiMS/drugScores/'
+drugScores_folder='../../files/drugScores/'
 fileName=paste0(drugScores_folder,thisPhenotype,'median',".csv")
 drugScores=read.csv(fileName,header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
 interactionWeightsRewriten[which(rownames(interactionWeights) %in% rownames(drugScores)),6]='yes'
@@ -145,11 +157,12 @@ warning(length(which(defectiveInts %in% inactiveInts)),' of ',length(defectiveIn
 if(thisMode=='median'){
 interactionWeightsRewriten=interactionWeightsRewriten[-which(interactionWeightsRewriten$weight==0),]
 }
+
 # **************************************************
 #********save
 # **************************************************
 write.csv(interactionWeightsRewriten,paste0(phenotypeNwsFigure_folder,thisPhenotype,'Weights','Median','.csv'),quote=F)
-
+}
 # **************************************************
 #********create a table of node properties
 # **************************************************
