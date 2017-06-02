@@ -8,26 +8,29 @@
 #library(ggplot2)
 library(CellNOptR)
 
+# *************** set working directory for relative paths
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
- source("/Users/marti/Documents/r/combiMS/calculateScore.R")
+
+source("../utils/calculateScore.R")
 # source("/Users/marti/Documents/r/combiMS/edgeContribution2.R")
 # source("/Users/marti/Documents/r/combiMS/loadPatientRuns.R")
 
 #***********************************************************************
 # *************** preprocess model
 #***********************************************************************
-data_folder="/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/normalized/secondRoundProcessedMidas/"
+data_folder="../../data/phosphos_processed/"
 patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-model_path="/Users/marti/Documents/R/combiMS/combiMSplane.sif"
+model_path="../../files/model/combiMSplaneCUT.sif"
 fileName=patientData[1]
 
 midas=CNOlist(paste(data_folder,fileName,sep=""))
 model=readSIF(model_path)  
 sprintf("*********Before preprocessing:  %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
 
-model=preprocessing(midas,model,expansion=FALSE)
+# model=preprocessing(midas,model,expansion=FALSE)
 numInteractions=length(model$reacID)
-sprintf("*********After compressing: %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
+# sprintf("*********After compressing: %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
 
 #***********************************************************************
 # *************** test that score is calculated properly
@@ -48,7 +51,7 @@ sprintf("*********After compressing: %s nodes and %s reactions",length(model$nam
 #       create structure with (iv) stats for sanity check, i.e. are num networks in runs and error related
 #***********************************************************************
 
-networks_folder="/Users/marti/Documents/R/combiMS/cluster/all/"
+networks_folder="../../files/all_solutions_models/"
 totalPatients=list.files(networks_folder,pattern="*.RData",full.names=FALSE)
 totalPatientsSimple=sapply(totalPatients, function(x){
   strsplit(x,"\\.")[[1]][1]
@@ -184,14 +187,14 @@ if(dim(total_patientDF)[1]!=1690){stop("Hey!! Not all patients were added, is IB
 #***********************************************************************
 rownames(allMedianNetworks)=totalPatientsSimple
 colnames(allMedianNetworks)=model$reacID
-save(allMedianNetworks,file=paste0("/Users/marti/Documents/R/combiMS/cluster/analysis/fivePerHundredThousTol2/","allMedianModels.RData"))
+save(allMedianNetworks,file="../../files/median_models/allMedianModels.RData")
 
 rownames(allMeanNetworks)=totalPatientsSimple
 colnames(allMeanNetworks)=model$reacID
-save(allMeanNetworks,file=paste0("/Users/marti/Documents/R/combiMS/cluster/analysis/fivePerHundredThousTol2/","allMeanModels.RData"))
+save(allMeanNetworks,file="../../files/median_models/allMeanModels.RData")
 
 names(medianNetworkErrors)=totalPatientsSimple
-save(medianNetworkErrors,file=paste0("/Users/marti/Documents/R/combiMS/cluster/analysis/fivePerHundredThousTol2/","allErrors.RData"))
+save(medianNetworkErrors,file="../../files/median_models/allErrors.RData")
 
 # *************** calculate best score across runs
 patient_names=unique(total_patientDF$name)
@@ -205,4 +208,4 @@ run_id=c("1","2","3","4","5","6","7","8","9","10")
 for (i in 1:length(patient_names)){
   total_patientDF$run_id[which(total_patientDF$name==patient_names[i])]=run_id
 }
-save(total_patientDF,file=paste0("/Users/marti/Documents/R/combiMS/cluster/analysis/fivePerHundredThousTol2/","statsModels.RData"))
+save(total_patientDF,file="../../files/model_merging/statsModels.RData")
