@@ -80,13 +80,14 @@ for (index in 1:numPatients){
   midas=CNOlist(paste(data_folder,fileName,sep=""))
   setTxtProgressBar(pb, (pb$getVal()+1))
   # cat("calculating MSE of median network, data is",fileName,"\n")    
-  medianNetworkMSE[[index]]=calculateScore(model=model,CNOlist = midas,bString=allMedianNetworks[index,])
+  medianNetworkMSE[[index]]=calculateScore(model=model,midas = midas,bString=allMedianNetworks[index,])
+  dev.off()
 }
 
-MSEs = unlist(medianNetworkMSE)
-# MSEs=unlist(lapply(medianNetworkMSE,function(x){
-  # (x$deviationPen)/(x$numMeasurements)
-# }))
+# MSEs = unlist(medianNetworkMSE)
+MSEs=unlist(lapply(medianNetworkMSE,function(x){
+  (x$deviationPen)/(x$numMeasurements)
+}))
 
 #*************************************************************
 # *************** create simpler metadata structure, rejecting info about all runs, keeping only best
@@ -168,37 +169,28 @@ distanceModels=jaccNello(allMedianNetworks[1,],allMedianNetworks[2,])
 # this are models better than found during optimization!
 # answer found: this was a bug in computeScore, now fixed and benchmarked against own version of computeScoreT1.R
 #***********************************************************************
-
-###
-#
-#
-#
-# HERE, I GET DIFFERENT RESULTS (MAYBE BECAUSE I DON'T HAVE THE RIGHT CALCULATESCORE-FUNCTION?)
-#
-#
-#
-###
-mini_DF[which(mini_DF$best_of_bests-mini_DF$merged_model_score>0.01),'name']
-# "IB064" "IB069" "UZ010" "UZ011" "UZ017"
-# from here, it runs again
-networks_folder='../../files/all_solutions_models/'# "/Users/marti/Documents/R/combiMS/cluster/all/"
-patient="IB064.RData"
-load(paste0(networks_folder,patient)) # this loads PatientResults
-which(PatientResults$AllScores==min(PatientResults$AllScores)) # there are several models with the exaxt same score!
-#372303 372696 372706 372754 373726 373811 374029 
-# get the first model out of the 7 with (same) best score
-
-best_model=PatientResults$AllNwsPatient[which(PatientResults$AllScores==min(PatientResults$AllScores))[1],]
-#plot simulation and data
-fileName=strsplit(patient,"\\.")[[1]][1]
-midas=CNOlist(paste0(data_folder,fileName,".csv"))
-model=readSIF(model_path)  
-sprintf("*********Before preprocessing:  %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
-#model=preprocessing(midas,model,expansion=FALSE)
-#numInteractions=length(model$reacID)
-#sprintf("*********After compressing: %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
-# Here it fails again
-prova=calculateScore(model = model,CNOlist = midas,bString=best_model)
-#plotModel(model,midas,bString=best_model)
-prova=computeScoreT1(CNOlist=midas,model=model,bString=best_model)
-computeScoreT1multiple(CNOlist=midas,model=model,bString=best_model)
+# 
+# mini_DF[which(mini_DF$best_of_bests-mini_DF$merged_model_score>0.01),'name']
+# # "IB064" "IB069" "UZ010" "UZ011" "UZ017"
+# # from here, it runs again
+# networks_folder='../../files/all_solutions_models/'# "/Users/marti/Documents/R/combiMS/cluster/all/"
+# patient="IB064.RData"
+# load(paste0(networks_folder,patient)) # this loads PatientResults
+# which(PatientResults$AllScores==min(PatientResults$AllScores)) # there are several models with the exaxt same score!
+# #372303 372696 372706 372754 373726 373811 374029 
+# # get the first model out of the 7 with (same) best score
+# 
+# best_model=PatientResults$AllNwsPatient[which(PatientResults$AllScores==min(PatientResults$AllScores))[1],]
+# #plot simulation and data
+# fileName=strsplit(patient,"\\.")[[1]][1]
+# midas=CNOlist(paste0(data_folder,fileName,".csv"))
+# model=readSIF(model_path)  
+# sprintf("*********Before preprocessing:  %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
+# #model=preprocessing(midas,model,expansion=FALSE)
+# #numInteractions=length(model$reacID)
+# #sprintf("*********After compressing: %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
+# # Here it fails again
+# prova=calculateScore(model = model,midas = midas,bString=best_model)
+# #plotModel(model,midas,bString=best_model)
+# prova=computeScoreT1(CNOlist=midas,model=model,bString=best_model)
+# computeScoreT1multiple(CNOlist=midas,model=model,bString=best_model)
