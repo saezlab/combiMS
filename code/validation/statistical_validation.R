@@ -17,38 +17,38 @@ library(igraph)
 # # Logic Model Interactions, manually extracted from the optimized networks in Figure 5 of the main manuscript
 # #######################################################################################################################################
 
-model_interactions = list(FTY = data.frame(t(matrix(data=c(c('ANTICD3', 'STAT5'), c('EGCG', 'STAT5'), c('NACL', 'MK12'), c('NACL', 'HSPB1'), 
-                                                           c('TNFA', 'MK12'), c('TNFA', 'HSPB1'), c('TNFA', 'IKBA'), c('TNFA', 'TF65'), 
-                                                           c('TNFA', 'MKO3'),  c('IL1A', 'MK12'), c('IL1A', 'HSPB1'), c('IL1A', 'IKBA'), 
-                                                           c('IL1A', 'TF65'), c('IL1A', 'MKO3'), c('POLYIC', 'MK12'), c('POLYIC', 'HSPB1'), 
-                                                           c('POLYIC', 'IKBA'), c('POLYIC', 'TF65'), c('POLYIC', 'MKO3'), c('LPS', 'MK12'), 
-                                                           c('LPS', 'HSPB1'), c('LPS', 'IKBA'), c('LPS', 'TF65'), c('LPS', 'MKO3'), 
-                                                           c('INS', 'AKT1'), c('INS', 'MP2K1'), c('REBIF', 'STAT6')), nrow=2))), 
-                          GA = data.frame(t(matrix(data=c(c('TNFA', 'MK12'), c('TNFA', 'MKO3'), c('LPS', 'MKO3'), c('POLYIC', 'MKO3'), 
-                                                          c('IL1A', 'MKO3'), c('INS', 'AKT1'), c('BDNF', 'AKT1'), c('CONA', 'AKT1'), 
-                                                          c('CONA', 'STAT1'), c('INFG', 'STAT1'), c('INFG', 'STAT3'), c('REBIF', 'STAT1'), 
-                                                          c('REBIF', 'STAT3'), c('IL6', 'STAT1'), c('IL6', 'STAT3')), nrow=2))), 
-                          IFNb = data.frame(t(matrix(data=c(c('NACL', 'MP2K1'), c('NACL', 'MK12'), c('NACL', 'HSPB1'), c('TNFA', 'MK12'), 
-                                                            c('TNFA', 'HSPB1'), c('TNFA', 'MKO3'), c('IL1A', 'MKO3'), c('LPS', 'MKO3'), 
-                                                            c('POLYIC', 'MKO3'), c('BDNF', 'AKT1'), c('INS', 'AKT1'), c('ANTICD3', 'STAT1'), 
-                                                            c('REBIF', 'STAT1'), c('INFG', 'STAT1'), c('IL6', 'STAT1')), nrow=2))),
-                          EGCG = data.frame(t(matrix(data=c(c('NACL', 'MK12'), c('NACL', 'MKO3'),
-                                                            c('TNFA', 'IKBA'), c('TNFA', 'TF65'), c('TNFA', 'MK12'), c('TNFA', 'MKO3'),
-                                                            c('POLYIC', 'IKBA'), c('POLYIC', 'TF65'), c('POLYIC', 'MK12'), c('POLYIC', 'MKO3'),
-                                                            c('LPS', 'IKBA'), c('LPS', 'TF65'), c('LPS', 'MK12'), c('LPS', 'MKO3'),
-                                                            c('IL1A', 'IKBA'), c('IL1A', 'TF65'), c('IL1A', 'MK12'), c('IL1A', 'MKO3'),
-                                                            c('CONA', 'MK12'), c('CONA', 'MKO3'),
-                                                            c('BDNF', 'MK12'), c('BDNF', 'MKO3'),
-                                                            c('IL6', 'MK12'), c('IL6', 'MKO3'), c('IL6', 'STAT3'),
-                                                            c('EGCG', 'STAT1'), c('EGCG', 'STAT5'), c('EGCG', 'STAT3'),
-                                                            c('ANTICD3', 'STAT1'), c('ANTICD3', 'STAT5'), c('ANTICD3', 'STAT3')), nrow=2))),
-                          NTZ = data.frame(t(matrix(data=c(c('NACL', 'MK12'), c('NACL', 'HSPB1'),
-                                                           c('TNFA', 'MK12'), c('TNFA', 'HSPB1'), c('TNFA', 'MKO3'),
-                                                           c('IL1A', 'MK12'), c('IL1A', 'HSPB1'), c('IL1A', 'MKO3'),
-                                                           c('POLYIC', 'MK12'), c('POLYIC', 'HSPB1'), c('POLYIC', 'MKO3'),
-                                                           c('LPS', 'MK12'), c('LPS', 'HSPB1'), c('LPS', 'MKO3'),
-                                                           c('INS', 'AKT1'),
-                                                           c('CONA', 'STAT1'), c('ANTICD3', 'STAT1'), c('REBIF', 'STAT1'), c('INFG', 'STAT1'), c('IL6', 'STAT1')), nrow=2))))
+# model_interactions_m = list(FTY = data.frame(t(matrix(data=c(c('ANTICD3', 'STAT5'), c('EGCG', 'STAT5'), c('NACL', 'MK12'), c('NACL', 'HSPB1'),
+#                                                            c('TNFA', 'MK12'), c('TNFA', 'HSPB1'), c('TNFA', 'IKBA'), c('TNFA', 'TF65'),
+#                                                            c('TNFA', 'MKO3'),  c('IL1A', 'MK12'), c('IL1A', 'HSPB1'), c('IL1A', 'IKBA'),
+#                                                            c('IL1A', 'TF65'), c('IL1A', 'MKO3'), c('POLYIC', 'MK12'), c('POLYIC', 'HSPB1'),
+#                                                            c('POLYIC', 'IKBA'), c('POLYIC', 'TF65'), c('POLYIC', 'MKO3'), c('LPS', 'MK12'),
+#                                                            c('LPS', 'HSPB1'), c('LPS', 'IKBA'), c('LPS', 'TF65'), c('LPS', 'MKO3'),
+#                                                            c('INS', 'AKT1'), c('INS', 'MP2K1'), c('REBIF', 'STAT6')), nrow=2))),
+#                           GA = data.frame(t(matrix(data=c(c('TNFA', 'MK12'), c('TNFA', 'MKO3'), c('LPS', 'MKO3'), c('POLYIC', 'MKO3'),
+#                                                           c('IL1A', 'MKO3'), c('INS', 'AKT1'), c('BDNF', 'AKT1'), c('CONA', 'AKT1'),
+#                                                           c('CONA', 'STAT1'), c('INFG', 'STAT1'), c('INFG', 'STAT3'), c('REBIF', 'STAT1'),
+#                                                           c('REBIF', 'STAT3'), c('IL6', 'STAT1'), c('IL6', 'STAT3')), nrow=2))),
+#                           IFNb = data.frame(t(matrix(data=c(c('NACL', 'MP2K1'), c('NACL', 'MK12'), c('NACL', 'HSPB1'), c('TNFA', 'MK12'),
+#                                                             c('TNFA', 'HSPB1'), c('TNFA', 'MKO3'), c('IL1A', 'MKO3'), c('LPS', 'MKO3'),
+#                                                             c('POLYIC', 'MKO3'), c('BDNF', 'AKT1'), c('INS', 'AKT1'), c('ANTICD3', 'STAT1'),
+#                                                             c('REBIF', 'STAT1'), c('INFG', 'STAT1'), c('IL6', 'STAT1')), nrow=2))),
+#                           EGCG = data.frame(t(matrix(data=c(c('NACL', 'MK12'), c('NACL', 'MKO3'),
+#                                                             c('TNFA', 'IKBA'), c('TNFA', 'TF65'), c('TNFA', 'MK12'), c('TNFA', 'MKO3'),
+#                                                             c('POLYIC', 'IKBA'), c('POLYIC', 'TF65'), c('POLYIC', 'MK12'), c('POLYIC', 'MKO3'),
+#                                                             c('LPS', 'IKBA'), c('LPS', 'TF65'), c('LPS', 'MK12'), c('LPS', 'MKO3'),
+#                                                             c('IL1A', 'IKBA'), c('IL1A', 'TF65'), c('IL1A', 'MK12'), c('IL1A', 'MKO3'),
+#                                                             c('CONA', 'MK12'), c('CONA', 'MKO3'),
+#                                                             c('BDNF', 'MK12'), c('BDNF', 'MKO3'),
+#                                                             c('IL6', 'MK12'), c('IL6', 'MKO3'), c('IL6', 'STAT3'),
+#                                                             c('EGCG', 'STAT1'), c('EGCG', 'STAT5'), c('EGCG', 'STAT3'),
+#                                                             c('ANTICD3', 'STAT1'), c('ANTICD3', 'STAT5'), c('ANTICD3', 'STAT3')), nrow=2))),
+#                           NTZ = data.frame(t(matrix(data=c(c('NACL', 'MK12'), c('NACL', 'HSPB1'),
+#                                                            c('TNFA', 'MK12'), c('TNFA', 'HSPB1'), c('TNFA', 'MKO3'),
+#                                                            c('IL1A', 'MK12'), c('IL1A', 'HSPB1'), c('IL1A', 'MKO3'),
+#                                                            c('POLYIC', 'MK12'), c('POLYIC', 'HSPB1'), c('POLYIC', 'MKO3'),
+#                                                            c('LPS', 'MK12'), c('LPS', 'HSPB1'), c('LPS', 'MKO3'),
+#                                                            c('INS', 'AKT1'),
+#                                                            c('CONA', 'STAT1'), c('ANTICD3', 'STAT1'), c('REBIF', 'STAT1'), c('INFG', 'STAT1'), c('IL6', 'STAT1')), nrow=2))))
 
 # #######################################################################################################################################
 # # Prepare Stuff
@@ -57,11 +57,11 @@ model_interactions = list(FTY = data.frame(t(matrix(data=c(c('ANTICD3', 'STAT5')
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 ## Not all donors have phospho-Data available
-DonorsWithPhospho = list.files('../../../data/phosphos_normalised/')
+DonorsWithPhospho = list.files('../../data/phosphos_normalised/')
 DonorsWithPhospho = gsub(".csv", '', DonorsWithPhospho)
 
 ## Annotations
-annotations = read.table('../../../files/annotations/annotations_169_patients.csv', header = T, row.names=1, sep=',')
+annotations = read.table('../../files/annotations/annotations_169_patients.csv', header = T, row.names=1, sep=',')
 
 # Hack for nicer annotation
 annotations$Group = as.character(annotations$Group)
@@ -76,7 +76,7 @@ for (i in 1:dim(annotations)[1]){
 # # Prepare Metadata, such as Stimuli and Phospho-information
 # #######################################################################################################################################
 
-Temp = readMIDAS('../../../data/phosphos_merged/CH003_phosphos_midas.csv', verbose=F)$dataMatrix
+Temp = readMIDAS('../../data/phosphos_merged/CH003_phosphos_midas.csv', verbose=F)$dataMatrix
 Phosphos = as.vector(sapply(colnames(Temp)[which(grepl('DV', colnames(Temp)))], FUN = function(x){strsplit(x, split=':')[[1]][2]}))[1:17]
 Stimuli = toupper(as.vector(sapply(colnames(Temp)[which(grepl('TR', colnames(Temp)))], FUN = function(x){strsplit(x, split=':')[[1]][2]}))[2:21])
 rm(Temp)
@@ -86,7 +86,7 @@ rm(Temp)
 # ######################################################################################################################################
 ListPhosphos = lapply(DonorsWithPhospho, FUN = function(donor){
   ## Load Data
-  Temp = readMIDAS(paste0("../../../data/phosphos_merged/", donor, '_phosphos_midas.csv'), verbose=F)$dataMatrix;
+  Temp = readMIDAS(paste0("../../data/phosphos_merged/", donor, '_phosphos_midas.csv'), verbose=F)$dataMatrix;
   Temp = Temp[-1,]
   Temp = as.matrix(Temp[,which(grepl('DV:', colnames(Temp)))]);
   Temp = Temp[,-c(18,19)]
@@ -108,9 +108,58 @@ names(ListPhosphos)  <- DonorsWithPhospho
 # Convert pkn into igraph object and find all possible Stimulus-Readout pairs
 # #####################################################################################################################################
 
-pknmodel = readSIF('../../../files/model/combiMS_pkn_cut.sif')
-cnolist = readMIDAS('../../../data/phosphos_normalised/CH003.csv')
+pknmodel = readSIF('../../files/model/combiMSplaneCUT.sif')
+cnolist = readMIDAS('../../data/phosphos_normalised/CH003.csv')
 cnolist = makeCNOlist(cnolist, subfield = FALSE)
+
+# #######################################################################################################################################
+# # Logic Model Interactions, automatically extracted from the optimized networks
+# #######################################################################################################################################
+
+find_model_interactions = function(group){
+  name_conversion = list('FTY'='Gilenya',
+                         "GA"='Copaxone',
+                         "IFNb"='IFNb',
+                         "EGCG"='EGCG',
+                         "NTZ"='Tysabri')
+  group = name_conversion[[group]]
+  model_group = read.csv(paste0('../../files/group_models/', group, 'median.csv'))
+  edges = pknmodel$interMat[,row.names(model_group)[which(model_group$x == 1)]]
+  adjacency = matrix(0, nrow(edges), nrow(edges))
+  for(i in 1:ncol(edges)){
+    startIdx = which(edges[, i]==-1)
+    endIdx = which(edges[, i]==1)
+
+    adjacency[startIdx, endIdx] = 1
+  }
+  rownames(adjacency) <- colnames(adjacency) <- rownames(edges)
+
+  netGraph <- graph.adjacency(adjacency, mode = "directed")
+
+  connectivity = matrix(data=NA, ncol=length(cnolist$namesSignals), nrow=length(cnolist$namesStimuli))
+  row.names(connectivity) = toupper(cnolist$namesStimuli)
+  colnames(connectivity) = cnolist$namesSignals
+
+  for (stim in toupper(cnolist$namesStimuli)){
+    for (sig in cnolist$namesSignals){
+      if (length(all_shortest_paths(netGraph, from=stim, to=sig)$res) == 0){
+        connectivity[which(row.names(connectivity) == stim), which(colnames(connectivity) == sig)] = 0
+      } else {
+        connectivity[which(row.names(connectivity) == stim), which(colnames(connectivity) == sig)] = length(all_shortest_paths(netGraph, from=stim, to=sig)$res[[1]])
+      }
+    }
+  }
+    
+  possible_interactions = melt(connectivity)
+  possible_interactions[['interaction']] = paste(possible_interactions$Var1, possible_interactions$Var2, sep='_')
+  model_int = possible_interactions[which(possible_interactions$value != 0),c(1,2)]
+  return(model_int)
+}
+
+model_interactions = list()
+for (group in c('FTY', 'NTZ', 'GA', 'IFNb', 'EGCG')){
+  model_interactions[[group]] = find_model_interactions(group)
+}
 
 # convert to igraph object
 edges <- pknmodel$interMat
@@ -238,6 +287,7 @@ test_with_fisher(EGCG)
 
 
 all_groups = rbind(IFN, EGCG, FTY, GAL, NTZ)
+
 # #############################################################################################################################################
 # nice Volcano plots
 # ############################################################################################################################################
@@ -257,6 +307,7 @@ g = ggplot(all_groups, aes(x=logFC, y=log.p.value, color=interaction_in_model, f
   scale_fill_manual(values=c('#8EBAE5', '#D85C41'), guide=FALSE) +
   scale_color_manual('Interaction', values=c('#8EBAE5', '#D85C41'), labels=c('not in\nmodel', 'in model'))
 
+plot(g)
 
 ann_text <- data.frame(log.p.value = c(2.95, 2.25, 1.15, 1, .5), y = c(.3, .3, .5, 2, 2), lab = c("INFb", 'NTZ','FTY', 'GA', 'EGCG'), 
                        interaction_in_model=c('none', 'none', 'none', 'none', 'none'),
@@ -273,13 +324,6 @@ g1 = ggplot(all_groups, aes(x=log.p.value, colour=interaction_in_model, fill=int
   scale_fill_manual('Interaction', values=alpha(c( '#8EBAE5', 'black', '#D85C41'),0.3), labels=c('not in\nmodel', 'in model', 'none')) +
   geom_text(data=ann_text, y=ann_text$y, label=ann_text$lab)
 
+plot(g1)
 
-# combine volcanos with cowplot in a nice grid
-library(cowplot)
-
-
-pdf("../../../figures/figure_statistics.pdf", width=7, height=3.5, onefile = FALSE)
-
-plot_grid(g, g1, labels = c('A', 'B'), ncol = 2)
-
-dev.off()
+save(all_groups, file='../../files/statistics/all_groups_wilcoxon_results.RData')
