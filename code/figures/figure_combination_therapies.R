@@ -48,11 +48,13 @@ plot_df_d$comb = 'FTY + TAKi'
 
 # Combine and plot
 temp = rbind(plot_df_c, plot_df_d)
+temp$treatment = factor(temp$treatment,  levels=c('Placebo', 'FTY', 'EGCG', 'TAKi', 'FTY+\nEGCG', 'FTY+\nTAKi'))
 
 g_v = ggplot(temp, aes(x=days, y=`clinical score`, color=treatment)) + 
   geom_line() + facet_grid(~comb, scales='free_x') + theme_classic() + 
-  geom_point(shape=15) + theme(strip.background=element_blank()) + annotate("segment", x=-Inf, xend=-Inf, y=-Inf, yend=Inf) +
-  scale_color_manual(values=c('#9C9E9F', '#57AB27', '#0098A1', '#CC071E', '#006165', '#A11035'))
+  geom_point(shape=15) + theme(strip.background=element_blank(), legend.key.size = unit(1.7, 'lines')) + 
+  annotate("segment", x=-Inf, xend=-Inf, y=-Inf, yend=Inf) +
+  scale_color_manual(values=c('#9C9E9F', '#57AB27', '#0098A1',  '#006165', '#CC071E', '#A11035'))
 
 # ####################################################################################
 # Combine everything
