@@ -2,9 +2,8 @@
 # NORMALIZATION PIPELINE FOR COMBIMS
 #
 # Compiled from OptAllPatients.R
-#               OptCombiMS.R
 #               processCombiData.R
-#
+#               normaliseSimp.R
 #
 # ######################################################################################################
 
@@ -17,12 +16,8 @@ library(NMF)
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 # STILL TO DO
-# # Find data files
-# file_list = list.files('../../data/phosphos_raw_clean/')
-# 
 # ****************** FUNCTION FOR COMBINATION OF BOTH TIMEPOINTS
-# combine_time_points = function(file_name){}
-
+# filenames = list.files('../../data/phosphos_raw_clean', pattern='*.csv', full.names=FALSE)
 
 
 # ****************** process merged files
@@ -46,7 +41,15 @@ for (i in 1:length(filenames)){
   write.table(taula,file=paste0('../../data/phosphos_normalised/', fileName),sep=",",row.names=FALSE,quote=F)
 }
 
+rm(list=ls())
+# ****************** further processing for matching names between midas and model
+filenames=list.files("../../data/phosphos_normalised/",pattern="*.csv",full.names=FALSE)
+for (i in 1:length(filenames)){
+  fileName=filenames[i]
+  cat(sprintf("*********The patient is %s\n",strsplit(fileName, split='\\.')[[1]][1]))
+  taula=read.csv(paste("../../data/phosphos_normalised/",fileName,sep=""),header=TRUE,dec=".",check.names=FALSE, stringsAsFactors=FALSE)
+  colnames(taula)[2:dim(taula)[2]] = toupper(colnames(taula)[2:dim(taula)[2]])
+  write.table(taula,file=paste0('../../data/phosphos_processed/', fileName),sep=",",row.names=FALSE,quote=F)
+}
 
-# STILL TO DO
-# ******************FUNCTION FOR FURTHER PROCESSING
-# process_normalized = function(file_name){}
+rm(list=ls())
