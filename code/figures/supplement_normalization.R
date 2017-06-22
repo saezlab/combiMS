@@ -4,7 +4,7 @@
 ## after each normalization step
 ## 
 ## Only the structure of the figure, annotations will be added
-## with an image manipulation program
+## with Inkscape
 ## 
 ## Panel A: Densities of log2 fold changes for all phosphos for one patient
 ## Panel B-D: Densities of up/down/non-regulated phosphos
@@ -51,6 +51,8 @@ data = M2$valueSignals[[2]]
 row.names(data) = M2$namesStimuli
 colnames(data) = M2$namesSignals
 
+names(colour_phosphos) = sort(colnames(data))
+
 # remove BSA and PE (internal controls)
 data = data[,-c(18,19)]
 
@@ -59,12 +61,12 @@ data_log_2=log2(data)
 
 #************* step2: compute Fold Change, since we have log2 we just substract
 data_fc = t(apply(data_log_2, 1, FUN=function(x){return(x-data_log_2[1,])}))
-
+data_fc = data_fc[-1,]
 ####################################################################################
 # PANEL A
 plot_df_a = melt(data_fc)
 colnames(plot_df_a) = c('stimulus', 'phospho', 'logFC')
-levels(plot_df_a$phospho) = sort(levels(plot_df_a$phospho))
+plot_df_a$phospho = factor(plot_df_a$phospho, levels=sort(levels(plot_df_a$phospho)))
 p_a = ggplot(plot_df_a, aes(x=logFC, color=phospho)) + 
   geom_density() + theme_cowplot() + 
   scale_color_manual(values=colour_phosphos) + 
@@ -97,19 +99,22 @@ for (i in 1:numProt){
 # noise proteins
 nameProts=colnames(data_fc)[noiseProt]
 plot_df_b=plot_df_a[which(plot_df_a$phospho %in% nameProts),]
-p_b = ggplot(plot_df_b, aes(logFC, colour=phospho)) + 
-  geom_density() +
+p_c = ggplot(plot_df_b, aes(logFC)) + 
+  geom_density(aes(color=phospho)) +
   geom_vline(xintercept=0, colour='grey') +
-  theme(legend.position = 'none') + scale_color_manual(values=colour_phosphos[noiseProt])
+  theme(legend.position = 'none') + 
+  scale_color_manual(values=colour_phosphos[noiseProt]) +
+  ggtitle('Not phosphorylated')
 
 # negatively phosphorylated
 nameProts=colnames(data_fc)[negativeProt]
 plot_df_c=plot_df_a[which(plot_df_a$phospho %in% nameProts),]
-p_c = ggplot(plot_df_c, aes(logFC, colour=phospho)) + 
+p_b = ggplot(plot_df_c, aes(logFC, colour=phospho)) + 
   geom_density() +
   geom_vline(xintercept=0, colour='grey') +
   theme(legend.position = "none") + 
-  scale_color_manual(values=colour_phosphos[negativeProt])
+  scale_color_manual(values=colour_phosphos[negativeProt]) + 
+  ggtitle('Negatively')
 
 # positively phosphorylated
 nameProts=colnames(data_fc)[positiveProt]
@@ -118,7 +123,8 @@ p_d = ggplot(plot_df_d, aes(logFC, colour=phospho)) +
   geom_density() +
   geom_vline(xintercept=0, colour='grey') +
   theme(legend.position = 'none')+
-  scale_color_manual(values=colour_phosphos[positiveProt])
+  scale_color_manual(values=colour_phosphos[positiveProt])+
+  ggtitle('Positively')
 
 #************** step3: correct pos and neg distributions (non-significant still need to be corrected)
 # in positive distributions: leave positives unchanged. between 0 and -1, replace by 0. below -1 replace by NA
@@ -148,7 +154,7 @@ if (length(negativeProt)>0){
       } else if(data_fc_c[i,negativeProt[j]]>=1 && !is.na(data_fc_c[i,negativeProt[j]])){
         data_fc_c[i,negativeProt[j]]=NA
       } else if (data_fc_c[i,negativeProt[j]]!=0  && !is.na(data_fc_c[i,negativeProt[j]])){
-        data_fc_c[i,negativeProt[j]]=abs(data_fc_c[i,negativeProt[j]]) 
+        data_fc_c[i,negativeProt[j]]=data_fc_c[i,negativeProt[j]]
       }
     }
   }
@@ -168,6 +174,7 @@ if(length(noiseProt)>0){
 
 # ************* step 5: Hill function on FCz, we are using as EC50 the median of each signal
 # taula2 = 1 / (1 + (EC50 / taula2)^HillCoef)
+HillCoef=2
 data_h=data_fc_c
 indexAllButNoise=setdiff(seq(1:ncol(data_fc_c)), noiseProt)
 data_h[,indexAllButNoise]=apply(data_fc_c[,indexAllButNoise], 2, function(column){
@@ -188,7 +195,7 @@ plot_df_c = melt(data_fc_c)
 colnames(plot_df_c) = c('stimulus', 'phospho', 'logFC')
 nameProts=colnames(data_fc_c)[noiseProt]
 plot_df_e=plot_df_c[which(plot_df_c$phospho %in% nameProts),]
-p_e = ggplot(plot_df_e, aes(logFC, colour=phospho)) + 
+p_f = ggplot(plot_df_e, aes(logFC, colour=phospho)) + 
   geom_density(adjust=.01) +
   geom_vline(xintercept=0, colour='grey') +
   theme(legend.position = 'none') + scale_color_manual(values=colour_phosphos[noiseProt])
@@ -196,7 +203,7 @@ p_e = ggplot(plot_df_e, aes(logFC, colour=phospho)) +
 # negatively phosphorylated
 nameProts=colnames(data_h)[negativeProt]
 plot_df_f=plot_df_c[which(plot_df_c$phospho %in% nameProts),]
-p_f = ggplot(plot_df_f, aes(logFC, colour=phospho)) + 
+p_e = ggplot(plot_df_f, aes(logFC, colour=phospho)) + 
   geom_density() +
   geom_vline(xintercept=0, colour='grey') +
   theme(legend.position = "none") + 
@@ -216,12 +223,39 @@ p_g = ggplot(plot_df_g, aes(logFC, colour=phospho)) +
 # PANEL H
 
 ####################################################################################
+# ANNOTATION PANEL
+annotation = data.frame(matrix(c(1, 1, 1, 3), nrow=2))
+
+p_x = 
+  ggplot(annotation, aes(X1, X2)) + theme_nothing() + geom_point(color='white') +
+  annotate('text', x=1, y=2.5, label =TeX("-1 < logFC < 0 $\\rightarrow$ 0", output = 'character'), parse=TRUE) + 
+  annotate('text', x=1, y=2, label =TeX("logFC < -1 $\\rightarrow$ NA", output = 'character'), parse=TRUE) + 
+  annotate('text', x=1, y=1.5, label =TeX("Non-linear normalization", output = 'character'), parse=TRUE)
+
+p_y = 
+  ggplot(annotation, aes(X1, X2)) + theme_nothing() + geom_point(color='white') +
+  annotate('text', x=1, y=2.5, label =TeX("-1 < logFC < 1 $\\rightarrow$ 0", output = 'character'), parse=TRUE) + 
+  annotate('text', x=1, y=2, label =TeX("logFC < -1 $\\rightarrow$ NA", output = 'character'), parse=TRUE) + 
+  annotate('text', x=1, y=1.5, label =TeX("logFC > 1 $\\rightarrow$ NA", output = 'character'), parse=TRUE)
+
+annotation = data.frame(matrix(c(1, 1, .5, 3), nrow=2))
+p_z = 
+  ggplot(annotation, aes(X1, X2)) + theme_nothing() + geom_point(color='white') +
+  annotate('text', x=1, y=2.5, label =TeX("0 > logFC > 1 $\\rightarrow$ 0", output = 'character'), parse=TRUE) + 
+  annotate('text', x=1, y=2, label =TeX("logFC > 1 $\\rightarrow$ NA", output = 'character'), parse=TRUE) + 
+  annotate('text', x=1, y=1.5, label =TeX("logFC $\\rightarrow$ 1-logFC", output = 'character'), parse=TRUE) +
+  annotate('text', x=1, y=1, label =TeX("Non-linear normalization", output = 'character'), parse=TRUE)
+
+####################################################################################
 # PLOT EVERYTHING TOGETHER
 # pdf('../figures/supplementary_normalization.pdf', size=c(8.3, 11.7))
-top_row = plot_grid(p_a, NULL, ncol=2)
+top_row = plot_grid(NULL, p_a, NULL, ncol=3, rel_widths=c(0.3, 1, 0.2))
 upper_middle_row = plot_grid(p_b, p_c, p_d, ncol=3)
+middle_row = plot_grid(p_z, p_y, p_x, ncol=3)
 lower_middle_row = plot_grid(p_e, p_f, p_g, ncol=3)
 bottom_row = plot_grid(NULL, NULL, p_h, ncol=3)
 
-plot_grid(top_row, upper_middle_row, lower_middle_row, top_row, nrow=4)
-# dev.off()
+pdf('../../figures/supplement_normalization.pdf', height = 11, width = 8)
+plot_grid(top_row, upper_middle_row, middle_row, lower_middle_row, top_row, nrow=5, 
+          rel_heights = c(1, 1, .3, 1, 1))
+dev.off()

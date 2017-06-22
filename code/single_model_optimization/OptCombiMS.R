@@ -1,18 +1,20 @@
 # Local version of the script Run in cluster for patient optimisation. Called by OptAllPatients.R
 # Marti Bernardo Faura, September 2014. 
 
+# Minor changes to adjust the paths to the combiMS Github project
+# Jakob Wirbel, June 2017
 
 OptCombiMS=function(fileName){
   library(CellNOptR)
   library(NMF)
-  setwd("/Users/marti/Documents/R/combiMS/modelling/final")
-  source("/Users/marti/Documents/R/combiMS/normaliseSimp.R")
+  # setwd("/Users/marti/Documents/R/combiMS/modelling/final")
+  # source("../data_processing_and_normalization/normaliseSimp.R")
   
   
   # *************************************************
   # ************find patient data, load its midas
   # **************************************************
-  data_folder="/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/normalized/secondRoundProcessedMidas/"
+  data_folder="../../data/phosphos_processed/"
   patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
   i=1; fileName=patientData[i] #give a specific patient if not passed via function
   cat(sprintf("*********The patient is %s",fileName))
@@ -24,7 +26,7 @@ OptCombiMS=function(fileName){
   # *************************************************
   # ************load compressed model
   # **************************************************
-  model_path='/Users/marti/Documents/R/combiMS/combiMSplaneCUT.sif'
+  model_path='../../files/model/combiMSplaneCUT.sif'
   #full_model_path='/Users/marti/Documents/R/combiMS/combiMSplane.sif'
   model=readSIF(model_path)
   numInteractions=length(model$reacID)

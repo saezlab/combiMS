@@ -1,12 +1,15 @@
-# Function to remove signals that were only measured to allow experimental QC and dynamic range calculation (PR; BSA). Also sanity check anc donsistency.
+# Function to remove signals that were only measured to allow experimental QC and dynamic range calculation (PR; BSA). Also sanity check anc consistency.
 # This is called from command line and OptAllPatients.R
 # Marti Bernardo Faura, Final version September 2014
+
+# Minor changes to adjust the paths to the combiMS Github project
+# Jakob Wirbel, June 2017
 
 processCombiData=function(fileName){
   
   # instead of directly loading into midas, first clean the headers, which for the TR: have a e.g. :cytokine field added for each column
   #taula=read.csv(paste("/Users/marti/Documents/ebi/combiMS/data/phosphos/midas/",fileName,sep=""),header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
-  taula=read.csv(paste("/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/",fileName,sep=""),header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
+  taula=read.csv(paste("../../data/phosphos_merged/",fileName,sep=""),header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
   taula=taula[,-1] # remove the first column, which are row labels
   taula=taula[-2,] # remove the first row, which is repeated (control at 0 and at 5 is the same)
   #pvataula[is.na(taula)]=0
@@ -50,8 +53,6 @@ processCombiData=function(fileName){
   #   aheatmap(taula[,grep('^DV:', colnames(taula))],labRow=namesStimuli,labCol=namesSignals, Rowv=NA, Colv=NA)
   
   fileNameClean=head(strsplit(fileName,"\\_")[[1]],n=1) #take only patient name
-  setwd("/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/normalized/")
-  write.table(taula,file=paste(fileNameClean,"csv",sep="."),sep=",",row.names=FALSE,quote=F)
-  
-  
+  # setwd("/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/normalized/")
+  write.table(taula,file=paste(paste0('../../data/phosphos_normalised/', fileNameClean),"csv",sep="."),sep=",",row.names=FALSE,quote=F)
 }

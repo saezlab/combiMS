@@ -1,16 +1,23 @@
 # Script to iteratively optimise all patients.
 # Marti Bernardo-Faura, September 2014
 
-source("/Users/marti/Documents/R/combiMS/OptCombiMS.R")
-source("/Users/marti/Documents/R/combiMS/normaliseSimp.R")
-source("/Users/marti/Documents/R/combiMS/modelling/processCombiData.R")
+# Minor changes to adjust the paths to the combiMS Github project
+# Jakob Wirbel, June 2017
 
-#setwd("/Users/marti/Documents/ebi/combiMS/data/midas_clean_merged_fc/")
+# ****************** Set working directory
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+
+source("./OptCombiMS.R")
+source("../data_processing_and_normalization/normaliseSimp.R")
+source("../data_processing_and_normalization/processCombiData.R")
+
+
 #filenames=list.files(".",pattern="*.csv",full.names=FALSE)
 
 #filenames=list.files("/Users/marti/Documents/ebi/combiMS/data/midas_clean_merged/processedForCNO/",pattern="*.csv",full.names=FALSE)
-filenames=list.files("/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/",pattern="*.csv",full.names=FALSE)
-setwd("/Users/marti/Documents/R/combiMS/modelling/final")
+filenames=list.files("../../data/phosphos_merged/",pattern="*.csv",full.names=FALSE)
+# setwd("/Users/marti/Documents/R/combiMS/modelling/final")
 
 
 
@@ -27,10 +34,10 @@ setwd("/Users/marti/Documents/R/combiMS/modelling/final")
 for (i in 1:length(filenames)){
   fileName=filenames[i]
   #fileName=paste(head(strsplit(filenames[i],"\\_")[[1]],n=1),".csv",sep="") #take only filename
-  taula=read.csv(paste("/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/",fileName,sep=""),header=TRUE,dec=".",check.names=FALSE, stringsAsFactors=FALSE)
+  taula=read.csv(paste("../../data/phosphos_merged/",fileName,sep=""),header=TRUE,dec=".",check.names=FALSE, stringsAsFactors=FALSE)
   taula=normaliseSimp(taula)
-  setwd("/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/normalized/")
-  write.table(taula,file=fileName,sep=",",row.names=FALSE,quote=F)
+  # setwd("/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/normalized/")
+  write.table(taula,file=paste0('../../data/phosphos_normalised/', fileName),sep=",",row.names=FALSE,quote=F)
 }
   
 # ****************** use data from all patients to optimize one model per patient
@@ -65,7 +72,7 @@ for (j in 1:length(filenames)){
   patientAnnot[j]=strsplit(strsplit(filenames[j],"/")[[1]][10],"_")[[1]][1]
 }
 
-annot=read.csv("/Users/marti/Documents/R/combiMS/modelling/annotation.csv",header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
+annot=read.csv("../../files/annotations/annotations_169_patients.csv",header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
 # find the indexes of the intersection between the files we have and teo's metadata
 # choose only the metadata for the patients that are measured
 annot = annot[match(patientAnnot,annot$ID),]
