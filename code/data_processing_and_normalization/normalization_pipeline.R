@@ -33,6 +33,7 @@ for (i in 1:length(filenames)){
   processCombiData(filenames[i]) 
 }
 
+rm(list=ls())
 # ****************** normalise all files
 filenames=list.files("../../data/phosphos_normalised/",pattern="*.csv",full.names=FALSE)
 source('./normaliseSimp.R')
