@@ -9,6 +9,10 @@ processCombiData=function(fileName){
   
   # instead of directly loading into midas, first clean the headers, which for the TR: have a e.g. :cytokine field added for each column
   #taula=read.csv(paste("/Users/marti/Documents/ebi/combiMS/data/phosphos/midas/",fileName,sep=""),header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
+  
+  # print patient name
+  cat(sprintf("*********The patient is %s\n",strsplit(fileName, split='_')[[1]][1]))
+  
   taula=read.csv(paste("../../data/phosphos_merged/",fileName,sep=""),header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
   taula=taula[,-1] # remove the first column, which are row labels
   taula=taula[-2,] # remove the first row, which is repeated (control at 0 and at 5 is the same)
