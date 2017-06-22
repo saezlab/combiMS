@@ -4,24 +4,31 @@
 # the runs that did not crush out of 10 attempts per patient
 # Juny 2015
 # Marti Bernardo-Faura
+
+# Minor changes to adjust the paths to the combiMS Github project
+# Jakob Wirbel, June 2017
 #***********************************************************************
+
+# Set working directory
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
 #library(reshape2)
 #library(ggplot2)
 library(CellNOptR)
 #library(corrplot)
 #library(vegan)
-source("/Users/marti/Documents/r/combiMS/calculateScore.R")
-source("/Users/marti/Documents/r/combiMS/edgeContribution2.R")
-source("/Users/marti/Documents/r/combiMS/loadPatientRuns.R")
+source("./calculateScore.R")
+source("./edgeContribution2.R") # is the 2 intentional?
+source("./loadPatientRuns.R")
 #******************************************************************
 #*************** define directory depending on appropriate cluster run
 #***********************************************************************
-run_folder="/Users/marti/Documents/R/combiMS/cluster/7th10hReltol005/results/"
-networks_folder="/Users/marti/Documents/R/combiMS/cluster/7th10hReltol005/networks/"
+run_folder="../../files/cluster/7th10hReltol005/results/"
+networks_folder="../../files/cluster/7th10hReltol005/networks/"
 
-similarity_folder="/Users/marti/Documents/R/combiMS/cluster/7th10hReltol005/similarity/"
-completed_patients_folder="/Users/marti/Documents/R/combiMS/cluster/completedPatients/"
-networks_for_Completion="/Users/marti/Documents/R/combiMS/cluster/8th10hReltol005/results/"
+similarity_folder="../../files/cluster/7th10hReltol005/similarity/"
+completed_patients_folder="../../files/cluster/completedPatients/"
+networks_for_Completion="../../files/cluster/8th10hReltol005/results/"
 modelsForCompletion=list.files(networks_for_Completion,pattern="*.RData",full.names=FALSE)
 
 

@@ -2,34 +2,40 @@
 # Marti Bernardo-Faura
 # June 2015
 
+# Minor changes to adjust the paths to the combiMS Github project
+# Jakob Wirbel, June 2017
+
+# Set working directory
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
 library(CellNOptR)
-source("/Users/marti/Documents/r/combiMS/loadPatientRuns.R")
-source("/Users/marti/Documents/r/combiMS/calculateScore.R")
-source("/Users/marti/Documents/r/combiMS/bindTwoRuns.R")
-source("/Users/marti/Documents/r/combiMS/checkNwsAndScores.R")
+source("./loadPatientRuns.R")
+source("./calculateScore.R")
+source("./bindTwoRuns.R")
+source("./checkNwsAndScores.R")
 #******************************************************************
 #*************** define directories with optimisation results
 #***********************************************************************
-first_folder="/Users/marti/Documents/R/combiMS/cluster/7th10hReltol005/results/"
-second_folder="/Users/marti/Documents/R/combiMS/cluster/8th10hReltol005/results/"
-third_folder="/Users/marti/Documents/R/combiMS/cluster/9th10hReltol005/results/"
-fourth_folder="/Users/marti/Documents/R/combiMS/cluster/9thB/OnePatient/"
+first_folder="../../files/cluster/7th10hReltol005/results/"
+second_folder="../../files/cluster/8th10hReltol005/results/"
+third_folder="../../files/cluster/9th10hReltol005/results/"
+fourth_folder="../../files/cluster/9thB/OnePatient/"
 all_folders=c(first_folder,second_folder,third_folder,fourth_folder)
 #***********************************************************************
 # *************** preprocess model
 #***********************************************************************
-data_folder="/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/normalized/secondRoundProcessedMidas/"
+data_folder="../../data/phosphos_processed/"
 patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-model_path="/Users/marti/Documents/R/combiMS/combiMSplane.sif"
+model_path="../../files/model/combiMSplaneCUT.sif"
 fileName=patientData[grep("IB068",patientData)]
 
 midas=CNOlist(paste(data_folder,fileName,sep=""))
 model=readSIF(model_path)  
 sprintf("*********Before preprocessing:  %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
 
-model=preprocessing(midas,model,expansion=FALSE)
-numInteractions=length(model$reacID)
-sprintf("*********After compressing: %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
+# model=preprocessing(midas,model,expansion=FALSE)
+# numInteractions=length(model$reacID)
+# sprintf("*********After compressing: %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
 
 # initBstring=rep(1,length(model$reacID))
 # Opt=gaBinaryT1(CNOlist=midas,model=model,initBstring=initBstring,stallGenMax=600,maxTime=20, maxGens=100000, verbose=FALSE,popSize=100,elitism=2)
@@ -38,7 +44,7 @@ sprintf("*********After compressing: %s nodes and %s reactions",length(model$nam
 #***********************************************************************
 # *************** generate lists of patients that need to be completed
 #***********************************************************************
-load("/Users/marti/Documents/R/combiMS/cluster/completedPatients/runsToCompleteAllPatients.RData")
+load("../../files/completedPatients/runsToCompleteAllPatients.RData")
 #this loads AllPatientsToComplete, which was calculated (TBC) in studyModelDistribution.R
 
 #***********************************************************************
