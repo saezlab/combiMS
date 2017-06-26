@@ -1,7 +1,11 @@
 # Final version of the optimization algorithm for a single patient. All parameters applied to final version
 # Marti Bernardo-Faura, Juni 2015
 
+# Minor changes to adjust the paths to the combiMS Github project
+# Jakob Wirbel, June 2017
+
 OptCombiMScluster=function(fileName){
+  
   library(CellNOptR)
   #library(NMF)
   #setwd("/Users/marti/Documents/R/combiMS/modelling/final")
@@ -11,7 +15,7 @@ OptCombiMScluster=function(fileName){
   cat(sprintf("*********The patient is %s",fileName))
   
   # *************************** load model
-  model=readSIF("/homes/bernardo/combiMS/modelling/combiMSplane.sif")
+  model=readSIF("../../files/model/combiMSplane.sif")
   
   # *************************** load processed midas
   # if already processed (by calling processCombiData.R in OptAllPatients.R), load the processed file
@@ -22,7 +26,7 @@ OptCombiMScluster=function(fileName){
   #taulaHill2=normaliseSimp(taula,HillCoef=2)
   #write.table(taulaHill2,file="/Users/marti/Documents/R/combiMS/modelling/midas.csv",sep=",",row.names=FALSE,quote=F)
   #midas=CNOlist("/Users/marti/Documents/R/combiMS/modelling/midas.csv")
-  midas=CNOlist(paste("/homes/bernardo/combiMS/secondRoundProcessedMidas/",fileName,sep=""))
+  midas=CNOlist(paste("../../data/phosphos_processed/",fileName,sep=""))
   # plot(midas)
   #midas@signals[[2]][,grep('^DIG1',colnames(midas@signals[[1]]))]
   
@@ -40,7 +44,16 @@ OptCombiMScluster=function(fileName){
   #cutAndPlot(midas,model, list(initBstring)) #simulate
   cat("********Optimizing",sep="\n")
   #Opt=gaBinaryLargeNw(CNOlist=midas,model=model,initBstring=initBstring,stallGenMax=600000,maxTime=36000, maxGens=100000, verbose=FALSE,popSize=100,elitism=2,relTol=0.05)
-  Opt=gaBinaryT1(CNOlist=midas,model=model,initBstring=initBstring,stallGenMax=600000,maxTime=36000, maxGens=100000, verbose=FALSE,popSize=100,elitism=2,relTol=0.05)
+  Opt=gaBinaryT1(CNOlist=midas,
+                 model=model,
+                 initBstring=initBstring,
+                 stallGenMax=600000,
+                 maxTime=36000, 
+                 maxGens=100000, 
+                 verbose=FALSE,
+                 popSize=100,
+                 elitism=2,
+                 relTol=0.05)
   
   
   
