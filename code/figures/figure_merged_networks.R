@@ -35,5 +35,5 @@ g = ggplot(all_groups, aes(x=log.p.value, colour=interaction_in_model, fill=inte
   geom_text(data=ann_text, y=ann_text$y, label=ann_text$lab)
 
 pdf('../../figures/figure_merged_networks.pdf', width = 7, height = 10)
-plot_grid(NULL, NULL, NULL, NULL, NULL, g, ncol=2, labels=c('A - EGCG', 'B - FTY', 'C - IFNb', 'D - GA', 'E - NTZ', 'F'))
+plot_grid(NULL, NULL, NULL, NULL, NULL, g, ncol=2, labels='AUTO')
 dev.off()
