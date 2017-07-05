@@ -23,7 +23,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 # ####################################################################################
 
 # ####################################################################################
-# Panel C and D
+# Panel C
 # ####################################################################################
 
 ## get data
@@ -33,8 +33,19 @@ plot_df_c = melt(plot_df_c, id='days')
 colnames(plot_df_c) = c('days', 'treatment', 'clinical score')
 
 ## reorder treatment
-plot_df_c$treatment = factor(plot_df_c$treatment, levels=c('Placebo', 'FTY', 'EGCG', 'FTY+\nEGCG'))
+plot_df_c$treatment = factor(plot_df_c$treatment, levels=c('Placebo', 'FTY', 'EGCG', 'TAKi', 'FTY+\nEGCG', 'FTY+\nTAKi'))
 plot_df_c$comb = 'FTY + EGCG'
+
+# Plot
+g_c = ggplot(plot_df_c, aes(x=days, y=`clinical score`, color=treatment)) +
+  geom_line() + theme_classic()  + 
+  geom_point(shape=15) + theme(strip.background=element_blank(), legend.key.size = unit(1.7, 'lines')) + 
+  scale_color_manual(values=c('#9C9E9F', '#57AB27', '#0098A1',  '#006165', '#CC071E', '#A11035'), 
+                     labels=levels(plot_df_c$treatment), drop=FALSE)
+
+# ####################################################################################
+# Panel C
+# ####################################################################################
 
 ## get data
 plot_df_d = read.xls('../../data/validation_experiments/EAE_FTY_TAK1i.xls', sheet=1, header=TRUE)[,c(1,2,3,4,5)]
@@ -46,15 +57,12 @@ colnames(plot_df_d) = c('days', 'treatment', 'clinical score')
 plot_df_d$treatment = factor(plot_df_d$treatment, levels=c('Placebo', 'FTY', 'TAKi', 'FTY+\nTAKi'))
 plot_df_d$comb = 'FTY + TAKi'
 
-# Combine and plot
-temp = rbind(plot_df_c, plot_df_d)
-temp$treatment = factor(temp$treatment,  levels=c('Placebo', 'FTY', 'EGCG', 'TAKi', 'FTY+\nEGCG', 'FTY+\nTAKi'))
-
-g_v = ggplot(temp, aes(x=days, y=`clinical score`, color=treatment)) + 
-  geom_line() + facet_grid(~comb, scales='free_x') + theme_classic() + 
-  geom_point(shape=15) + theme(strip.background=element_blank(), legend.key.size = unit(1.7, 'lines')) + 
-  annotate("segment", x=-Inf, xend=-Inf, y=-Inf, yend=Inf) +
-  scale_color_manual(values=c('#9C9E9F', '#57AB27', '#0098A1',  '#006165', '#CC071E', '#A11035'))
+# Plot
+g_d = ggplot(plot_df_d, aes(x=days, y=`clinical score`, color=treatment)) +
+  geom_line() + theme_classic()  + 
+  geom_point(shape=15) + theme(strip.background=element_blank(), legend.key.size = unit(1.7, 'lines')) +
+  scale_color_manual(values=c('#9C9E9F', '#57AB27', '#006165', '#A11035'), 
+                     drop=FALSE, guide=FALSE)
 
 # ####################################################################################
 # Combine everything
@@ -63,6 +71,7 @@ g_v = ggplot(temp, aes(x=days, y=`clinical score`, color=treatment)) +
 library(cowplot) # Version 0.6.2 # loaded later, otherwise it messes up the facet grid plot
 
 pdf('../../figures/figure_combination_therapy.pdf', width=7, height=7)
-top_row = plot_grid(NULL, NULL, ncol=2, labels=c('A', 'B'))
-plot_grid(top_row, g_v, nrow=2, labels=c('', 'C'))
+top_row = plot_grid(NULL, NULL, labels=c('A', 'B'), nrow=1)
+bottom_row = plot_grid(g_c, g_d, labels=c('C', 'D'), nrow=1, rel_widths = c(1.4, 1))
+plot_grid(top_row, bottom_row, nrow=2)
 dev.off()
