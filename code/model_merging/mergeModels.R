@@ -1,7 +1,8 @@
-# Function to merge all cluster run solutions to allow each single model to be calculated from successful 10 cluster runs.
-# If less than 10 jobs converged, the job was submitted again. When 10  solutions were obtained, all networks found within 0.00005 relative tolerance of the best networkd were concatenated.
-# This allowed fair merging of all networks for subsequent single model calculation and was analysed in depth (other functions used)
-# I investigated the reason for non-convergence, which was due to memory usage linked to larger number of networks withi rel tol (see code for model quality control)
+
+# Function to create a single model from all solutions found within relative tolerance of the best model for a given patient
+# (-) For a given patient, take a subset of models within reltol. Then clean the non unique.
+# (-) For each patient, calculate a single network (i.e. the mean and the median), and keep stats such as error, num of networks within reltol
+# (-) Merge all single models (each one for a patient) into one structure of networks
 # Created by Marti Bernardo-Faura, final version July 2015
 
 #library(reshape2)
