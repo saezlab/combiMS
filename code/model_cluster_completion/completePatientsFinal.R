@@ -1,6 +1,8 @@
-# For a single patient, merge cluster jobs until 10 successful cluster jobs have been concatenated
-# Marti Bernardo-Faura
-# June 2015
+# Function to merge all cluster run solutions to allow each single model to be calculated from successful 10 cluster runs.
+# If less than 10 jobs converged, the job was submitted again. When 10  solutions were obtained, all networks found within 0.00005 relative tolerance of the best networkd were concatenated.
+# This allowed fair merging of all networks for subsequent single model calculation and was analysed in depth (other functions used)
+# I investigated the reason for non-convergence, which was due to memory usage linked to larger number of networks withi rel tol (see code for model quality control)
+# Created by Marti Bernardo-Faura, final version July 2015
 
 # Minor changes to adjust the paths to the combiMS Github project
 # Jakob Wirbel, June 2017
