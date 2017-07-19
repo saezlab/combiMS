@@ -38,9 +38,9 @@ solutionsAllRunsPatient=list.files(networks_folder,pattern="*.RData",full.names=
 #***********************************************************************
 # *************** preprocess model
 #***********************************************************************
-data_folder="/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/normalized/secondRoundProcessedMidas/"
+data_folder="../../data/phosphos_processed/"
 patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-model_path="/Users/marti/Documents/R/combiMS/combiMSplane.sif"
+model_path="../../files/model/combiMSplane.sif"
 fileName=patientData[1]
 
 midas=CNOlist(paste(data_folder,fileName,sep=""))
@@ -76,7 +76,7 @@ save(AllPatientsToComplete,file=paste0(completed_patients_folder,"runsToComplete
 #***********************************************************************
 # *************** load data to complete patients
 #***********************************************************************
-networks_for_Completion="/Users/marti/Documents/R/combiMS/cluster/8th10hReltol005/results/"
+networks_for_Completion="../../files/cluster/8th10hReltol005/results/"
 for(i in 1:numPatientsToComplete){
   patientToComplete=names(AllPatientsToComplete[i])
   runsNeededPatient=AllPatientsToComplete[i]  
@@ -89,7 +89,7 @@ for(i in 1:numPatientsToComplete){
 # *************** bind data to complete patients from 7th run with the above from 8th
 #***********************************************************************
 # double check number of runs to complete
-networks_folder="/Users/marti/Documents/R/combiMS/cluster/7th10hReltol005/networks/"
+networks_folder="../../files/cluster/7th10hReltol005/networks/"
 totalPatients=list.files(networks_folder,pattern="*.RData",full.names=FALSE)
 incompletePatientSummary=list()
 indexIncomplete=0
@@ -108,7 +108,7 @@ for(indexBoth in 1:length(totalPatients)){
   }
 }
 # bind to networks previously loaded from 8th
-completed_patients_folder="/Users/marti/Documents/R/combiMS/cluster/completedPatients/"
+completed_patients_folder="../../files/cluster/completedPatients/"
 patientsToBind=list.files(completed_patients_folder,pattern="*.RData",full.names=FALSE)
 patientsToBind=patientsToBind[-c(10,11)] #remove two directories
 
@@ -121,7 +121,7 @@ incomplete_patients=c('UZ022.RData', 'UZ027.RData', 'IB068.RData', 'IB030.RData'
 for (i in 1:length(patientsToBind)){
   load(paste0(completed_patients_folder,patientsToBind[i]))#this loads networksToAdd
   
-  networks_folder="/Users/marti/Documents/R/combiMS/cluster/7th10hReltol005/networks/"
+  networks_folder="../../files/cluster/7th10hReltol005/networks/"
   load(paste0(networks_folder,patientsToBind[i]))#this loads PatientResults
   cat("completing",PatientResults$name,"with",networksToAdd$name,"\n")
   cat("completing",length(PatientResults$NwsInRuns),"with",length(networksToAdd$NwsInRuns),"\n")
@@ -161,7 +161,7 @@ re_completed$NwsInRuns=c(PatientResults$NwsInRuns,networksToAdd$NwsInRuns)
 runsNeeded=10-length(re_completed$NwsInRuns)
 
 #load missing runs from 9th run
-networks_for_Re_Completion="/Users/marti/Documents/R/combiMS/cluster/9th10hReltol005/results/"
+networks_for_Re_Completion="../../files/cluster/9th10hReltol005/results/"
 NetworksToAdd=loadPatientRuns(incomplete_patients[i],runsNeeded,numInteractions,networks_for_Re_Completion)
 
 # finally bind from 9th (in thrice_completed) to result of binding from 7th (in networksToAdd) and 8th (in re_completed)
@@ -177,18 +177,18 @@ save(thrice_completed,file=paste0(completed_patients_folder,"completed/",incompl
 # *************** IB068 is still incomplete by one run
 #***********************************************************************
 incomplete_patient='IB068.RData'
-networks_folder="/Users/marti/Documents/R/combiMS/cluster/completedPatients/stillLacking1RunAfter9th/"
+networks_folder="../../files/cluster/completedPatients/stillLacking1RunAfter9th/"
 
 # load networks completed from 7th, 8th, and 9th run
 load(paste0(networks_folder,incomplete_patient))
 
 #load networksToAdd from 9bis run
-networks_for_Completion="/Users/marti/Documents/R/combiMS/cluster/completedPatients/OnePatient/"
+networks_for_Completion="../../files/cluster/completedPatients/OnePatient/"
 runsNeededPatient=10-length(thrice_completed$NwsInRuns) 
 NetworksToAdd=loadPatientRuns(incomplete_patient,runsNeededPatient,numInteractions,networks_for_Completion)
 
 # bind them
-completed_patients_folder="/Users/marti/Documents/R/combiMS/cluster/completedPatients/completed/"
+completed_patients_folder="../../files/cluster/completedPatients/completed/"
 
 four_completed=list()
 four_completed$name=NetworksToAdd$name

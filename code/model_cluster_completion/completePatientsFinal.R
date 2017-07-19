@@ -132,7 +132,7 @@ problem_finding_files=vector(mode="character")
   
   # *************** save
   cat("saving patient","\n")
-  save(PatientResults,file=paste0("/Users/marti/Documents/R/combiMS/cluster/completedPatients/completed/",patientToComplete))
+  save(PatientResults,file=paste0("../files/completedPatients/completed/",patientToComplete))
   cat("-------------------------------------------------patient completed","\n")
   
 }  
