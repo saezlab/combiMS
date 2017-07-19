@@ -7,12 +7,6 @@ For more information, please visit the [website](http://combims.eu/) of the proj
 The analysis results compiled here are presented in the following publication:
 > Bernardo-Faura, M. et al, Prediction of combination therapy based on perturbation modeling of the multiple sclerosis signaling network, submitted 2017.
 
-## Information on Versions and Packages
-
-The scripts collected in this repository are written in [R 3.4.0 (2017-04-21) -- "You Stupid Darkness"](https://cran.r-project.org/) and were run in [RStudio Version 0.99.893](https://www.rstudio.com) and on the Cluster of the [Rheinisch-Westfälische Technische Hochschule Aachen](https://www.rwth-aachen.de/), which uses Centos 7.3 and the LSF job scheduling system version 9.1.3.0.
-
-The [CellNOptR](https://saezlab.github.io/cellnopt/) packages to fit the signaling models for each individual patient was used in version 1.22.0.
-
 ## Workflow of the Project
 
 1. Normalization of the raw data with [normalization_pipeline.R](https://github.com/saezlab/combiMS/blob/master/code/data_processing_and_normalization/normalization_pipeline.R)
@@ -25,3 +19,9 @@ The [CellNOptR](https://saezlab.github.io/cellnopt/) packages to fit the signali
 ## License
 
 Distributed under the GNU GPLv3 License. See accompanying file [LICENSE.txt](https://github.com/saezlab/combiMS/blob/master/LICENSE.txt) or copy at [http://www.gnu.org/licenses/gpl-3.0.html](http://www.gnu.org/licenses/gpl-3.0.html).
+
+## Requirements
+
+The scripts collected in this repository are written in [R 3.4.0 (2017-04-21) -- "You Stupid Darkness"](https://cran.r-project.org/) and were run in [RStudio Version 0.99.893](https://www.rstudio.com) and on the Cluster of the [Rheinisch-Westfälische Technische Hochschule Aachen](https://www.rwth-aachen.de/), which uses Centos 7.3 and the LSF job scheduling system version 9.1.3.0.
+
+The [CellNOptR](https://saezlab.github.io/cellnopt/) packages to fit the signaling models for each individual patient was used in version 1.22.0.
