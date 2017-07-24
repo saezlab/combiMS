@@ -3,12 +3,14 @@
 # Marti Bernardo-Faura
 # Final version April 2016
 
+# Minor changes for Github repository by Jakob Wirbel, July 2017
+
 calculateDefective=function(thisMode='mean',drugable="zero"){
   library(ggplot2)
   library(reshape2)
-  source("/Users/marti/Documents/R/combiMS/phenotypeNetwork.R")
-  phenotypeNws_folder='/Users/marti/Documents/R/combiMS/phenotypeNws/'
-  drugScores_folder='/Users/marti/Documents/R/combiMS/drugScores/'
+  source("./phenotypeNetwork.R")
+  phenotypeNws_folder='../../files/group_models/'
+  drugScores_folder='../../files/drugScores/'
   
   # *************************************************************************************************************************
   # ***********given a patient-model, are we interested in mean or median for the cohort?

@@ -3,6 +3,9 @@
 
 # Final version April 2016
 # Marti Bernardo-Faura
+
+# minor changed for github repository by Jakob Wirbel, July 2017
+
 # *************************************************************************************************************************
 # ***********determine if a stimulus connects to signals through predicted interactions
 # *************************************************************************************************************************
@@ -11,14 +14,14 @@
 
 makeMatrixPathStimSignal<-function(graphGroup,link){
   
-  source("/Users/marti/Documents/R/combiMS/is.connected.R")
+  source("./is.connected.R")
   
   #graphGroup=subnetwork$graph
   cat("the interaction is",link,"\n")
   
   # ************load model and midas for annotation
   patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-  model_path="/Users/marti/Documents/R/combiMS/combiMSplane.sif"
+  model_path="../../files/model/combiMSplane.sif"
   fileName=patientData[1]
   midas=CNOlist(paste(data_folder,fileName,sep=""))
   model=readSIF(model_path)  

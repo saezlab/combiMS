@@ -5,19 +5,25 @@
 # predicted to be targeted successfully, as described by their score in reverting the disease phenotype to a healthy edge weight
 # which was calculated using substractNetworksByEdge.R 
 
+# minor changed for github repository by Jakob Wirbel, 2017
+
+library(CellNOptR)
 library(reshape2)
 library(NMF)
 library(ggplot2)
 library(corrplot)
 library(beeswarm)
 
-source("/Users/marti/Documents/R/combiMS/calculateDefective.R")
-source("/Users/marti/Documents/R/combiMS/phenotypeNetwork.R")
-source("/Users/marti/Documents/R/combiMS/makeMatrixPathStimSignal.R")
-source("/Users/marti/Documents/R/combiMS/network2graph.R")
+# set working directory
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
-figure_folder="~/Desktop/figuresCombiMS/cohortSignaling2/"
-drugScores_folder='/Users/marti/Documents/R/combiMS/drugScores/'
+source("./calculateDefective.R")
+source("./phenotypeNetwork.R")
+source("./makeMatrixPathStimSignal.R")
+source("./network2graph.R")
+
+figure_folder="../../files/cohort_signaling/"
+drugScores_folder='../../files/drugScores/'
 
 
 # *************************************************************************************************************************
@@ -31,9 +37,9 @@ searchInactiveInts="yes"
 # *************************************************************************************************************************
 
 # ************load anotation to map patients to groups
-data_folder="/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/normalized/secondRoundProcessedMidas/"
+data_folder="../../data/phosphos_processed/"
 filenames=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-annot=read.csv("/Users/marti/Documents/R/combiMS/modelling/annot169pat_v2.csv",header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
+annot=read.csv("../../files/annotations/annot169pat_v2.csv",header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
 numPat=length(filenames)
 filenames2=filenames
 for (j in 1:numPat){
@@ -42,12 +48,12 @@ for (j in 1:numPat){
 
 # ************load model and midas for annotation
 patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-model_path="/Users/marti/Documents/R/combiMS/combiMSplane.sif"
+model_path="../../files/model/combiMSplaneCUT.sif"
 fileName=patientData[1]
 midas=CNOlist(paste(data_folder,fileName,sep=""))
 model=readSIF(model_path)  
 sprintf("*********Before preprocessing:  %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
-model=preprocessing(midas,model,expansion=FALSE)
+#model=preprocessing(midas,model,expansion=FALSE)
 numInteractions=length(model$reacID)
 sprintf("*********After compressing: %s nodes and %s reactions",length(model$namesSpecies),numInteractions)
 
@@ -57,7 +63,7 @@ sprintf("*********After compressing: %s nodes and %s reactions",length(model$nam
 # ***********load predicted networks
 # *************************************************************************************************************************
 
-load("/Users/marti/Documents/R/combiMS/cluster/analysis/fivePerHundredThousTol2/allMedianModels.RData")
+load("../../files/median_models/allMedianModels.RData")
 
 
 # *************************************************************************************************************************
@@ -82,7 +88,7 @@ allDrugNws=defectiveScores$allDrugNws
 # *************************************************************************************************************************
 # *********** 1b. Add the calculation of MS subtypes networks, as they are not needed in calculateDefective
 # *************************************************************************************************************************
-phenotypeNws_folder='/Users/marti/Documents/R/combiMS/phenotypeNws/'
+phenotypeNws_folder='../../files/group_models/'
 
 
 #simplify category
@@ -201,3 +207,4 @@ cat('**************num combinations by reaction',length(unique(combinationExperi
 # *********** test each group against each other - careful with the interpretation, as it should be one group against all others
 # *************************************************************************************************************************
 #see pathDrugTargetsFinal.R
+
