@@ -136,9 +136,10 @@ a = ggplot(data=numDefectiveDF,
            aes(drug_name,NumDefective,fill=drug_name)) + 
   geom_bar(stat='identity') + 
   theme_classic() + theme(legend.position = 'none') + 
-  xlab('') + ylab('# of co-druggable reactions') +
+  xlab('') + ylab('Number of \n co-druggable reactions') +
+  theme(axis.title.y = element_text(size=8)) +
   scale_fill_manual(values=c('#612158', '#7A6FAC', '#57AB27', '#BDCD00', '#0098A1'), guide=FALSE) +
-  coord_flip()
+  theme(axis.text.x = element_text(angle=45, hjust=1))
 
 #******plot bars with superposed intearctions to identify common defective
 phenotypeScores$Drug = factor(phenotypeScores$Drug, levels=c('IFNb', 'Tysabri', 'Gilenya', 'Copaxone', 'EGCG'))
@@ -167,7 +168,7 @@ plot_df_c$comb = 'FTY + EGCG'
 # Plot
 g_c = ggplot(plot_df_c, aes(x=days, y=`clinical score`, color=treatment)) +
   geom_line() + theme_classic()  + 
-  geom_point(shape=15) + theme(strip.background=element_blank(), legend.key.size = unit(1.7, 'lines')) + 
+  geom_point(shape=15) + theme(strip.background=element_blank(), legend.key.size = unit(1.3, 'lines')) + 
   scale_color_manual(values=c('#9C9E9F', '#57AB27', '#0098A1',  '#006165', '#CC071E', '#A11035'), 
                      labels=levels(plot_df_c$treatment), drop=FALSE)
 
@@ -188,7 +189,7 @@ plot_df_d$comb = 'FTY + TAKi'
 # Plot
 g_d = ggplot(plot_df_d, aes(x=days, y=`clinical score`, color=treatment)) +
   geom_line() + theme_classic()  + 
-  geom_point(shape=15) + theme(strip.background=element_blank(), legend.key.size = unit(1.7, 'lines')) +
+  geom_point(shape=15) + theme(strip.background=element_blank(), legend.key.size = unit(1.2, 'lines')) +
   scale_color_manual(values=c('#9C9E9F', '#57AB27', '#006165', '#A11035'), 
                      drop=FALSE, guide=FALSE)
 
@@ -198,12 +199,10 @@ g_d = ggplot(plot_df_d, aes(x=days, y=`clinical score`, color=treatment)) +
 
 library(cowplot) # Version 0.6.2 # loaded later, otherwise it messes up the facet grid plot
 
-temp = plot_grid(NULL, a, NULL, nrow=1, rel_widths = c(0.2, 1, 0.2))
-g_a = plot_grid(b, temp, nrow=2, rel_heights = c(1, 0.55))
-
 pdf('../../figures/figure_combination_therapy.pdf', width=7, height=7)
-top_row = plot_grid(g_a, NULL, labels=c('A', 'B'), nrow=1)
-bottom_row = plot_grid(g_c, g_d, labels=c('C', 'D'), nrow=1, rel_widths = c(1.4, 1))
-plot_grid(top_row, bottom_row, nrow=2)
+top_row = plot_grid(b, a, labels=c('A', 'B'), nrow=1, rel_widths = c(1, .45))
+middle_row = plot_grid(NULL, labels = c('C'))
+bottom_row = plot_grid(g_c, g_d, labels=c('D', 'E'), nrow=1, rel_widths = c(1.4, 1))
+plot_grid(top_row, middle_row, bottom_row, nrow=3)
 dev.off()
 
