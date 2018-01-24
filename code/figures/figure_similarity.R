@@ -111,6 +111,7 @@ heatmap_median_models = ggplot(plot_df, aes(x=Model_Interactions, y=Patients)) +
 # load annotation file and similarity BETWEEN matrix
 # ####################################################################################################################
 load("../../files/similarity/similarityMatrix.RData")
+lowerTriangle(similarityMatrix) <- NA
 
 # ************************************ 
 # include similarities WITHIN
@@ -191,15 +192,18 @@ plot_df_2 = rbind(sub_same_group_similarity, sub_self_similarity, sub_IFN, sub_a
 sorted_groups = c('All', 'Self', 'Healthy', 'EGCG', 'FTY', 'IFNb', 'GA', 'NTZ', 'RR Untreated', 'Untreated')
 plot_df_2$Group = factor(plot_df_2$Group, sorted_groups)
 
+### remove NAs
+plot_df_2 <- plot_df_2[complete.cases(plot_df_2),]
+
 boxplot_similarity = ggplot(plot_df_2, aes(x=Group, y=Similarity, fill=Group)) + 
-  geom_boxplot(notch=T, outlier.alpha = 0.2, outlier.stroke = 0) +
+  geom_boxplot(notch=FALSE, outlier.alpha = 0.2, outlier.stroke = 0) +
   theme_classic() + 
   scale_fill_manual(values=c('#ECEDED', '#ECEDED', '#407FB7', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#FDD48F', '#FABE50')) + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.title.x = element_blank()) +
   theme(legend.position = 'none') + 
   geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.05) + 
-  ylim(0.5,1.08) 
+  ylim(0.5,1.08)
 
 # ###################################################################################################################################################
 # Divert output into pdf
