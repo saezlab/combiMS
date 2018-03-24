@@ -42,11 +42,11 @@ OptCombiMS_MR = function(fileName){
   # setwd("/Users/marti/Documents/R/combiMS/modelling/final")
   # source("../data_processing_and_normalization/normaliseSimp.R")
   
-  # working_directory =dirname(rstudioapi::getActiveDocumentContext()$path)    # MR
-  # setwd(working_directory)                                                   # MR
+  working_directory =dirname(rstudioapi::getActiveDocumentContext()$path)    
+  setwd(working_directory)                                                  
   
-  working_directory ="/Users/melanie/Documents/GitHub/combiMS-master_MR/code/single_model_optimization"    # MR
-  setwd(working_directory)                                                   # MR
+  # working_directory ="/Users/melanie/Documents/GitHub/combiMS-master_MR/code/single_model_optimization"    # MR
+  # setwd(working_directory)                                                   # MR
   
   
   

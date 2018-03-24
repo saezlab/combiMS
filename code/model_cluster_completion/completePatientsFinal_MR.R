@@ -21,8 +21,8 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 library(CellNOptR)
-source("./loadPatientRuns.R")
-source("./calculateScore.R")
+source("./loadPatientRuns_MR.R")   # MR modified
+source("./calculateScore_MR.R")   # MR modified
 source("./bindTwoRuns.R")
 source("./checkNwsAndScores.R")
 #******************************************************************
