@@ -4,8 +4,16 @@ calculateScore <- function (model,midas,bString){
 #   if(!exists("bString")){
 #     bString=rep(1,length(model$reacID))
 #   }
-  sim=cutAndPlot(model=model,bStrings=list(bString),CNOlist=midas, plotPDF=FALSE, plotParams=list(maxrow=50))
   
+   
+   graphics.off()                                  
+   
+   pdf(file = NULL)                                
+   
+   sim=cutAndPlot(model=model,bStrings=list(bString),CNOlist=midas, plotPDF=FALSE, plotParams=list(maxrow=50))
+  
+   dev.off     
+   
   #************* calculate deviation
   timeIndex=2
   simResultsT0 = sim$simResults[[1]]$t0
@@ -31,7 +39,8 @@ calculateScore <- function (model,midas,bString){
   NAPen <- NAFac * length(which(is.na(simResults)))
   
   #************* sum all scores to produce final score
-  # achtung: the total after computeScoreT1 is still divideb by numMeasurements in getFit
+  # achtung: the total after computeScoreT1 is still divided by numMeasurements after getFit in computeScoreT1
+
   numMeasurements=sum(!is.na(midas@signals[[timeIndex]]))
   score = (deviationPen + NAPen + sizePen) / numMeasurements
   scores=list("score"=score,"deviationPen"=deviationPen,"NAPen"=NAPen,"sizePen"=sizePen,"numMeasurements"=numMeasurements)
