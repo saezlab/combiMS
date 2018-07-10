@@ -1132,13 +1132,13 @@ boxplot_similarity_test_all_drugs__versus__RRuntreated = ggplot(plot_df_2, aes(x
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                                                 # MR modified
   #geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-   geom_signif(comparisons=list(c("EGCG", "Untreated")), map_signif_level = TRUE, y_position = 1.0,na.rm = TRUE) +                                                 # MR modified
-   geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.1,na.rm = TRUE) +                                                     # MR modified
-   geom_signif(comparisons=list(c("IFNb", "Untreated")), map_signif_level = TRUE, y_position =1.2,na.rm = TRUE) +                                                 # MR modified
-   geom_signif(comparisons=list(c("GA", "Untreated")), map_signif_level = TRUE, y_position = 1.3,na.rm = TRUE) +  
-   geom_signif(comparisons=list(c("NTZ", "Untreated")), map_signif_level = TRUE, y_position = 1.4,na.rm = TRUE) +                                                     # MR modified
+   geom_signif(comparisons=list(c("EGCG", "RR Untreated")), map_signif_level = TRUE, y_position = 1.0,na.rm = TRUE) +                                                 # MR modified
+   geom_signif(comparisons=list(c("FTY", "RR Untreated")), map_signif_level = TRUE, y_position = 1.1,na.rm = TRUE) +                                                     # MR modified
+   geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.2,na.rm = TRUE) +                                                 # MR modified
+   geom_signif(comparisons=list(c("GA", "RR Untreated")), map_signif_level = TRUE, y_position = 1.3,na.rm = TRUE) +  
+   geom_signif(comparisons=list(c("NTZ", "RR Untreated")), map_signif_level = TRUE, y_position = 1.4,na.rm = TRUE) +                                                     # MR modified
    # MR modified
-   ylim(-0.05,1.5)                  # MR modified
+   ylim(-0.05,1.5)          
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity_test_all_drugs__versus__RRuntreated__unique.pdf",sep = "")), width = FigureWidth_boxplot, height = FigureHeight_boxplot)             # MR inserted
 
 
