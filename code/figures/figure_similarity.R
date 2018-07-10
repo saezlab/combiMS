@@ -111,26 +111,29 @@ heatmap_median_models = ggplot(plot_df, aes(x=Model_Interactions, y=Patients)) +
 # load annotation file and similarity BETWEEN matrix
 # ####################################################################################################################
 load("../../files/similarity/similarityMatrix.RData")
-lowerTriangle(similarityMatrix) <- NA
+
+# remove duplicated values in similarity matrix
+similarityMatrix_unique <- similarityMatrix
+similarityMatrix_unique[lower.tri(similarityMatrix_unique,diag=FALSE)]=NA 
 
 # ************************************ 
 # include similarities WITHIN
 load('../../files/similarity/similarityWITHINMeans.RData')
 for (i in 1:dim(similarityMatrix)[1]){
-  similarityMatrix[i,i]=means_within[i]
+  similarityMatrix_unique[i,i]=means_within[i]
 }
  
 
 # ##########################################################################################################
 # create dataframe of similarities to plot
 # ##########################################################################################################
-sim_df=melt(similarityMatrix)
-sim_df$Group=rep(F,dim(similarityMatrix)[1])
-sim_df$GroupSim=rep(F,dim(similarityMatrix)[1])
-sim_df$Condition=rep(F,dim(similarityMatrix)[1])
-sim_df$ConditionSim=rep(F,dim(similarityMatrix)[1])
-sim_df$Self=rep(F,dim(similarityMatrix)[1])
-sim_df$RR_Untreated=rep(F,dim(similarityMatrix)[1])
+sim_df=melt(similarityMatrix_unique)
+sim_df$Group=rep(F,dim(similarityMatrix_unique)[1])
+sim_df$GroupSim=rep(F,dim(similarityMatrix_unique)[1])
+sim_df$Condition=rep(F,dim(similarityMatrix_unique)[1])
+sim_df$ConditionSim=rep(F,dim(similarityMatrix_unique)[1])
+sim_df$Self=rep(F,dim(similarityMatrix_unique)[1])
+sim_df$RR_Untreated=rep(F,dim(similarityMatrix_unique)[1])
 
 colnames(sim_df)=c('SimWith','Patient','Similarity','Group','GroupSim','Condition','ConditionSim','Self','RR_Untreated')  
 sim_df$GroupSim=rep(annot$Group,length(annot$ID))
