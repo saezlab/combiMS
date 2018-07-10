@@ -18,6 +18,7 @@ network2graph<-function(phenotypeNw,mode='mean'){
   }else if (mode=='mean'){
     #phenotypeNw=apply(allMedianNetworks[IndexPatients,],2,mean)
     #if mode=mean, select only active part (apply 0.5 activation threshold)
+    linkActivityThreshold=0.5   # define activation threshold
     phenotypeNw[which(phenotypeNw>=linkActivityThreshold)]=1
     phenotypeNw[which(phenotypeNw<linkActivityThreshold)]=0
     
