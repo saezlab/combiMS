@@ -8,6 +8,20 @@
 ## 
 ####################################################################################
 
+# ####################################################################################
+# User defined input variables
+# ####################################################################################
+
+input__median_models_used = "files/median_models/median_models__based_on__SIFcombiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED"
+input__Results_based_on_SIF_used = 'Results_based_on_SIF_combiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED'
+model_used =   "combiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED.sif"                      # MR inserted
+#model_used =   "combiMSplaneCUT.sif"                      # MR inserted
+
+
+
+
+
+
 ## Load Packages
 library(CellNOptR) # Version 1.16
 library(reshape2) # Version 1.4.1
@@ -29,10 +43,17 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 # Minor changes for Github repository by Jakob Wirbel, July 2017
 source("../combination_therapy_prediction/phenotypeNetwork.R")
-load('../../files/median_models/allMedianModels.RData')
+#load('../../files/median_models/allMedianModels.RData')
+file_path__allMedianModels_RData=  paste('../../',input__median_models_used,'/allMedianModels.RData',sep="")
+load(file_path__allMedianModels_RData)  # called allMedianNetworks
+
+
 thisMode='median'
-phenotypeNws_folder='../../files/group_models/'
-drugScores_folder='../../files/drugScores/'
+# phenotypeNws_folder='../../files/group_models/'
+# drugScores_folder='../../files/drugScores/'
+phenotypeNws_folder=paste('../../files/group_models/',input__Results_based_on_SIF_used,sep="")
+drugScores_folder=paste('../../files/drugScores/',input__Results_based_on_SIF_used,sep="")
+
 
 # ************load anotation to map patients to groups
   #   data_folder="/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/normalized/secondRoundProcessedMidas/"
@@ -45,7 +66,12 @@ annot=read.csv("../../files/annotations/annot169pat_v2.csv",header=TRUE,dec=".",
   #   }
   
 # ************load model and midas for annotation
-model_path="../../files/model/combiMSplaneCUT.sif"
+# 
+
+
+#model_path="../../files/model/combiMSplaneCUT.sif"
+model_path=paste("../../files/model/",model_used,sep='')
+
 model=readSIF(model_path)  
 numInteractions=length(model$reacID)
 

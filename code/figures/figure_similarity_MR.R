@@ -1,7 +1,7 @@
 
 # figure_similarity_MR
 
-#figure_similarity_MR__using_Cluster_MR_Results_based_on_using_MIDAS_phosphos_processed__original_MB_JW__AND__combiMSplaneCUT__gaBinaryT1_postCellNOptRupdate__OKpostCellNOptRupdate
+#
 
 
 
@@ -42,8 +42,28 @@
 
 
 
+# !!!!!!!!!!!!! ATTENTION: The user inputs !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#                          - Results_storage_name
+#                          - Results_storage_name__median_models
+#                     
+# have to be defined 2 times in the code 
+#                          (1) at the top in the following 
+#                          AND
+#                          (2) after 
+                                 # TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+                                 #
+                                 #rm(list = ls())
 
-Results_storage_name = "OptCombiMSclusterFork10_MR__using_MIDAS_phosphos_processed__original_MB_JW__AND__combiMSplaneCUT__gaBinaryT1_postCellNOptRupdate"        # MR inserted
+## !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+
+
+
+
+
+
+Results_storage_name = "Results_based_on_SIF_combiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED"        # MR inserted 
+Results_storage_name__median_models = "median_models__based_on__SIFcombiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED"    # MR inserted
+
 
 include__similarityMatrixSelf__of_each_donor = FALSE                                 # MR inserted
 
@@ -76,7 +96,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 
 
-figures_MR_folder = "../../figures_MR"   
+figures_MR_folder = "../../figures"   
 
 
 ifelse(!dir.exists(file.path(figures_MR_folder,"figure_similarity_MR")), dir.create(file.path(figures_MR_folder,"figure_similarity_MR")), FALSE)              # MR inserted
@@ -160,8 +180,8 @@ annot_Disease.Subtype_unique
 
 #load('../../files/median_models/allMedianModels.RData')        # MR modified
 
-files_median_models_MR_folder = "../../files/median_models_MR"                                       # MR inserted
-sub_dir__Results_allMedianModels = file.path(files_median_models_MR_folder,Results_storage_name)     # MR inserted
+files_median_models_MR_folder = "../../files/median_models"                                       # MR inserted
+sub_dir__Results_allMedianModels = file.path(files_median_models_MR_folder,Results_storage_name__median_models)     # MR inserted
 
 load(file=paste0(sub_dir__Results_allMedianModels,"/allMedianModels.RData"))   # MR modified
 
@@ -280,13 +300,11 @@ ggsave(file.path(sub_dir__Figures_folder_of_current_script__Whole_similarityMatr
 #load("../../files/similarity/similarityMatrix.RData")    # MR commented
 
 
-files_Similarity_MR_folder = "../../files/Similarity_MR"                                                             # MR inserted
+files_Similarity_MR_folder = "../../files/similarity"                                                             # MR inserted
 sub_dir__Results_Similarity_MR = file.path(files_Similarity_MR_folder,Results_storage_name)                          # MR inserted
 
 load(paste(sub_dir__Results_Similarity_MR,"/similarityMatrix.RData",sep="")) # called similarityMatrix               # MR inserted
 
-# wrong_similarityMatrix
-load(paste(sub_dir__Results_Similarity_MR,"/wrong_similarityMatrix.RData",sep="")) # called wrong_similarityMatrix               # MR inserted
 
 
 # ************************************ 
@@ -668,8 +686,8 @@ rm(list = ls())
 
 
 
-
-Results_storage_name = "OptCombiMSclusterFork10_MR__using_MIDAS_phosphos_processed__original_MB_JW__AND__combiMSplaneCUT__gaBinaryT1_postCellNOptRupdate"        # MR inserted
+Results_storage_name = "Results_based_on_SIF_combiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED"        # MR inserted   
+Results_storage_name__median_models = "median_models__based_on__SIFcombiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED"    # MR inserted
 
 include__similarityMatrixSelf__of_each_donor = FALSE                                 # MR inserted
 
@@ -702,7 +720,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 
 
-figures_MR_folder = "../../figures_MR"   
+figures_MR_folder = "../../figures"   
 
 
 ifelse(!dir.exists(file.path(figures_MR_folder,"figure_similarity_MR")), dir.create(file.path(figures_MR_folder,"figure_similarity_MR")), FALSE)              # MR inserted
@@ -786,10 +804,13 @@ annot_Disease.Subtype_unique
 
 #load('../../files/median_models/allMedianModels.RData')        # MR modified
 
-files_median_models_MR_folder = "../../files/median_models_MR"                                       # MR inserted
-sub_dir__Results_allMedianModels = file.path(files_median_models_MR_folder,Results_storage_name)     # MR inserted
+
+files_median_models_MR_folder = "../../files/median_models"                                       # MR inserted
+sub_dir__Results_allMedianModels = file.path(files_median_models_MR_folder,Results_storage_name__median_models)     # MR inserted
 
 load(file=paste0(sub_dir__Results_allMedianModels,"/allMedianModels.RData"))   # MR modified
+
+
 
 
 
@@ -906,13 +927,11 @@ ggsave(file.path(sub_dir__Figures_folder_of_current_script__Whole_similarityMatr
 #load("../../files/similarity/similarityMatrix.RData")    # MR commented
 
 
-files_Similarity_MR_folder = "../../files/Similarity_MR"                                                             # MR inserted
+files_Similarity_MR_folder = "../../files/similarity"                                                             # MR inserted
 sub_dir__Results_Similarity_MR = file.path(files_Similarity_MR_folder,Results_storage_name)                          # MR inserted
 
 load(paste(sub_dir__Results_Similarity_MR,"/similarityMatrix.RData",sep="")) # called similarityMatrix               # MR inserted
 
-# wrong_similarityMatrix
-load(paste(sub_dir__Results_Similarity_MR,"/wrong_similarityMatrix.RData",sep="")) # called wrong_similarityMatrix               # MR inserted
 
 
 # ************************************ 
@@ -1093,13 +1112,13 @@ boxplot_similarity_test_all_drugs__versus__untreated = ggplot(plot_df_2, aes(x=G
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                                                 # MR modified
   #geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  geom_signif(comparisons=list(c("EGCG", "Untreated")), map_signif_level = TRUE, y_position = 0.7,na.rm = TRUE) +                                                 # MR modified
-  geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 0.8,na.rm = TRUE) +                                                     # MR modified
-  geom_signif(comparisons=list(c("IFNb", "Untreated")), map_signif_level = TRUE, y_position = 0.9,na.rm = TRUE) +                                                 # MR modified
-  geom_signif(comparisons=list(c("GA", "Untreated")), map_signif_level = TRUE, y_position = 1.0,na.rm = TRUE) +  
-  geom_signif(comparisons=list(c("NTZ", "Untreated")), map_signif_level = TRUE, y_position = 1.1,na.rm = TRUE) +                                                     # MR modified
+  geom_signif(comparisons=list(c("EGCG", "Untreated")), map_signif_level = TRUE, y_position = 1.0,na.rm = TRUE) +                                                 # MR modified
+  geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.1,na.rm = TRUE) +                                                     # MR modified
+  geom_signif(comparisons=list(c("IFNb", "Untreated")), map_signif_level = TRUE, y_position =1.2,na.rm = TRUE) +                                                 # MR modified
+  geom_signif(comparisons=list(c("GA", "Untreated")), map_signif_level = TRUE, y_position = 1.3,na.rm = TRUE) +  
+  geom_signif(comparisons=list(c("NTZ", "Untreated")), map_signif_level = TRUE, y_position = 1.4,na.rm = TRUE) +                                                     # MR modified
   # MR modified
-  ylim(-0.05,1.2)               # MR modified
+  ylim(-0.05,1.5)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity_test_all_drugs__versus__untreated__unique.pdf",sep = "")), width = FigureWidth_boxplot, height = FigureHeight_boxplot)             # MR inserted
 
 boxplot_similarity_test_all_drugs__versus__RRuntreated = ggplot(plot_df_2, aes(x=Group, y=Similarity, fill=Group)) + 
@@ -1113,13 +1132,13 @@ boxplot_similarity_test_all_drugs__versus__RRuntreated = ggplot(plot_df_2, aes(x
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                                                 # MR modified
   #geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  geom_signif(comparisons=list(c("EGCG", "RR Untreated")), map_signif_level = TRUE, y_position = 0.7,na.rm = TRUE) +                                                 # MR modified
-  geom_signif(comparisons=list(c("FTY", "RR Untreated")), map_signif_level = TRUE, y_position = 0.8,na.rm = TRUE) +                                                     # MR modified
-  geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 0.9,na.rm = TRUE) +                                                 # MR modified
-  geom_signif(comparisons=list(c("GA", "RR Untreated")), map_signif_level = TRUE, y_position = 1.0,na.rm = TRUE) +  
-  geom_signif(comparisons=list(c("NTZ", "RR Untreated")), map_signif_level = TRUE, y_position = 1.1,na.rm = TRUE) +                                                     # MR modified
-  # MR modified
-  ylim(-0.05,1.2)               # MR modified
+   geom_signif(comparisons=list(c("EGCG", "Untreated")), map_signif_level = TRUE, y_position = 1.0,na.rm = TRUE) +                                                 # MR modified
+   geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.1,na.rm = TRUE) +                                                     # MR modified
+   geom_signif(comparisons=list(c("IFNb", "Untreated")), map_signif_level = TRUE, y_position =1.2,na.rm = TRUE) +                                                 # MR modified
+   geom_signif(comparisons=list(c("GA", "Untreated")), map_signif_level = TRUE, y_position = 1.3,na.rm = TRUE) +  
+   geom_signif(comparisons=list(c("NTZ", "Untreated")), map_signif_level = TRUE, y_position = 1.4,na.rm = TRUE) +                                                     # MR modified
+   # MR modified
+   ylim(-0.05,1.5)                  # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity_test_all_drugs__versus__RRuntreated__unique.pdf",sep = "")), width = FigureWidth_boxplot, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -1265,56 +1284,56 @@ sub_plot_df_2_EGCG_unique = sub_plot_df_2_EGCG[row.names(EGCG_unique_indices), ]
 
 
 
-boxplot_similarity_EGCG_unique = ggplot(sub_plot_df_2_EGCG_unique, aes(x=Group, y=Similarity, fill=Group)) + 
-  #geom_boxplot(notch=T, outlier.alpha = 0.2, outlier.stroke = 0) +
-  geom_boxplot(notch=T, outlier.alpha = 0.2, outlier.stroke = 0,na.rm = TRUE) +                                                                         # MR modified
-  theme_classic() + 
-  #scale_fill_manual(values=c('#ECEDED', '#ECEDED', '#407FB7', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#FDD48F', '#FABE50')) +         
-  scale_fill_manual(values=c('#8DC060')) +                        # MR modified
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.title.x = element_blank()) +
-  theme(legend.position = 'none') + 
-  #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
-  # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
-  # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(-0.05,1.2)               # MR modified
-ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG_unique.pdf",sep = "")), width = FigureWidth_boxplot*0.2, height = FigureHeight_boxplot)             # MR inserted
+# boxplot_similarity_EGCG_unique = ggplot(sub_plot_df_2_EGCG_unique, aes(x=Group, y=Similarity, fill=Group)) + 
+#   #geom_boxplot(notch=T, outlier.alpha = 0.2, outlier.stroke = 0) +
+#   geom_boxplot(notch=T, outlier.alpha = 0.2, outlier.stroke = 0,na.rm = TRUE) +                                                                         # MR modified
+#   theme_classic() + 
+#   #scale_fill_manual(values=c('#ECEDED', '#ECEDED', '#407FB7', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#FDD48F', '#FABE50')) +         
+#   scale_fill_manual(values=c('#8DC060')) +                        # MR modified
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.title.x = element_blank()) +
+#   theme(legend.position = 'none') + 
+#   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
+#   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
+#   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
+#   ylim(-0.05,1.2)               # MR modified
+# ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG_unique.pdf",sep = "")), width = FigureWidth_boxplot*0.2, height = FigureHeight_boxplot)             # MR inserted
 
 
 
-boxplot_similarity_EGCG_unique = ggplot(sub_plot_df_2_EGCG_unique, aes(x=Group, y=Similarity, colour=SimWith)) + 
-  #geom_boxplot(notch=T, outlier.alpha = 0.2, outlier.stroke = 0) +
-  geom_point(position = position_jitter(width = 0.5))+
-  theme_classic() + 
-  #scale_fill_manual(values=c('#ECEDED', '#ECEDED', '#407FB7', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#FDD48F', '#FABE50')) +         
-  #scale_fill_manual(values=c('#8DC060')) +                        # MR modified
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.title.x = element_blank()) +
-  #theme(legend.position = 'none') + 
-  #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
-  # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
-  # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(-0.05,1.2)               # MR modified
-ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG_unique__geom_point_colour_SimWith.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
+# boxplot_similarity_EGCG_unique = ggplot(sub_plot_df_2_EGCG_unique, aes(x=Group, y=Similarity, colour=SimWith)) + 
+#   #geom_boxplot(notch=T, outlier.alpha = 0.2, outlier.stroke = 0) +
+#   geom_point(position = position_jitter(width = 0.5))+
+#   theme_classic() + 
+#   #scale_fill_manual(values=c('#ECEDED', '#ECEDED', '#407FB7', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#FDD48F', '#FABE50')) +         
+#   #scale_fill_manual(values=c('#8DC060')) +                        # MR modified
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.title.x = element_blank()) +
+#   #theme(legend.position = 'none') + 
+#   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
+#   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
+#   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
+#   ylim(-0.05,1.2)               # MR modified
+# ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG_unique__geom_point_colour_SimWith.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
+# 
 
 
 
-
-boxplot_similarity_EGCG_unique_2 = ggplot(sub_plot_df_2_EGCG_unique, aes(x=Group, y=Similarity, colour=Patient)) + 
-  #geom_boxplot(notch=T, outlier.alpha = 0.2, outlier.stroke = 0) +
-  geom_point(position = position_jitter(width = 0.5))+
-  theme_classic() + 
-  #scale_fill_manual(values=c('#ECEDED', '#ECEDED', '#407FB7', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#FDD48F', '#FABE50')) +         
-  #scale_fill_manual(values=c('#8DC060')) +                        # MR modified
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.title.x = element_blank()) +
-  #theme(legend.position = 'none') + 
-  #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
-  # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
-  # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(-0.05,1.2)               # MR modified
-ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG_unique__geom_point_colour_Patient.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
-
-
-
-
+# boxplot_similarity_EGCG_unique_2 = ggplot(sub_plot_df_2_EGCG_unique, aes(x=Group, y=Similarity, colour=Patient)) + 
+#   #geom_boxplot(notch=T, outlier.alpha = 0.2, outlier.stroke = 0) +
+#   geom_point(position = position_jitter(width = 0.5))+
+#   theme_classic() + 
+#   #scale_fill_manual(values=c('#ECEDED', '#ECEDED', '#407FB7', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#8DC060', '#FDD48F', '#FABE50')) +         
+#   #scale_fill_manual(values=c('#8DC060')) +                        # MR modified
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.title.x = element_blank()) +
+#   #theme(legend.position = 'none') + 
+#   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
+#   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
+#   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
+#   ylim(-0.05,1.2)               # MR modified
+# ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG_unique__geom_point_colour_Patient.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
+# 
+# 
+# 
+# 
 
 
 
