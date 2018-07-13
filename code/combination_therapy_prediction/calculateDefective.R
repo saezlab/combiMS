@@ -5,7 +5,7 @@
 
 # Minor changes for Github repository by Jakob Wirbel, July 2017
 
-calculateDefective=function(thisMode='mean',drugable="zero"){
+calculateDefective=function(thisMode='mean',drugable="zero",linkActivityThreshold_used=0.5,applyLinkActivityThreshold_used ='no'){
   library(ggplot2)
   library(reshape2)
   source("./phenotypeNetwork.R")
@@ -19,6 +19,18 @@ calculateDefective=function(thisMode='mean',drugable="zero"){
   warning(paste0(drugable," scores selected"))
   
   
+  applyLinkActivityThreshold__storing_text = ''
+  
+  if(thisMode='mean' && applyLinkActivityThreshold_used =='no'){
+     
+     applyLinkActivityThreshold__storing_text = 'NOTroundedRealNumber_'
+     
+  } else if (thisMode='mean' && applyLinkActivityThreshold_used =='yes'){
+    
+     linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold_used)
+     applyLinkActivityThreshold__storing_text = paste('based_on_linkActivityThreshold_',linkActivityThreshold_used_text,'_rounded_',sep="")
+     
+  }
   
   # *************************************************************************************************************************
   # ***********load anotation
@@ -62,13 +74,15 @@ calculateDefective=function(thisMode='mean',drugable="zero"){
   IdxHealthy = annot$Group == 'Healthy'
   IdxMSuntreated = (annot$Treatment == "no" & annot$Disease.Subtype!='')
   
-  H = phenotypeNetwork(IdxHealthy, allMedianNetworks,model,mode=thisMode)  
+  H = phenotypeNetwork(IdxHealthy, allMedianNetworks,model,mode=thisMode,linkActivityThreshold=linkActivityThreshold_used,applyLinkActivityThreshold=applyLinkActivityThreshold_used)  
   thisPhenotype='Healthy'
   write.table(H$network,file=paste0(phenotypeNws_folder,thisPhenotype,thisMode,".csv"),sep=",",row.names=T)
+  write.table(H$network,file=paste(phenotypeNws_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,thisMode,".csv",sep=""),sep=",",row.names=T)
   
-  MSuntreatedNw=phenotypeNetwork(IdxMSuntreated, allMedianNetworks,model,mode=thisMode)
+  MSuntreatedNw=phenotypeNetwork(IdxMSuntreated, allMedianNetworks,model,mode=thisMode,linkActivityThreshold=linkActivityThreshold_used,applyLinkActivityThreshold=applyLinkActivityThreshold_used) 
   thisPhenotype='MS'
   write.table(MSuntreatedNw$network,file=paste0(phenotypeNws_folder,thisPhenotype,thisMode,".csv"),sep=",",row.names=T)
+  write.table(MSuntreatedNw$network,file=paste(phenotypeNws_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,thisMode,".csv",sep=""),sep=",",row.names=T)
   
   
   #distance
@@ -94,7 +108,7 @@ calculateDefective=function(thisMode='mean',drugable="zero"){
     thisPhenotype=phenotypes[i]
     patientsThisPhenotype= annot$Treatment==thisPhenotype   #which are the patients in this phenotype?
     #**************Create phenotype network for Drug i
-    phenoNw=phenotypeNetwork(patientsThisPhenotype,allMedianNetworks,model,mode=thisMode) 
+    phenoNw=phenotypeNetwork(patientsThisPhenotype,allMedianNetworks,model,mode=thisMode,linkActivityThreshold=linkActivityThreshold_used,applyLinkActivityThreshold=applyLinkActivityThreshold_used) 
     #**************Calculate the distance between i drug-Network and Healthy network
     H2Pheno=H$network-phenoNw$network 
     #**************Substract the above from Healthy to Ms
@@ -128,12 +142,16 @@ calculateDefective=function(thisMode='mean',drugable="zero"){
     warning(paste0(numDrugDefective[i]," drugable reactions for ",thisPhenotype,"\n"))
     
     #**************Save this network to structure in order to concatenate all networks
-    allDrugNws[[i]]=phenotypeNetwork(patientsThisPhenotype,allMedianNetworks,model,mode=thisMode)
+    allDrugNws[[i]]=phenotypeNetwork(patientsThisPhenotype,allMedianNetworks,model,mode=thisMode,linkActivityThreshold=linkActivityThreshold_used,applyLinkActivityThreshold=applyLinkActivityThreshold_used) 
     allDrugNws[[i]]$Drug=thisPhenotype
     
     #**************save individual files: for this drug, (i) defective reactions and (ii) network
     write.table(defectiveInts,file=paste0(drugScores_folder,thisPhenotype,thisMode,drugable,".csv"),sep=",",row.names=T)
+    write.table(defectiveInts,file=paste(drugScores_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,thisMode,"_",drugable,".csv",sep=""),sep=",",row.names=T)
+    
     write.table(allDrugNws[[i]]$network,file=paste0(phenotypeNws_folder,thisPhenotype,thisMode,drugable,".csv"),sep=",",row.names=T)
+    write.table(allDrugNws[[i]]$network,file=paste(phenotypeNws_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,thisMode,"_",drugable,".csv",sep=""),sep=",",row.names=T)
+    
     
   }
   
@@ -141,7 +159,8 @@ calculateDefective=function(thisMode='mean',drugable="zero"){
   #****** which are the interactions that are defective in all drugs?
   alwaysDefective=intersect(intersect(intersect(intersect(names(allDefective[[1]]),names(allDefective[[2]])),names(allDefective[[3]])),names(allDefective[[4]])),names(allDefective[[5]]))
   write.table(alwaysDefective,file=paste0(drugScores_folder,thisMode,"alwaysDefective.csv"),sep=",",row.names=T)
-
+  write.table(alwaysDefective,file=paste(drugScores_folder,"alwaysDefective","__",applyLinkActivityThreshold__storing_text,thisMode,"_",drugable,".csv",sep=""),sep=",",row.names=T)
+  
 # *************************************************************************************************************************
   # *********** 3. Visualize defective interactions and phenotype networks
   # *************************************************************************************************************************
