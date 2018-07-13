@@ -6,7 +6,18 @@
 #this is the modification of phenotypeNetwork old. here i do not take the links above activity threshold
 #this modification allows to calculate defective and only then remove those below threshold
 #for the same reason, I cannot turn network into graph, this is now done in pathDrugTargetv3
-phenotypeNetwork<-function(IndexPatients, allMedianNetworks, model, mode='mean', linkActivityThreshold=0.5 ){
+#
+#
+#
+
+# applyLinkActivityThreshold ='no' can be used to produce a non-weighted network for plotting and graph search
+# in the median model it is not necessary
+# 
+# applyLinkActivityThreshold ='yes' leads to rounded mean values based on the choosen linkActivityThreshold
+
+
+
+phenotypeNetwork<-function(IndexPatients, allMedianNetworks, model, mode='mean', linkActivityThreshold=0.5,applyLinkActivityThreshold ='no'){
 
   # *************************************************************************************************************************
   # ***********calculate grand median OR mean of median models for each phenotype
@@ -18,10 +29,16 @@ phenotypeNetwork<-function(IndexPatients, allMedianNetworks, model, mode='mean',
   phenotypeNw[which(phenotypeNw==0.5)]=1
   }else if (mode=='mean'){
     phenotypeNw=apply(allMedianNetworks[IndexPatients,],2,mean)
-    #if mode=mean, select only active part (apply 0.5 activation threshold)
-    phenotypeNw[which(phenotypeNw>=linkActivityThreshold)]=1
-    phenotypeNw[which(phenotypeNw<linkActivityThreshold)]=0
     
+   
+    if(applyLinkActivityThreshold == 'yes'){
+       
+       phenotypeNw[which(phenotypeNw>=linkActivityThreshold)]=1
+       phenotypeNw[which(phenotypeNw<linkActivityThreshold)]=0
+       
+    }
+    #if mode=mean, select only active part (apply 0.5 activation threshold)
+   
   } else (stop("Wrong mode. Mean or median required"))
 
 
