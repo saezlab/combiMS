@@ -4,8 +4,32 @@
 # Final version April 2016
 
 # Minor changes for Github repository by Jakob Wirbel, July 2017
+# 
+# Changes by Melanie Rinas, July 2018
+# 
+# 
 
-calculateDefective=function(thisMode='mean',drugable="zero",linkActivityThreshold_used=0.5,applyLinkActivityThreshold_used ='no'){
+
+ 
+# Copyright information ================================================================================================================================== -->
+
+#  Copyright (c) 2018 - European Molecular Biology Laboratory, European Bioinformatics Institute, UK,
+#                       Joint Research Center for Computational Biomedicine (JRC-COMBINE), RWTH-Aachen University, Faculty of Medicine, Aachen, Germany 
+# 
+#  File author(s): Marti Bernardo-Faura (marti.bernardo.faura@gmail.com), Jakob Wirbel, Melanie Rinas (melrinas@gmail.com) 
+# 
+#  Distributed under the GPLv3 License. 
+#  See accompanying file LICENSE.txt or copy at
+#  http://www.gnu.org/licenses/gpl-3.0.html 
+
+#  ======================================================================================================================================================== -->
+
+
+
+calculateDefective=function(thisMode='mean',
+                            drugable="zero",
+                            linkActivityThreshold_used=0.5,
+                            applyLinkActivityThreshold_used ='no'){
   library(ggplot2)
   library(reshape2)
   source("./phenotypeNetwork.R")
@@ -21,14 +45,14 @@ calculateDefective=function(thisMode='mean',drugable="zero",linkActivityThreshol
   
   applyLinkActivityThreshold__storing_text = ''
   
-  if(thisMode='mean' && applyLinkActivityThreshold_used =='no'){
+  if(thisMode =='mean' && applyLinkActivityThreshold_used =='no'){
      
      applyLinkActivityThreshold__storing_text = 'NOTroundedRealNumber_'
      
-  } else if (thisMode='mean' && applyLinkActivityThreshold_used =='yes'){
+  } else if (thisMode =='mean' && applyLinkActivityThreshold_used =='yes'){
     
      linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold_used)
-     applyLinkActivityThreshold__storing_text = paste('based_on_linkActivityThreshold_',linkActivityThreshold_used_text,'_rounded_',sep="")
+     applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_rounded_',sep="")
      
   }
   
