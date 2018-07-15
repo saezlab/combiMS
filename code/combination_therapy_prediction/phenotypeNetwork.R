@@ -15,9 +15,31 @@
 # 
 # applyLinkActivityThreshold ='yes' leads to rounded mean values based on the choosen linkActivityThreshold
 
+# Changes by Melanie Rinas, July 2018
 
 
-phenotypeNetwork<-function(IndexPatients, allMedianNetworks, model, mode='mean', linkActivityThreshold=0.5,applyLinkActivityThreshold ='no'){
+
+
+# Copyright information ================================================================================================================================== -->
+   
+#  Copyright (c) 2018 - European Molecular Biology Laboratory, European Bioinformatics Institute, UK,
+#                       Joint Research Center for Computational Biomedicine (JRC-COMBINE), RWTH-Aachen University, Faculty of Medicine, Aachen, Germany 
+# 
+#  File author(s): Marti Bernardo-Faura (marti.bernardo.faura@gmail.com), Melanie Rinas (melrinas@gmail.com) 
+# 
+#  Distributed under the GPLv3 License. 
+#  See accompanying file LICENSE.txt or copy at
+#  http://www.gnu.org/licenses/gpl-3.0.html 
+   
+#  ======================================================================================================================================================== -->
+   
+
+phenotypeNetwork<-function(IndexPatients, 
+                           allMedianNetworks, 
+                           model, 
+                           mode='mean', 
+                           linkActivityThreshold=0.5,
+                           applyLinkActivityThreshold ='no'){
 
   # *************************************************************************************************************************
   # ***********calculate grand median OR mean of median models for each phenotype
