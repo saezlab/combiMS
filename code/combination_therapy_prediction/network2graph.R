@@ -1,7 +1,33 @@
 # Function called by pathDrugTargetsFinalv3.R to transform a graph after graph search into a network
 # Marti Bernardo-Faura
 # Final version April 2016
-network2graph<-function(phenotypeNw,mode='mean'){
+# 
+# 
+# 
+# 
+# 
+# Changes by Melanie Rinas, July 2018
+# 
+# 
+# 
+# Copyright information ================================================================================================================================== -->
+
+#  Copyright (c) 2018 - European Molecular Biology Laboratory, European Bioinformatics Institute, UK,
+#                       Joint Research Center for Computational Biomedicine (JRC-COMBINE), RWTH-Aachen University, Faculty of Medicine, Aachen, Germany 
+# 
+#  File author(s): Marti Bernardo-Faura (marti.bernardo.faura@gmail.com), Jakob Wirbel, Melanie Rinas (melrinas@gmail.com) 
+# 
+#  Distributed under the GPLv3 License. 
+#  See accompanying file LICENSE.txt or copy at
+#  http://www.gnu.org/licenses/gpl-3.0.html 
+
+#  ======================================================================================================================================================== -->
+
+network2graph<-function(phenotypeNw,
+                        mode='mean',
+                        linkActivityThreshold=0.5){   # Note: The function network2graph requires a Boolean logic network (using not rounded mean causes several wrong results). 
+                                                      # Thus the option applyLinkActivityThreshold must be applyLinkActivityThreshold = 'no' and can not be chosen by the user (to prevent wrong results).     
+   
 
   # *************************************************************************************************************************
   # ***********calculate grand median OR mean of median models for each phenotype
@@ -18,9 +44,12 @@ network2graph<-function(phenotypeNw,mode='mean'){
   }else if (mode=='mean'){
     #phenotypeNw=apply(allMedianNetworks[IndexPatients,],2,mean)
     #if mode=mean, select only active part (apply 0.5 activation threshold)
-    linkActivityThreshold=0.5   # define activation threshold
+    
     phenotypeNw[which(phenotypeNw>=linkActivityThreshold)]=1
     phenotypeNw[which(phenotypeNw<linkActivityThreshold)]=0
+    
+    warning(paste0('The results of the function network2graph are generated using the Boolean version of the network (rounded mean values) based on the chosen linkActivityThreshold.\n'))
+    
     
   } else (stop("Wrong mode. Mean or median required"))
 
