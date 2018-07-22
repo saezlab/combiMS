@@ -181,8 +181,7 @@ annot_Disease.Subtype_unique
 #load('../../files/median_models/allMedianModels.RData')        # MR modified
 
 files_median_models_MR_folder = "../../files/median_models"                                       # MR inserted
-#sub_dir__Results_allMedianModels = file.path(files_median_models_MR_folder,Results_storage_name__median_models)     # MR inserted
-sub_dir__Results_allMedianModels = file.path(files_median_models_MR_folder)     # MR inserted
+sub_dir__Results_allMedianModels = file.path(files_median_models_MR_folder,Results_storage_name__median_models)     # MR inserted
 
 load(file=paste0(sub_dir__Results_allMedianModels,"/allMedianModels.RData"))   # MR modified
 
@@ -274,7 +273,7 @@ FigureHeight_map=8     # MR inserted
 heatmap_median_models = ggplot(plot_df, aes(x=Model_Interactions, y=Patients)) + 
   facet_grid(~split, scales = "free_x", space='free', margins=FALSE) + 
   geom_tile(aes(fill=value)) + 
-  xlab('Model Reactions (1-168)') + ylab('Patients (1-169)') +
+  xlab('Model Reactions (1-186)') + ylab('Patients (1-169)') +
   theme(strip.background=element_blank(), strip.text= element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(),
         axis.ticks = element_blank(), axis.line.y = element_blank(), legend.text = element_text(size=6), axis.line.x = element_blank(),
         axis.title = element_text(size=9),
@@ -447,7 +446,7 @@ boxplot_similarity = ggplot(plot_df_2, aes(x=Group, y=Similarity, fill=Group)) +
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
   geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Whole_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity.pdf",sep = "")), width = FigureWidth_boxplot, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -508,7 +507,7 @@ boxplot_similarity_EGCG = ggplot(sub_plot_df_2_EGCG, aes(x=Group, y=Similarity, 
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Whole_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity_EGCG.pdf",sep = "")), width = FigureWidth_boxplot*0.2, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -524,7 +523,7 @@ boxplot_similarity_EGCG = ggplot(sub_plot_df_2_EGCG, aes(x=Group, y=Similarity, 
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Whole_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity_EGCG__geom_point_colour_SimWith.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -541,7 +540,7 @@ boxplot_similarity_EGCG_2 = ggplot(sub_plot_df_2_EGCG, aes(x=Group, y=Similarity
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Whole_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity_EGCG__geom_point_colour_Patient.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -567,7 +566,7 @@ boxplot_similarity_EGCG_unique = ggplot(sub_plot_df_2_EGCG_unique, aes(x=Group, 
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Whole_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity_EGCG_unique.pdf",sep = "")), width = FigureWidth_boxplot*0.2, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -583,7 +582,7 @@ boxplot_similarity_EGCG_unique = ggplot(sub_plot_df_2_EGCG_unique, aes(x=Group, 
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Whole_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity_EGCG_unique__geom_point_colour_SimWith.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -600,7 +599,7 @@ boxplot_similarity_EGCG_unique_2 = ggplot(sub_plot_df_2_EGCG_unique, aes(x=Group
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Whole_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity_EGCG_unique__geom_point_colour_Patient.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -661,7 +660,7 @@ ggsave(file.path(sub_dir__Figures_folder_of_current_script__Whole_similarityMatr
 #    #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
 #    geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
 #    geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-#    ylim(0.5,1.2)               # MR modified
+#    ylim(-0.05,1.2)               # MR modified
 # ggsave(file.path(sub_dir__Figures_folder_of_current_script,paste("figure_similarity_MR__B__boxplot_similarity_unique.pdf",sep = "")), width = FigureWidth_boxplot, height = FigureHeight_boxplot)             # MR inserted
 # 
 # 
@@ -807,8 +806,7 @@ annot_Disease.Subtype_unique
 
 
 files_median_models_MR_folder = "../../files/median_models"                                       # MR inserted
-#sub_dir__Results_allMedianModels = file.path(files_median_models_MR_folder,Results_storage_name__median_models)     # MR inserted
-sub_dir__Results_allMedianModels = file.path(files_median_models_MR_folder)     # MR inserted
+sub_dir__Results_allMedianModels = file.path(files_median_models_MR_folder,Results_storage_name__median_models)     # MR inserted
 
 load(file=paste0(sub_dir__Results_allMedianModels,"/allMedianModels.RData"))   # MR modified
 
@@ -902,7 +900,7 @@ FigureHeight_map=8     # MR inserted
 heatmap_median_models = ggplot(plot_df, aes(x=Model_Interactions, y=Patients)) + 
   facet_grid(~split, scales = "free_x", space='free', margins=FALSE) + 
   geom_tile(aes(fill=value)) + 
-  xlab('Model Reactions (1-168)') + ylab('Patients (1-169)') +
+  xlab('Model Reactions (1-186)') + ylab('Patients (1-169)') +
   theme(strip.background=element_blank(), strip.text= element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(),
         axis.ticks = element_blank(), axis.line.y = element_blank(), legend.text = element_text(size=6), axis.line.x = element_blank(),
         axis.title = element_text(size=9),
@@ -1093,7 +1091,7 @@ boxplot_similarity = ggplot(plot_df_2, aes(x=Group, y=Similarity, fill=Group)) +
   #geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
   geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05,na.rm = TRUE) +                                                 # MR modified
   geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15,na.rm = TRUE) +                                                     # MR modified
-   ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique.pdf",sep = "")), width = FigureWidth_boxplot, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -1120,7 +1118,7 @@ boxplot_similarity_test_all_drugs__versus__untreated = ggplot(plot_df_2, aes(x=G
   geom_signif(comparisons=list(c("GA", "Untreated")), map_signif_level = TRUE, y_position = 1.3,na.rm = TRUE) +  
   geom_signif(comparisons=list(c("NTZ", "Untreated")), map_signif_level = TRUE, y_position = 1.4,na.rm = TRUE) +                                                     # MR modified
   # MR modified
-  ylim(0.5,1.5)               # MR modified
+  ylim(-0.05,1.5)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity_test_all_drugs__versus__untreated__unique.pdf",sep = "")), width = FigureWidth_boxplot, height = FigureHeight_boxplot)             # MR inserted
 
 boxplot_similarity_test_all_drugs__versus__RRuntreated = ggplot(plot_df_2, aes(x=Group, y=Similarity, fill=Group)) + 
@@ -1140,7 +1138,7 @@ boxplot_similarity_test_all_drugs__versus__RRuntreated = ggplot(plot_df_2, aes(x
    geom_signif(comparisons=list(c("GA", "RR Untreated")), map_signif_level = TRUE, y_position = 1.3,na.rm = TRUE) +  
    geom_signif(comparisons=list(c("NTZ", "RR Untreated")), map_signif_level = TRUE, y_position = 1.4,na.rm = TRUE) +                                                     # MR modified
    # MR modified
-   ylim(0.5,1.5)          
+   ylim(-0.05,1.5)          
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity_test_all_drugs__versus__RRuntreated__unique.pdf",sep = "")), width = FigureWidth_boxplot, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -1175,7 +1173,7 @@ boxplot_similarity_subset_without_NA = ggplot(plot_df_2__subset_without_NA, aes(
   #geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
   geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05,na.rm = TRUE) +                                                 # MR modified
   geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15,na.rm = TRUE) +                                                     # MR modified
-  ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique__using_plot_df_2__subset_without_NA.pdf",sep = "")), width = FigureWidth_boxplot, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -1237,7 +1235,7 @@ boxplot_similarity_EGCG = ggplot(sub_plot_df_2_EGCG, aes(x=Group, y=Similarity, 
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG.pdf",sep = "")), width = FigureWidth_boxplot*0.2, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -1253,7 +1251,7 @@ boxplot_similarity_EGCG = ggplot(sub_plot_df_2_EGCG, aes(x=Group, y=Similarity, 
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG__geom_point_colour_SimWith.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -1270,7 +1268,7 @@ boxplot_similarity_EGCG_2 = ggplot(sub_plot_df_2_EGCG, aes(x=Group, y=Similarity
   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-  ylim(0.5,1.2)               # MR modified
+  ylim(-0.05,1.2)               # MR modified
 ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG__geom_point_colour_Patient.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -1297,7 +1295,7 @@ sub_plot_df_2_EGCG_unique = sub_plot_df_2_EGCG[row.names(EGCG_unique_indices), ]
 #   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
 #   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
 #   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-#   ylim(0.5,1.2)               # MR modified
+#   ylim(-0.05,1.2)               # MR modified
 # ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG_unique.pdf",sep = "")), width = FigureWidth_boxplot*0.2, height = FigureHeight_boxplot)             # MR inserted
 
 
@@ -1313,7 +1311,7 @@ sub_plot_df_2_EGCG_unique = sub_plot_df_2_EGCG[row.names(EGCG_unique_indices), ]
 #   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
 #   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
 #   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-#   ylim(0.5,1.2)               # MR modified
+#   ylim(-0.05,1.2)               # MR modified
 # ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG_unique__geom_point_colour_SimWith.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
 # 
 
@@ -1330,7 +1328,7 @@ sub_plot_df_2_EGCG_unique = sub_plot_df_2_EGCG[row.names(EGCG_unique_indices), ]
 #   #geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE) +
 #   # geom_signif(comparisons=list(c("IFNb", "RR Untreated")), map_signif_level = TRUE, y_position = 1.05) +                         # MR modified
 #   # geom_signif(comparisons=list(c("FTY", "Untreated")), map_signif_level = TRUE, y_position = 1.15) +
-#   ylim(0.5,1.2)               # MR modified
+#   ylim(-0.05,1.2)               # MR modified
 # ggsave(file.path(sub_dir__Figures_folder_of_current_script__Unique_similarityMatrix,paste("figure_similarity_MR__B__boxplot_similarity__unique_EGCG_unique__geom_point_colour_Patient.pdf",sep = "")), width = FigureWidth_boxplot*1.5, height = FigureHeight_boxplot)             # MR inserted
 # 
 # 

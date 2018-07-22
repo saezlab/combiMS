@@ -153,7 +153,7 @@ calculateDefective=function(thisMode='mean',
       ints0AndOk=intersect(names(drugScores[which(drugScores==0)]), intsSituationOk)
       intsNeg=which(drugScores<0)
       intsPos=which(drugScores>0)
-      warning(paste0("Neg: ",length(intsNeg),"\nPos: ",length(intsPos),"\n0AndOk: ",length(ints0AndOk),"\n0andNotOk: ",length(ints0AndNotOk),"\n"))
+      warning(paste0("Neg:",length(intsNeg)," Pos:",length(intsPos)," 0AndOk: ",length(ints0AndOk)," 0andNotOk:",length(ints0AndNotOk),"\n"))
       # replace
       drugScores[which(names(drugScores) %in% ints0AndOk)]=1
       defectiveInts=drugScores[which(drugScores<=0)]
