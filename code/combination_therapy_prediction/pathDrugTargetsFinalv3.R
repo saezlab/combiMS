@@ -19,6 +19,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 source("./calculateDefective.R")
 source("./phenotypeNetwork.R")
+
 source("./makeMatrixPathStimSignal.R")
 source("./network2graph.R")
 
@@ -29,9 +30,32 @@ drugScores_folder='../../files/drugScores/'
 # *************************************************************************************************************************
 # ***********select algorythm options
 # *************************************************************************************************************************
-groupingMode='median'
-thisDrugable="zero"
+
+
+groupingMode='mean'     # 2 groupingMode options are possible: 'mean' or 'median'
+
+linkActivityThreshold=0.5
+applyLinkActivityThreshold ='no'
+
+thisDrugable="zero"     # 2 thisDrugable options are possible: "zero" or "negative"
+                        # "zero": defectiveInts are interactions with a drugScore equal or smaller than 0 (drugScore <= 0)
+                        # "negative": defectiveInts are only interactions with a negative drugScore (drugScore < 0)
+                        
 searchInactiveInts="yes"
+
+# option searchInactiveInts has no effect in this script as
+# the searchInactiveInts="yes" related modification of
+# drugNetwork$network
+# by setting
+# drugNetwork$network[which(names(drugNetwork$network) %in% interactionsToReplace)]=1 #replace activity by 1
+# 
+# is afterwards not used and not saved
+
+
+
+
+
+
 # *************************************************************************************************************************
 # ***********load anotation
 # *************************************************************************************************************************
@@ -48,7 +72,7 @@ for (j in 1:numPat){
 
 # ************load model and midas for annotation
 patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-model_path="../../files/model/combiMSplaneCUT.sif"
+model_path="../../files/model/combiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED.sif"
 fileName=patientData[1]
 midas=CNOlist(paste(data_folder,fileName,sep=""))
 model=readSIF(model_path)  
@@ -70,7 +94,10 @@ load("../../files/median_models/allMedianModels.RData")
 # *********** 1. Calculate Healthy, MS and drug phenotipic network and identify defective interactions
 # *************************************************************************************************************************
 
-defectiveScores=calculateDefective(thisMode=groupingMode,drugable=thisDrugable)
+defectiveScores=calculateDefective(thisMode=groupingMode,
+                                   drugable=thisDrugable,
+                                   linkActivityThreshold_used=linkActivityThreshold,
+                                   applyLinkActivityThreshold_used = applyLinkActivityThreshold)
 #save plots
 # defectiveScores$scorePlot
 # ggsave(paste0(figure_folder,"scoreCumulativePlot",groupingMode,thisDrugable,".pdf"))
@@ -102,15 +129,35 @@ length(which(annot2$Category=='PPMS')) + length(which(annot2$Category=='RRMS')) 
 length(which(annot2$Category=='RRMS' & annot2$condition=='Untreated')) + length(which(annot2$Category=='PPMS' & annot2$condition=='Untreated')) + length(which(annot2$condition=='Treated')) + length(which(annot2$condition=='Healthy'))
 
 #create PPMS and RRMS networks
+
+
+
+applyLinkActivityThreshold__storing_text = ''
+
+if(groupingMode =='mean' && applyLinkActivityThreshold =='no'){
+   
+   applyLinkActivityThreshold__storing_text = 'NOTroundedRealNumber_'
+   
+} else if (groupingMode =='mean' && applyLinkActivityThreshold =='yes'){
+   
+   linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold)
+   applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_rounded_',sep="")
+   
+}
+
+
+
 thisPhenotype='RRMS'
 Idx= which(annot2$Category==thisPhenotype & annot2$condition=='Untreated')
-thisNw= phenotypeNetwork(Idx, allMedianNetworks,model,mode=groupingMode)  
-write.table(thisNw$network,file=paste0(phenotypeNws_folder,thisPhenotype,groupingMode,".csv"),sep=",",row.names=T)
+thisNw= phenotypeNetwork(Idx, allMedianNetworks,model,mode=groupingMode,linkActivityThreshold=linkActivityThreshold,applyLinkActivityThreshold = applyLinkActivityThreshold)  
+
+write.table(thisNw$network,file=paste(phenotypeNws_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,".csv",sep=""),sep=",",row.names=T)
 
 thisPhenotype='PPMS'
 Idx= which(annot2$Category==thisPhenotype & annot2$condition=='Untreated')
-thisNw= phenotypeNetwork(Idx, allMedianNetworks,model,mode=groupingMode)  
-write.table(thisNw$network,file=paste0(phenotypeNws_folder,thisPhenotype,groupingMode,".csv"),sep=",",row.names=T)
+thisNw= phenotypeNetwork(Idx, allMedianNetworks,model,mode=groupingMode,linkActivityThreshold=linkActivityThreshold,applyLinkActivityThreshold = applyLinkActivityThreshold)  
+  
+write.table(thisNw$network,paste(phenotypeNws_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,".csv",sep=""),sep=",",row.names=T)
 
 
 # *************************************************************************************************************************
@@ -129,7 +176,12 @@ numDrugs=5
 # *********** 2. Select only active parts of nw above activity threshold, then turn into graph
 # *************************************************************************************************************************
 # Transform network into graph. Booleanize network if mode is mean
-drugNetwork=network2graph(allDrugNws[[drug]]$network,mode=groupingMode)
+drugNetwork=network2graph(allDrugNws[[drug]]$network,
+                          mode=groupingMode,
+                          linkActivityThreshold=linkActivityThreshold)  # Note: The function network2graph requires a Boolean logic network (using not rounded mean causes several wrong results). 
+                                                                        # Thus the option applyLinkActivityThreshold must be applyLinkActivityThreshold = 'no' and can not be chosen by the user (to prevent wrong results).     
+
+
 plotModel(drugNetwork$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,nodeHeight=1))
 
 #Note the difference between activity in network (grouping), co-drugability score, and "situation not ok"score, i.e. difference between grouping in H and D.
@@ -138,9 +190,14 @@ plotModel(drugNetwork$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,no
 # discussed where it is interesting to use them. Therefore, before prediction of combination therapy, force activation of these interactions.
 # note:intereactions with 0 scores and situation ok have been replaced by 1 in their score, hence it is safe to just activate all remaining ints with 0 scores
 if(searchInactiveInts=="no"){
-  warning(paste0("serching inactive ints: ",searchInactiveInts))
+   
+  warning(paste0("searching inactive ints: ",searchInactiveInts))
+   
 } else if (searchInactiveInts=="yes"){
-  phenotypeScores=read.table(file=paste0(drugScores_folder,phenotypes[drug],groupingMode,thisDrugable,".csv"),sep=",")
+   
+  phenotypeScores=read.table(file=paste(drugScores_folder,phenotypes[drug],"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,".csv",sep=""),sep=",")
+  
+   
   interactions0Score=drugNetwork$network[which(names(drugNetwork$network) %in% rownames(phenotypeScores)[which(phenotypeScores==0)])]
   interactionsToReplace=names(which(interactions0Score==0))
   drugNetwork$network[which(names(drugNetwork$network) %in% interactionsToReplace)]=1 #replace activity by 1
