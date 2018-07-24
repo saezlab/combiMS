@@ -45,16 +45,19 @@ calculateDefective=function(thisMode='mean',
   
   applyLinkActivityThreshold__storing_text = ''
   
-  if(thisMode =='mean' && applyLinkActivityThreshold_used =='no'){
+  
+  if(thisMode =='mean' && applyLinkActivityThreshold_used =='no'){     
      
-     applyLinkActivityThreshold__storing_text = 'NOTroundedRealNumber_'
+     applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_NOTroundedRealNumber_',sep="")
      
   } else if (thisMode =='mean' && applyLinkActivityThreshold_used =='yes'){
-    
+     
      linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold_used)
      applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_rounded_',sep="")
      
   }
+  
+ 
   
   # *************************************************************************************************************************
   # ***********load anotation
