@@ -43,14 +43,6 @@ thisDrugable="zero"     # 2 thisDrugable options are possible: "zero" or "negati
                         
 searchInactiveInts="yes"
 
-# option searchInactiveInts has no effect in this script as
-# the searchInactiveInts="yes" related modification of
-# drugNetwork$network
-# by setting
-# drugNetwork$network[which(names(drugNetwork$network) %in% interactionsToReplace)]=1 #replace activity by 1
-# 
-# is afterwards not used and not saved
-
 
 
 
@@ -136,7 +128,7 @@ applyLinkActivityThreshold__storing_text = ''
 
 if(groupingMode =='mean' && applyLinkActivityThreshold =='no'){
    
-   applyLinkActivityThreshold__storing_text = 'NOTroundedRealNumber_'
+   applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_NOTroundedRealNumber_',sep="")
    
 } else if (groupingMode =='mean' && applyLinkActivityThreshold =='yes'){
    
@@ -185,10 +177,10 @@ drugNetwork=network2graph(allDrugNws[[drug]]$network,
 plotModel(drugNetwork$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,nodeHeight=1))
 
 #Note the difference between activity in network (grouping), co-drugability score, and "situation not ok"score, i.e. difference between grouping in H and D.
-#calculateDefective can work in "zero" scoring mode, identifying some interactions with a socre of 0 where situation is not ok. 
+#calculateDefective can work in "zero" scoring mode, identifying possibly inactive interactions with a non-positive co-drugability (groupingMode = median: score of 0 or -1; groupingMode = mean: score <= 0) where situation is not ok. 
 # network2graph will cut such interactions out, thereby if we search that graph such interactions cannot be used. A rationale has been
 # discussed where it is interesting to use them. Therefore, before prediction of combination therapy, force activation of these interactions.
-# note:intereactions with 0 scores and situation ok have been replaced by 1 in their score, hence it is safe to just activate all remaining ints with 0 scores
+# note:interactions with 0 scores and situation ok have been replaced by 1 in their score
 if(searchInactiveInts=="no"){
    
   warning(paste0("searching inactive ints: ",searchInactiveInts))
@@ -199,10 +191,101 @@ if(searchInactiveInts=="no"){
   
    
   interactions0Score=drugNetwork$network[which(names(drugNetwork$network) %in% rownames(phenotypeScores)[which(phenotypeScores==0)])]
-  interactionsToReplace=names(which(interactions0Score==0))
-  drugNetwork$network[which(names(drugNetwork$network) %in% interactionsToReplace)]=1 #replace activity by 1
-  warning(paste0(interactionsToReplace," ints replaced with activity=1. Total of ",length(interactions0Score)," ints with 0 score and situation not ok"))
-} else {stop(warning("incorrect searching mode selected"))}
+  interactions0ScoreToReplace=names(which(interactions0Score==0))
+  
+  interactionsNegativeScore=drugNetwork$network[which(names(drugNetwork$network) %in% rownames(phenotypeScores)[which(phenotypeScores<0)])]
+  interactionsNegativeScoreToReplace=names(which(interactionsNegativeScore==0))
+  
+  
+  network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts  =  drugNetwork$network   # create new list element to store the modified activity value
+  
+  network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts[which(names(drugNetwork$network) %in% interactions0ScoreToReplace)]=1 #replace activity by 1
+  network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts[which(names(drugNetwork$network) %in% interactionsNegativeScoreToReplace)]=1 #replace activity by 1
+  
+  for(ii in 1:length(interactions0ScoreToReplace)){
+     
+     print(warning(paste0("(" , ii , ")  " , interactions0ScoreToReplace[ii]," defective inactive (OFF) interaction replaced with activity=1 (ON).\n")))
+     
+  }
+  warning(paste0("Total of ",length(interactions0ScoreToReplace)," inactive (OFF) ints with 0 score and situation not ok \nout of all (ON and OFF) ",
+                       length(rownames(phenotypeScores)[which(phenotypeScores==0)]) ," ints with 0 score and situation not ok.\n"))
+  
+  
+  
+  
+  
+  for(iii in 1:length(interactionsNegativeScoreToReplace)){
+     
+     print(warning(paste0("(" , iii , ")  " , interactionsNegativeScoreToReplace[iii]," defective inactive (OFF) interaction replaced with activity=1 (ON).\n")))
+
+  }
+  warning(paste0("Total of ",length(interactionsNegativeScoreToReplace)," inactive (OFF) ints with negative score and situation not ok \nout of all (ON and OFF) ",
+                 length(rownames(phenotypeScores)[which(phenotypeScores<0)]) ," ints with negative score and situation not ok.\n"))
+  
+
+  
+  
+  
+  # *************************************************************************************************************************
+  # *********** Repeat calculations of network2graph.R using network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts and 
+  #             store them as new list elements in drugNetwork
+  #             
+  #             In this way, drugNetwork will by a list containing following list elements:
+  #             (1) "model"=modelPhenotype
+  #             (2) "graph"=graphModel
+  #             (3) "network"=phenotypeNw
+  #             (4) "cutNetwork"=cutNw
+  #             
+  #             (5) "model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts"
+  #             (6) "graph_OFFdefectiveInts_ModifiedTo_ONdefectiveInts"
+  #             (7) "network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts"
+  #             (8) "cutNetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts"
+  #             
+  # *************************************************************************************************************************
+  
+  
+  # create model with active part
+  modelPhenotype_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = cutModel(model,network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts)
+  drugNetwork$model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = modelPhenotype_OFFdefectiveInts_ModifiedTo_ONdefectiveInts
+  # Note: For the number of interactions of drugNetwork$model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts it holds:
+  #       length(drugNetwork$model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts$reacID) = length(drugNetwork$model$reacID) + length(interactions0ScoreToReplace) + length(interactionsNegativeScoreToReplace)
+     
+  plotModel(drugNetwork$model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,midas,graphvizParams=list(fontsize=35,nodeWidth=1,nodeHeight=1))
+  
+  # transform model into graph
+  tempSIF_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = model2sif(model,optimRes=list(bString=network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts))
+  cutNw__OFFdefectiveInts_ModifiedTo_ONdefectiveInts=tempSIF_OFFdefectiveInts_ModifiedTo_ONdefectiveInts
+  # replace inhibition by activation, as the graph only accepts positive interactions
+  tempSIF_OFFdefectiveInts_ModifiedTo_ONdefectiveInts[,2]=abs(as.numeric(tempSIF_OFFdefectiveInts_ModifiedTo_ONdefectiveInts[,2]))
+  graphModel_OFFdefectiveInts_ModifiedTo_ONdefectiveInts=sif2graph(tempSIF_OFFdefectiveInts_ModifiedTo_ONdefectiveInts)
+  
+
+  drugNetwork$graph_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = graphModel_OFFdefectiveInts_ModifiedTo_ONdefectiveInts
+  drugNetwork$network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts
+  drugNetwork$cutNetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = cutNw__OFFdefectiveInts_ModifiedTo_ONdefectiveInts
+  
+     
+     #  ModelGraph=list("model"=modelPhenotype,"graph"=graphModel,"network"=phenotypeNw,"cutNetwork"=cutNw)
+
+  # transform network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts into graph
+  
+  tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = model2sif(model,optimRes=list(bString=network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts))
+  cut__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts
+  
+  graphModel__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts=sif2graph(tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts)                                                            
+  
+  # replace inhibition by activation, as the graph only accepts positive interactions
+  tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts[,2]=abs(as.numeric(tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts[,2]))                                                
+  graphModel__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts__inhibition_replaced_by_activation=sif2graph(tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts)  
+  
+  
+  drugNetwork$graph__codruggableInactiveInts__modified_to_active = graphModel__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts
+  drugNetwork$graph__codruggableInactiveInts__modified_to_active__inhibition_replaced_by_activation = graphModel__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts__inhibition_replaced_by_activation
+  drugNetwork$cutnetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = cut__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts
+  
+
+  
+  } else {stop(warning("incorrect searching mode selected"))}
 
 # *************************************************************************************************************************
 # ***********3. Once a drug is selected, recreate drug network, then
@@ -256,7 +339,18 @@ combinationExperiments=rbind(combinationExperiments,experimentsThisInteraction)
 
 drugName=phenotypes[drug]
 write.csv(combinationExperiments,file=paste("/Users/marti/Desktop/figuresCombiMS/combinations/",drugName,thisDrugable,searchInactiveInts,groupingMode,".csv",sep=""))
+
 write.table(drugNetwork$cutNetwork,file=paste0(phenotypeNws_folder,drugName,"CUT",thisDrugable,searchInactiveInts,groupingMode,".csv"),sep=",",row.names=T,quote=F)
+write.table(drugNetwork$cutNetwork,file=paste0(phenotypeNws_folder,drugName,"CUT",thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".csv"),sep=",",row.names=T,quote=F)
+
+
+write.table(drugNetwork$cutNetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,file=paste0(phenotypeNws_folder,drugName,"CUT_OFFdefectiveInts_ModifiedTo_ONdefectiveInts_",thisDrugable,searchInactiveInts,groupingMode,".csv"),sep=",",row.names=T,quote=F)
+write.table(drugNetwork$cutNetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,file=paste0(phenotypeNws_folder,drugName,"CUT_OFFdefectiveInts_ModifiedTo_ONdefectiveInts_",thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".csv"),sep=",",row.names=T,quote=F)
+
+
+
+save(drugNetwork,file=paste(phenotypeNws_folder,drugName,"_drugNetwork_",thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".RData",sep=""))
+
 
 cat('**************num combinations by stimuli',length(unique(combinationExperiments[,2])),'\n')
 cat('**************num combinations by reaction',length(unique(combinationExperiments[,1])),'\n')
