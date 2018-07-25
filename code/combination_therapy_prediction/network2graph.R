@@ -67,7 +67,10 @@ network2graph<-function(phenotypeNw,
   tempSIF[,2]=abs(as.numeric(tempSIF[,2]))
   graphModel=sif2graph(tempSIF)
 
-  ModelGraph=list("model"=modelPhenotype,"graph"=graphModel,"network"=phenotypeNw,"cutNetwork"=cutNw)
+  ModelGraph=list("model"=modelPhenotype,
+                  "graph"=graphModel,
+                  "network"=phenotypeNw,
+                  "cutNetwork"=cutNw)
 
 return(ModelGraph)
 
