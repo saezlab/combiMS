@@ -6,6 +6,27 @@
 # which was calculated using substractNetworksByEdge.R 
 
 # minor changed for github repository by Jakob Wirbel, 2017
+# 
+# 
+# 
+# Changes by Melanie Rinas, July 2018
+# 
+# 
+
+
+
+# Copyright information ================================================================================================================================== -->
+
+#  Copyright (c) 2018 - European Molecular Biology Laboratory, European Bioinformatics Institute, UK,
+#                       Joint Research Center for Computational Biomedicine (JRC-COMBINE), RWTH-Aachen University, Faculty of Medicine, Aachen, Germany 
+# 
+#  File author(s): Marti Bernardo-Faura (marti.bernardo.faura@gmail.com), Jakob Wirbel, Melanie Rinas (melrinas@gmail.com) 
+# 
+#  Distributed under the GPLv3 License. 
+#  See accompanying file LICENSE.txt or copy at
+#  http://www.gnu.org/licenses/gpl-3.0.html 
+
+
 
 library(CellNOptR)
 library(reshape2)
@@ -25,6 +46,11 @@ source("./network2graph.R")
 
 figure_folder="../../files/cohort_signaling/"
 drugScores_folder='../../files/drugScores/'
+
+
+
+
+
 
 
 # *************************************************************************************************************************
@@ -165,6 +191,17 @@ numDrugs=5
 # #plot(allDrugNws[[drug]]$graph)
 
 
+
+
+Figure_folder_storage_name = paste("Figures_based_on__", phenotypes[drug] ,"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,sep="")        
+
+ifelse(!dir.exists(file.path(figure_folder,Figure_folder_storage_name)), dir.create(file.path(figure_folder,Figure_folder_storage_name)), FALSE)              
+figure_folder_of_current_script_settings = file.path(figure_folder,Figure_folder_storage_name)                                                                             
+figure_folder_of_current_script_settings_ = paste(figure_folder_of_current_script_settings,"/",sep="")
+
+
+
+
 # *************************************************************************************************************************
 # *********** 2. Select only active parts of nw above activity threshold, then turn into graph
 # *************************************************************************************************************************
@@ -176,6 +213,18 @@ drugNetwork=network2graph(allDrugNws[[drug]]$network,
 
 
 plotModel(drugNetwork$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,nodeHeight=1))
+
+
+# Save figure in figure_folder_of_current_script_settings_
+FigureWidth_plotModel = 22    
+FigureHeight_plotModel = 10   
+
+pdf(file=file.path(figure_folder_of_current_script_settings_,paste("plotModel_drugNetwork_model__", phenotypes[drug] ,"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,".pdf",sep="")),width=FigureWidth_plotModel, height=FigureHeight_plotModel)
+
+plotModel(drugNetwork$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,nodeHeight=1))
+
+dev.off()    
+
 
 #Note the difference between activity in network (grouping), co-drugability score, and "situation not ok"score, i.e. difference between grouping in H and D.
 #calculateDefective can work in "zero" scoring mode, identifying possibly inactive interactions with a non-positive co-drugability (groupingMode = median: score of 0 or -1; groupingMode = mean: score <= 0) where situation is not ok. 
@@ -252,6 +301,18 @@ if(searchInactiveInts=="no"){
   #       length(drugNetwork$model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts$reacID) = length(drugNetwork$model$reacID) + length(interactions0ScoreToReplace) + length(interactionsNegativeScoreToReplace)
      
   plotModel(drugNetwork$model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,midas,graphvizParams=list(fontsize=35,nodeWidth=1,nodeHeight=1))
+  
+  
+  # Save figure in figure_folder_of_current_script_settings_
+  FigureWidth_plotModel__OFFdefectiveInts_ModifiedTo_ONdefectiveInts = 32    
+  FigureHeight_plotModel__OFFdefectiveInts_ModifiedTo_ONdefectiveInts = 15   
+  
+  pdf(file=file.path(figure_folder_of_current_script_settings_,paste("plotModel_drugNetwork_model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts__", phenotypes[drug] ,"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,".pdf",sep="")),width=FigureWidth_plotModel, height=FigureHeight_plotModel)
+  
+  plotModel(drugNetwork$model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,midas,graphvizParams=list(fontsize=35,nodeWidth=4,nodeHeight=4))
+  
+  dev.off()    
+  
   
   # transform model into graph
   tempSIF_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = model2sif(model,optimRes=list(bString=network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts))
