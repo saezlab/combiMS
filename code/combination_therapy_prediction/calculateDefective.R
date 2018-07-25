@@ -48,6 +48,7 @@ calculateDefective=function(thisMode='mean',
   
   if(thisMode =='mean' && applyLinkActivityThreshold_used =='no'){     
      
+     linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold_used)
      applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_NOTroundedRealNumber_',sep="")
      
   } else if (thisMode =='mean' && applyLinkActivityThreshold_used =='yes'){
