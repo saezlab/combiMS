@@ -128,6 +128,7 @@ applyLinkActivityThreshold__storing_text = ''
 
 if(groupingMode =='mean' && applyLinkActivityThreshold =='no'){
    
+   linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold)
    applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_NOTroundedRealNumber_',sep="")
    
 } else if (groupingMode =='mean' && applyLinkActivityThreshold =='yes'){
@@ -157,7 +158,7 @@ write.table(thisNw$network,paste(phenotypeNws_folder,thisPhenotype,"__",applyLin
 # *************************************************************************************************************************
 
 
-drug=5 #**********select a drug here
+drug=1     # 5 #**********select a drug here
 #Gilenya=Fingolimod, Glatiramer=Copaxone
 phenotypes=c('Gilenya','IFNb','Copaxone','EGCG','Tysabri')
 numDrugs=5
@@ -285,12 +286,20 @@ if(searchInactiveInts=="no"){
   
 
   
-  } else {stop(warning("incorrect searching mode selected"))}
+} else {stop(warning("incorrect searching mode selected"))}
+
+
+
+
+
 
 # *************************************************************************************************************************
 # ***********3. Once a drug is selected, recreate drug network, then
 #************determine if a stimulus connects to signals through Defective interactions
 # *************************************************************************************************************************
+
+# ***********3.1 Determine combinationExperiments using only active (ON) defective interactions # ****************************************************
+
 Stimuli=colnames(midas@stimuli)
 AllReadouts=colnames(midas@signals[[2]])
 cat('**************Chosen drug:',phenotypes[drug],'\n')
@@ -303,8 +312,8 @@ presentTopInts=topTargets[which(topTargets %in% drugNetwork$model$reacID)]
 presentStimuli=colnames(midas@stimuli)[which(colnames(midas@stimuli) %in% drugNetwork$graph@nodes)]
 presentSignals=colnames(midas@signals[[2]])[which(colnames(midas@signals[[2]]) %in% drugNetwork$graph@nodes)]
 
-cat("Defective intearctions:",topTargets,"\n")
-cat("Present defective:",presentTopInts,"\n")
+cat("Defective interactions:",topTargets,"\n")
+cat("Present (active) defective:",presentTopInts,"\n")
 cat("Stimuli with activity:",presentStimuli,"\n")
 cat("Readouts with activity",presentSignals,"\n")
 
@@ -315,6 +324,7 @@ colnames(combinationExperiments)=c('Reaction','Stimulus','Readout','drugScore')
 
 
 for(indexInts in 1:length(presentTopInts)){
+   
 link=presentTopInts[indexInts]
 matrixPaths=makeMatrixPathStimSignal(drugNetwork$graph,link)
 numCombinations=length(AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]])
@@ -324,7 +334,7 @@ experimentsThisInteraction=matrix(nrow=numCombinations,ncol=4)
 experimentsThisInteraction[,1]=rep(link,numCombinations)
 experimentsThisInteraction[,2]=Stimuli[which(matrixPaths==1,arr.ind=T)[,2]]
 experimentsThisInteraction[,3]=AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]]
-experimentsThisInteraction[,4]=rep(defectiveScores$defectiveInts[[drug]][indexInts],numCombinations) 
+experimentsThisInteraction[,4]=rep(defectiveScores$defectiveInts[[drug]][link],numCombinations) 
 
 
 
@@ -338,7 +348,84 @@ combinationExperiments=rbind(combinationExperiments,experimentsThisInteraction)
 }
 
 drugName=phenotypes[drug]
-write.csv(combinationExperiments,file=paste("/Users/marti/Desktop/figuresCombiMS/combinations/",drugName,thisDrugable,searchInactiveInts,groupingMode,".csv",sep=""))
+
+
+#write.csv(combinationExperiments,file=paste("/Users/marti/Desktop/figuresCombiMS/combinations/",drugName,thisDrugable,searchInactiveInts,groupingMode,".csv",sep=""))
+write.csv(combinationExperiments,file=paste(drugScores_folder,"combinationExperiments_",drugName,thisDrugable,searchInactiveInts,groupingMode,".csv",sep=""))
+write.csv(combinationExperiments,file=paste(drugScores_folder,"combinationExperiments_",drugName,thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".csv",sep=""))
+
+
+
+
+
+# *********** If searchInactiveInts = "yes" ********************************************************************************************************
+
+# ***********3.2 Determine combinationExperiments using active (ON) and inactive (OFF) defective interactions # ****************************************************
+#                by repeating 3.2 using 'OFFdefectiveInts_ModifiedTo_ONdefectiveInts' list elements of drugNetwork 
+
+
+if(searchInactiveInts == "yes"){
+   
+      
+   cat('**************Chosen drug:',phenotypes[drug],'\n')
+   
+   
+   ONandOFF_TopInts=topTargets[which(topTargets %in% drugNetwork$model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts$reacID)]
+   ONandOFF_Stimuli=colnames(midas@stimuli)[which(colnames(midas@stimuli) %in% drugNetwork$graph_OFFdefectiveInts_ModifiedTo_ONdefectiveInts@nodes)]
+   ONandOFF_Signals=colnames(midas@signals[[2]])[which(colnames(midas@signals[[2]]) %in% drugNetwork$graph_OFFdefectiveInts_ModifiedTo_ONdefectiveInts@nodes)]
+   
+   cat("Defective interactions:",topTargets,"\n")
+   cat("ON and OFF (active and inactive) defective of model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts :",ONandOFF_TopInts,"\n")
+   cat("Stimuli of graph_OFFdefectiveInts_ModifiedTo_ONdefectiveInts:",ONandOFF_Stimuli,"\n")
+   cat("Readouts of graph_OFFdefectiveInts_ModifiedTo_ONdefectiveInts",ONandOFF_Signals,"\n")
+   
+   
+   #combinationExperiments__ONandOFF_DefectiveInts=data.frame(Reaction=character(),Stimulus=numeric(),Readout=numeric(),drugScoreInteraction=numeric())
+   combinationExperiments__ONandOFF_DefectiveInts=matrix(ncol=6,nrow=0)
+   colnames(combinationExperiments__ONandOFF_DefectiveInts)=c('Reaction','Stimulus','Readout','drugScore','Boolean network activity','Group network activity')
+   
+   
+   for(indexInts in 1:length(ONandOFF_TopInts)){
+      
+      link=ONandOFF_TopInts[indexInts]
+      matrixPaths=makeMatrixPathStimSignal(drugNetwork$graph_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,link)
+      numCombinations=length(AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]])
+      Stimuli[which(matrixPaths==1,arr.ind=T)[,2]]
+      
+      experimentsThisInteraction=matrix(nrow=numCombinations,ncol=6)
+      experimentsThisInteraction[,1]=rep(link,numCombinations)
+      experimentsThisInteraction[,2]=Stimuli[which(matrixPaths==1,arr.ind=T)[,2]]
+      experimentsThisInteraction[,3]=AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]]
+      experimentsThisInteraction[,4]=rep(defectiveScores$defectiveInts[[drug]][link],numCombinations) 
+      experimentsThisInteraction[,5]=rep(drugNetwork$network[link],numCombinations) 
+      experimentsThisInteraction[,6]=rep(defectiveScores$allDrugNws[[drug]]$network[link],numCombinations) 
+      
+      
+      
+      # experimentsThisInteraction=data.frame(Reaction=rep(link,numCombinations),
+      #                                       Stimulus=Stimuli[which(matrixPaths==1,arr.ind=T)[,2]],
+      #                                       Readout=AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]],
+      #                                       drugScoreInteraction=rep(defectiveScores$defectiveInts[[drug]][indexInts],numCombinations) 
+      #                             )
+      combinationExperiments__ONandOFF_DefectiveInts=rbind(combinationExperiments__ONandOFF_DefectiveInts,experimentsThisInteraction)
+      #aheatmap(matrixPaths,Rowv=NA,Colv=NA)
+}
+
+   drugName=phenotypes[drug]
+   
+   
+   #write.csv(combinationExperiments__ONandOFF_DefectiveInts,file=paste("/Users/marti/Desktop/figuresCombiMS/combinations/",drugName,thisDrugable,searchInactiveInts,groupingMode,".csv",sep=""))
+   write.csv(combinationExperiments__ONandOFF_DefectiveInts,file=paste(drugScores_folder,"combinationExperiments__ONandOFF_DefectiveInts_",drugName,thisDrugable,searchInactiveInts,groupingMode,".csv",sep=""))
+   write.csv(combinationExperiments__ONandOFF_DefectiveInts,file=paste(drugScores_folder,"combinationExperiments__ONandOFF_DefectiveInts_",drugName,thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".csv",sep=""))
+
+
+
+
+}
+
+
+
+
 
 write.table(drugNetwork$cutNetwork,file=paste0(phenotypeNws_folder,drugName,"CUT",thisDrugable,searchInactiveInts,groupingMode,".csv"),sep=",",row.names=T,quote=F)
 write.table(drugNetwork$cutNetwork,file=paste0(phenotypeNws_folder,drugName,"CUT",thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".csv"),sep=",",row.names=T,quote=F)
@@ -352,10 +439,18 @@ write.table(drugNetwork$cutNetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,f
 save(drugNetwork,file=paste(phenotypeNws_folder,drugName,"_drugNetwork_",thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".RData",sep=""))
 
 
-cat('**************num combinations by stimuli',length(unique(combinationExperiments[,2])),'\n')
-cat('**************num combinations by reaction',length(unique(combinationExperiments[,1])),'\n')
+cat('**************num combinations by stimuli',length(unique(combinationExperiments[,2])),' based on active co-druggable interactions. \n')
+cat('**************num combinations by reaction',length(unique(combinationExperiments[,1])),' based on active co-druggable interactions. \n')
+
+if(searchInactiveInts == "yes"){
+   
+   cat('**************num combinations by stimuli',length(unique(combinationExperiments__ONandOFF_DefectiveInts[,2])),' based on active and inactive co-druggable interactions. \n')
+   cat('**************num combinations by reaction',length(unique(combinationExperiments__ONandOFF_DefectiveInts[,1])),' based on active and inactive co-druggable interactions. \n')
+}
+
 # *************************************************************************************************************************
 # *********** test each group against each other - careful with the interpretation, as it should be one group against all others
 # *************************************************************************************************************************
 #see pathDrugTargetsFinal.R
 
+print("Script finished.")
