@@ -58,7 +58,22 @@ calculateDefective=function(thisMode='mean',
      
   }
   
- 
+  
+  
+  
+  drugScores_folder_storage_name = paste("drugScores_based_on__",applyLinkActivityThreshold__storing_text,thisMode,"_",drugable,"_",searchInactiveInts,sep="")        
+  
+  ifelse(!dir.exists(file.path(drugScores_folder,drugScores_folder_storage_name)), dir.create(file.path(drugScores_folder,drugScores_folder_storage_name)), FALSE)              
+  drugScores_folder_of_current_script_settings = file.path(drugScores_folder,drugScores_folder_storage_name)                                                                             
+  drugScores_folder_of_current_script_settings_ = paste(drugScores_folder_of_current_script_settings,"/",sep="")
+  
+  
+  phenotypeNws_folder_storage_name = paste("phenotypeNws_based_on__",applyLinkActivityThreshold__storing_text,thisMode,"_",drugable,"_",searchInactiveInts,sep="")        
+  
+  ifelse(!dir.exists(file.path(phenotypeNws_folder,phenotypeNws_folder_storage_name)), dir.create(file.path(phenotypeNws_folder,phenotypeNws_folder_storage_name)), FALSE)              
+  phenotypeNws_folder_of_current_script_settings = file.path(phenotypeNws_folder,phenotypeNws_folder_storage_name)                                                                             
+  phenotypeNws_folder_of_current_script_settings_ = paste(phenotypeNws_folder_of_current_script_settings,"/",sep="")
+  
   
   # *************************************************************************************************************************
   # ***********load anotation
@@ -104,14 +119,12 @@ calculateDefective=function(thisMode='mean',
   
   H = phenotypeNetwork(IdxHealthy, allMedianNetworks,model,mode=thisMode,linkActivityThreshold=linkActivityThreshold_used,applyLinkActivityThreshold=applyLinkActivityThreshold_used)  
   thisPhenotype='Healthy'
-  write.table(H$network,file=paste0(phenotypeNws_folder,thisPhenotype,thisMode,".csv"),sep=",",row.names=T)
-  write.table(H$network,file=paste(phenotypeNws_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,thisMode,".csv",sep=""),sep=",",row.names=T)
-  
+  write.table(H$network,file=paste0(phenotypeNws_folder_of_current_script_settings_,thisPhenotype,"_network.csv"),sep=",",row.names=T)
+
   MSuntreatedNw=phenotypeNetwork(IdxMSuntreated, allMedianNetworks,model,mode=thisMode,linkActivityThreshold=linkActivityThreshold_used,applyLinkActivityThreshold=applyLinkActivityThreshold_used) 
   thisPhenotype='MS'
-  write.table(MSuntreatedNw$network,file=paste0(phenotypeNws_folder,thisPhenotype,thisMode,".csv"),sep=",",row.names=T)
-  write.table(MSuntreatedNw$network,file=paste(phenotypeNws_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,thisMode,".csv",sep=""),sep=",",row.names=T)
-  
+  write.table(MSuntreatedNw$network,file=paste0(phenotypeNws_folder_of_current_script_settings_,thisPhenotype,"_network.csv"),sep=",",row.names=T)
+
   
   #distance
   HD=H$network-MSuntreatedNw$network
@@ -142,6 +155,11 @@ calculateDefective=function(thisMode='mean',
     #**************Substract the above from Healthy to Ms
     drugScores=abs(HD)-abs(H2Pheno) 
     #phenotypeScores[,i+1]=drugScores
+    drugScores_allInts = drugScores
+    write.table(drugScores,file=paste0(drugScores_folder_of_current_script_settings_,thisPhenotype,"_drugScores_allInts.csv"),sep=",",row.names=T)
+    save(drugScores_allInts,file=paste(drugScores_folder_of_current_script_settings_,thisPhenotype,"_drugScores_allInts.RData",sep=""))
+    
+    
     #**************Fill in dataframe for plotting with scores
     phenotypeScores$Score[which(as.character(phenotypeScores$Drug)==thisPhenotype)]=drugScores
     #barplot(drugScores,ylab='drugScores',xlab='Interactions (original network:186)',main=paste0(thisPhenotype,". Defective:",length(which(drugScores<0))))
@@ -173,22 +191,22 @@ calculateDefective=function(thisMode='mean',
     allDrugNws[[i]]=phenotypeNetwork(patientsThisPhenotype,allMedianNetworks,model,mode=thisMode,linkActivityThreshold=linkActivityThreshold_used,applyLinkActivityThreshold=applyLinkActivityThreshold_used) 
     allDrugNws[[i]]$Drug=thisPhenotype
     
-    #**************save individual files: for this drug, (i) defective reactions and (ii) network
-    write.table(defectiveInts,file=paste0(drugScores_folder,thisPhenotype,thisMode,drugable,".csv"),sep=",",row.names=T)
-    write.table(defectiveInts,file=paste(drugScores_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,thisMode,"_",drugable,".csv",sep=""),sep=",",row.names=T)
+    #**************save individual files: for this drug, (i) drugScores, (ii) defective reactions and (iii) network
     
-    write.table(allDrugNws[[i]]$network,file=paste0(phenotypeNws_folder,thisPhenotype,thisMode,drugable,".csv"),sep=",",row.names=T)
-    write.table(allDrugNws[[i]]$network,file=paste(phenotypeNws_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,thisMode,"_",drugable,".csv",sep=""),sep=",",row.names=T)
+    write.table(drugScores,file=paste0(drugScores_folder_of_current_script_settings_,thisPhenotype,"_drugScores_allInts__modified_ints0AndOk_fixed_to_1.csv"),sep=",",row.names=T)
     
+    write.table(defectiveInts,file=paste0(drugScores_folder_of_current_script_settings_,thisPhenotype,"_drugScores_defectiveInts.csv"),sep=",",row.names=T)
+
+    write.table(allDrugNws[[i]]$network,file=paste0(phenotypeNws_folder_of_current_script_settings_,thisPhenotype,"_network.csv"),sep=",",row.names=T)
+
     
   }
   
 
   #****** which are the interactions that are defective in all drugs?
   alwaysDefective=intersect(intersect(intersect(intersect(names(allDefective[[1]]),names(allDefective[[2]])),names(allDefective[[3]])),names(allDefective[[4]])),names(allDefective[[5]]))
-  write.table(alwaysDefective,file=paste0(drugScores_folder,thisMode,"alwaysDefective.csv"),sep=",",row.names=T)
-  write.table(alwaysDefective,file=paste(drugScores_folder,"alwaysDefective","__",applyLinkActivityThreshold__storing_text,thisMode,"_",drugable,".csv",sep=""),sep=",",row.names=T)
-  
+  write.table(alwaysDefective,file=paste0(drugScores_folder_of_current_script_settings_,"alwaysDefective.csv"),sep=",",row.names=T)
+
 # *************************************************************************************************************************
   # *********** 3. Visualize defective interactions and phenotype networks
   # *************************************************************************************************************************
