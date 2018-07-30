@@ -46,7 +46,7 @@ source("./network2graph.R")
 
 figure_folder="../../files/cohort_signaling/"
 drugScores_folder='../../files/drugScores/'
-
+phenotypeNws_folder='../../files/group_models/'
 
 
 
@@ -69,6 +69,50 @@ thisDrugable="zero"     # 2 thisDrugable options are possible: "zero" or "negati
                         
 searchInactiveInts="yes"
 
+
+
+
+
+
+# ************ Create text of used settings for storage names
+
+applyLinkActivityThreshold__storing_text = ''
+
+if(groupingMode =='mean' && applyLinkActivityThreshold =='no'){
+   
+   linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold)
+   applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_NOTroundedRealNumber_',sep="")
+   
+} else if (groupingMode =='mean' && applyLinkActivityThreshold =='yes'){
+   
+   linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold)
+   applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_rounded_',sep="")
+   
+}
+
+
+
+# ************ Create storage subfolders named by the used settings 
+
+Figure_folder_storage_name = paste("Figures_based_on__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,"_",searchInactiveInts,sep="")        
+
+ifelse(!dir.exists(file.path(figure_folder,Figure_folder_storage_name)), dir.create(file.path(figure_folder,Figure_folder_storage_name)), FALSE)              
+figure_folder_of_current_script_settings = file.path(figure_folder,Figure_folder_storage_name)                                                                             
+figure_folder_of_current_script_settings_ = paste(figure_folder_of_current_script_settings,"/",sep="")
+
+
+drugScores_folder_storage_name = paste("drugScores_based_on__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,"_",searchInactiveInts,sep="")        
+
+ifelse(!dir.exists(file.path(drugScores_folder,drugScores_folder_storage_name)), dir.create(file.path(drugScores_folder,drugScores_folder_storage_name)), FALSE)              
+drugScores_folder_of_current_script_settings = file.path(drugScores_folder,drugScores_folder_storage_name)                                                                             
+drugScores_folder_of_current_script_settings_ = paste(drugScores_folder_of_current_script_settings,"/",sep="")
+
+
+phenotypeNws_folder_storage_name = paste("phenotypeNws_based_on__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,"_",searchInactiveInts,sep="")        
+
+ifelse(!dir.exists(file.path(phenotypeNws_folder,phenotypeNws_folder_storage_name)), dir.create(file.path(phenotypeNws_folder,phenotypeNws_folder_storage_name)), FALSE)              
+phenotypeNws_folder_of_current_script_settings = file.path(phenotypeNws_folder,phenotypeNws_folder_storage_name)                                                                             
+phenotypeNws_folder_of_current_script_settings_ = paste(phenotypeNws_folder_of_current_script_settings,"/",sep="")
 
 
 
@@ -133,7 +177,7 @@ allDrugNws=defectiveScores$allDrugNws
 # *************************************************************************************************************************
 # *********** 1b. Add the calculation of MS subtypes networks, as they are not needed in calculateDefective
 # *************************************************************************************************************************
-phenotypeNws_folder='../../files/group_models/'
+
 
 
 #simplify category
@@ -150,19 +194,6 @@ length(which(annot2$Category=='RRMS' & annot2$condition=='Untreated')) + length(
 
 
 
-applyLinkActivityThreshold__storing_text = ''
-
-if(groupingMode =='mean' && applyLinkActivityThreshold =='no'){
-   
-   linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold)
-   applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_NOTroundedRealNumber_',sep="")
-   
-} else if (groupingMode =='mean' && applyLinkActivityThreshold =='yes'){
-   
-   linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold)
-   applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_rounded_',sep="")
-   
-}
 
 
 
@@ -170,13 +201,13 @@ thisPhenotype='RRMS'
 Idx= which(annot2$Category==thisPhenotype & annot2$condition=='Untreated')
 thisNw= phenotypeNetwork(Idx, allMedianNetworks,model,mode=groupingMode,linkActivityThreshold=linkActivityThreshold,applyLinkActivityThreshold = applyLinkActivityThreshold)  
 
-write.table(thisNw$network,file=paste(phenotypeNws_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,".csv",sep=""),sep=",",row.names=T)
+write.table(thisNw$network,file=paste(phenotypeNws_folder_of_current_script_settings_,thisPhenotype,"_network.csv",sep=""),sep=",",row.names=T)
 
 thisPhenotype='PPMS'
 Idx= which(annot2$Category==thisPhenotype & annot2$condition=='Untreated')
 thisNw= phenotypeNetwork(Idx, allMedianNetworks,model,mode=groupingMode,linkActivityThreshold=linkActivityThreshold,applyLinkActivityThreshold = applyLinkActivityThreshold)  
   
-write.table(thisNw$network,paste(phenotypeNws_folder,thisPhenotype,"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,".csv",sep=""),sep=",",row.names=T)
+write.table(thisNw$network,paste(phenotypeNws_folder_of_current_script_settings_,thisPhenotype,"_network.csv",sep=""),sep=",",row.names=T)
 
 
 # *************************************************************************************************************************
@@ -184,7 +215,7 @@ write.table(thisNw$network,paste(phenotypeNws_folder,thisPhenotype,"__",applyLin
 # *************************************************************************************************************************
 
 
-drug=1     # 5 #**********select a drug here
+drug=5     # 5 #**********select a drug here
 #Gilenya=Fingolimod, Glatiramer=Copaxone
 phenotypes=c('Gilenya','IFNb','Copaxone','EGCG','Tysabri')
 numDrugs=5
@@ -193,11 +224,6 @@ numDrugs=5
 
 
 
-Figure_folder_storage_name = paste("Figures_based_on__", phenotypes[drug] ,"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,sep="")        
-
-ifelse(!dir.exists(file.path(figure_folder,Figure_folder_storage_name)), dir.create(file.path(figure_folder,Figure_folder_storage_name)), FALSE)              
-figure_folder_of_current_script_settings = file.path(figure_folder,Figure_folder_storage_name)                                                                             
-figure_folder_of_current_script_settings_ = paste(figure_folder_of_current_script_settings,"/",sep="")
 
 
 
@@ -219,7 +245,7 @@ plotModel(drugNetwork$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,no
 FigureWidth_plotModel = 22    
 FigureHeight_plotModel = 10   
 
-pdf(file=file.path(figure_folder_of_current_script_settings_,paste("plotModel_drugNetwork_model__", phenotypes[drug] ,"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,".pdf",sep="")),width=FigureWidth_plotModel, height=FigureHeight_plotModel)
+pdf(file=file.path(figure_folder_of_current_script_settings_,paste(phenotypes[drug] ,"_plotModel_drugNetwork.pdf",sep="")),width=FigureWidth_plotModel, height=FigureHeight_plotModel)
 
 plotModel(drugNetwork$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,nodeHeight=1))
 
@@ -237,8 +263,8 @@ if(searchInactiveInts=="no"){
    
 } else if (searchInactiveInts=="yes"){
    
-  phenotypeScores=read.table(file=paste(drugScores_folder,phenotypes[drug],"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,".csv",sep=""),sep=",")
-  
+  phenotypeScores=read.table(file=paste(drugScores_folder_of_current_script_settings_,phenotypes[drug],"_drugScores_defectiveInts.csv",sep=""),sep=",")
+
    
   interactions0Score=drugNetwork$network[which(names(drugNetwork$network) %in% rownames(phenotypeScores)[which(phenotypeScores==0)])]
   interactions0ScoreToReplace=names(which(interactions0Score==0))
@@ -307,7 +333,8 @@ if(searchInactiveInts=="no"){
   FigureWidth_plotModel__OFFdefectiveInts_ModifiedTo_ONdefectiveInts = 32    
   FigureHeight_plotModel__OFFdefectiveInts_ModifiedTo_ONdefectiveInts = 15   
   
-  pdf(file=file.path(figure_folder_of_current_script_settings_,paste("plotModel_drugNetwork_model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts__", phenotypes[drug] ,"__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,".pdf",sep="")),width=FigureWidth_plotModel, height=FigureHeight_plotModel)
+
+  pdf(file=file.path(figure_folder_of_current_script_settings_,paste(phenotypes[drug] ,"_plotModel_drugNetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts.pdf",sep="")),width=FigureWidth_plotModel, height=FigureHeight_plotModel)
   
   plotModel(drugNetwork$model_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,midas,graphvizParams=list(fontsize=35,nodeWidth=4,nodeHeight=4))
   
@@ -327,23 +354,6 @@ if(searchInactiveInts=="no"){
   drugNetwork$cutNetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = cutNw__OFFdefectiveInts_ModifiedTo_ONdefectiveInts
   
      
-     #  ModelGraph=list("model"=modelPhenotype,"graph"=graphModel,"network"=phenotypeNw,"cutNetwork"=cutNw)
-
-  # transform network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts into graph
-  
-  tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = model2sif(model,optimRes=list(bString=network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts))
-  cut__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts
-  
-  graphModel__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts=sif2graph(tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts)                                                            
-  
-  # replace inhibition by activation, as the graph only accepts positive interactions
-  tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts[,2]=abs(as.numeric(tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts[,2]))                                                
-  graphModel__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts__inhibition_replaced_by_activation=sif2graph(tempSIF__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts)  
-  
-  
-  drugNetwork$graph__codruggableInactiveInts__modified_to_active = graphModel__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts
-  drugNetwork$graph__codruggableInactiveInts__modified_to_active__inhibition_replaced_by_activation = graphModel__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts__inhibition_replaced_by_activation
-  drugNetwork$cutnetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts = cut__network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts
   
 
   
@@ -412,8 +422,7 @@ drugName=phenotypes[drug]
 
 
 #write.csv(combinationExperiments,file=paste("/Users/marti/Desktop/figuresCombiMS/combinations/",drugName,thisDrugable,searchInactiveInts,groupingMode,".csv",sep=""))
-write.csv(combinationExperiments,file=paste(drugScores_folder,"combinationExperiments_",drugName,thisDrugable,searchInactiveInts,groupingMode,".csv",sep=""))
-write.csv(combinationExperiments,file=paste(drugScores_folder,"combinationExperiments_",drugName,thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".csv",sep=""))
+write.csv(combinationExperiments,file=paste(drugScores_folder_of_current_script_settings_,drugName,"_combinationExperiments.csv",sep=""))
 
 
 
@@ -476,8 +485,7 @@ if(searchInactiveInts == "yes"){
    
    
    #write.csv(combinationExperiments__ONandOFF_DefectiveInts,file=paste("/Users/marti/Desktop/figuresCombiMS/combinations/",drugName,thisDrugable,searchInactiveInts,groupingMode,".csv",sep=""))
-   write.csv(combinationExperiments__ONandOFF_DefectiveInts,file=paste(drugScores_folder,"combinationExperiments__ONandOFF_DefectiveInts_",drugName,thisDrugable,searchInactiveInts,groupingMode,".csv",sep=""))
-   write.csv(combinationExperiments__ONandOFF_DefectiveInts,file=paste(drugScores_folder,"combinationExperiments__ONandOFF_DefectiveInts_",drugName,thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".csv",sep=""))
+   write.csv(combinationExperiments__ONandOFF_DefectiveInts,file=paste(drugScores_folder_of_current_script_settings_,drugName,"_combinationExperiments_ONandOFF_DefectiveInts.csv",sep=""))
 
 
 
@@ -488,16 +496,14 @@ if(searchInactiveInts == "yes"){
 
 
 
-write.table(drugNetwork$cutNetwork,file=paste0(phenotypeNws_folder,drugName,"CUT",thisDrugable,searchInactiveInts,groupingMode,".csv"),sep=",",row.names=T,quote=F)
-write.table(drugNetwork$cutNetwork,file=paste0(phenotypeNws_folder,drugName,"CUT",thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".csv"),sep=",",row.names=T,quote=F)
+write.table(drugNetwork$cutNetwork,file=paste0(phenotypeNws_folder_of_current_script_settings_,drugName,"_CUTnetwork.csv"),sep=",",row.names=T,quote=F)
 
 
-write.table(drugNetwork$cutNetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,file=paste0(phenotypeNws_folder,drugName,"CUT_OFFdefectiveInts_ModifiedTo_ONdefectiveInts_",thisDrugable,searchInactiveInts,groupingMode,".csv"),sep=",",row.names=T,quote=F)
-write.table(drugNetwork$cutNetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,file=paste0(phenotypeNws_folder,drugName,"CUT_OFFdefectiveInts_ModifiedTo_ONdefectiveInts_",thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".csv"),sep=",",row.names=T,quote=F)
+write.table(drugNetwork$cutNetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,file=paste0(phenotypeNws_folder_of_current_script_settings_,drugName,"CUTnetwork_OFFdefectiveInts_ModifiedTo_ONdefectiveInts.csv"),sep=",",row.names=T,quote=F)
 
 
 
-save(drugNetwork,file=paste(phenotypeNws_folder,drugName,"_drugNetwork_",thisDrugable,searchInactiveInts,applyLinkActivityThreshold__storing_text,groupingMode,".RData",sep=""))
+save(drugNetwork,file=paste(phenotypeNws_folder_of_current_script_settings_,drugName,"_drugNetwork.RData",sep=""))
 
 
 cat('**************num combinations by stimuli',length(unique(combinationExperiments[,2])),' based on active co-druggable interactions. \n')
