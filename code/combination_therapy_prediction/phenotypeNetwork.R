@@ -10,12 +10,12 @@
 #
 #
 
-# applyLinkActivityThreshold ='no' can be used to produce a non-weighted network for plotting and graph search
-# in the median model it is not necessary
+# applylinkActivityQuantileThreshold ='no' can be used to produce a non-weighted network for plotting and graph search
+# The option applylinkActivityQuantileThreshold is only used for grouping mode mean, as in the median model it is not necessary
 # 
-# applyLinkActivityThreshold ='yes' leads to rounded mean values based on the choosen linkActivityThreshold
+# applylinkActivityQuantileThreshold ='yes' leads to rounded mean values based on the choosen linkActivityQuantileThreshold
 
-# Changes by Melanie Rinas, July 2018
+# Changes by Melanie Rinas, August 2018
 
 
 
@@ -38,8 +38,8 @@ phenotypeNetwork<-function(IndexPatients,
                            allMedianNetworks, 
                            model, 
                            mode='mean', 
-                           linkActivityThreshold=0.5,
-                           applyLinkActivityThreshold ='no'){
+                           linkActivityQuantileThreshold=0.75,
+                           applylinkActivityQuantileThreshold ='no'){
 
   # *************************************************************************************************************************
   # ***********calculate grand median OR mean of median models for each phenotype
@@ -53,13 +53,14 @@ phenotypeNetwork<-function(IndexPatients,
     phenotypeNw=apply(allMedianNetworks[IndexPatients,],2,mean)
     
    
-    if(applyLinkActivityThreshold == 'yes'){
+    if(applylinkActivityQuantileThreshold == 'yes'){
        
-       phenotypeNw[which(phenotypeNw>=linkActivityThreshold)]=1
-       phenotypeNw[which(phenotypeNw<linkActivityThreshold)]=0
+       
+       phenotypeNw[which(phenotypeNw > quantile(phenotypeNw, probs = linkActivityQuantileThreshold))]=1
+       phenotypeNw[which(phenotypeNw <= quantile(phenotypeNw, probs = linkActivityQuantileThreshold))]=0
        
     }
-    #if mode=mean, select only active part (apply 0.5 activation threshold)
+    #if mode=mean, select only active part based on the chosen linkActivityQuantileThreshold
    
   } else (stop("Wrong mode. Mean or median required"))
 
