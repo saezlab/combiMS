@@ -1,0 +1,6 @@
+"","Reaction","Stimulus","Readout","drugScore"
+"1","JAK1=STAT6","REBIF","STAT6","-1"
+"2","!LCK=STAT5","IL1A","STAT5","-1"
+"3","!LCK=STAT5","LPS","STAT5","-1"
+"4","!LCK=STAT5","POLYIC","STAT5","-1"
+"5","!LCK=STAT5","TNFA","STAT5","-1"
