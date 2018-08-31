@@ -9,7 +9,7 @@
 # 
 # 
 # 
-# Changes by Melanie Rinas, July 2018
+# Changes by Melanie Rinas, August 2018
 # 
 # 
 
@@ -44,9 +44,9 @@ source("./phenotypeNetwork.R")
 source("./makeMatrixPathStimSignal.R")
 source("./network2graph.R")
 
-figure_folder="../../files/cohort_signaling/"
-drugScores_folder='../../files/drugScores/'
-phenotypeNws_folder='../../files/group_models/'
+figure_folder="../../files/cohort_signaling"
+drugScores_folder='../../files/drugScores'
+phenotypeNws_folder='../../files/group_models'
 
 
 
@@ -60,8 +60,15 @@ phenotypeNws_folder='../../files/group_models/'
 
 groupingMode='mean'     # 2 groupingMode options are possible: 'mean' or 'median'
 
-linkActivityThreshold=0.5
-applyLinkActivityThreshold ='no'
+linkActivityQuantileThreshold=0.75           # Define only 'strong active' model interactions as activ, 
+                                             # by requiring that either the healthy or the MS untreated or the drug treated mean activity level of the respective model interaction 
+                                             # is larger than the chosen quantile threshold level
+
+applylinkActivityQuantileThreshold ='no'     # applylinkActivityQuantileThreshold ='no' can be used to produce a non-weighted network for plotting and graph search
+                                             # The option applylinkActivityQuantileThreshold is only used for grouping mode mean, as in the median model it is not necessary
+                                             # 
+                                             # applylinkActivityQuantileThreshold ='yes' leads to rounded mean values based on the choosen linkActivityQuantileThreshold
+
 
 thisDrugable="zero"     # 2 thisDrugable options are possible: "zero" or "negative"
                         # "zero": defectiveInts are interactions with a drugScore equal or smaller than 0 (drugScore <= 0)
@@ -71,22 +78,24 @@ searchInactiveInts="yes"
 
 
 
+DrugScoreEpsilonRegionQuantileThreshold = 0.25
 
 
+DiffQuantileThreshold_abs_H_minus_D = 0.75 # 0.75
 
 # ************ Create text of used settings for storage names
 
-applyLinkActivityThreshold__storing_text = ''
+applylinkActivityQuantileThreshold__storing_text = ''
 
-if(groupingMode =='mean' && applyLinkActivityThreshold =='no'){
+if(groupingMode =='mean' && applylinkActivityQuantileThreshold =='no'){
    
-   linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold)
-   applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_NOTroundedRealNumber_',sep="")
+   linkActivityQuantileThreshold_used_text = gsub('\\.', '_', linkActivityQuantileThreshold)
+   applylinkActivityQuantileThreshold__storing_text = paste('linkActivityQuantileThreshold_',linkActivityQuantileThreshold_used_text,'_NOTroundedRealNumber_',sep="")
    
-} else if (groupingMode =='mean' && applyLinkActivityThreshold =='yes'){
+} else if (groupingMode =='mean' && applylinkActivityQuantileThreshold =='yes'){
    
-   linkActivityThreshold_used_text = gsub('\\.', '_', linkActivityThreshold)
-   applyLinkActivityThreshold__storing_text = paste('linkActivityThreshold_',linkActivityThreshold_used_text,'_rounded_',sep="")
+   linkActivityQuantileThreshold_used_text = gsub('\\.', '_', linkActivityQuantileThreshold)
+   applylinkActivityQuantileThreshold__storing_text = paste('linkActivityQuantileThreshold_',linkActivityQuantileThreshold_used_text,'_rounded_',sep="")
    
 }
 
@@ -94,21 +103,21 @@ if(groupingMode =='mean' && applyLinkActivityThreshold =='no'){
 
 # ************ Create storage subfolders named by the used settings 
 
-Figure_folder_storage_name = paste("Figures_based_on__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,"_",searchInactiveInts,sep="")        
+Figure_folder_storage_name = paste("Figures_based_on__",applylinkActivityQuantileThreshold__storing_text,groupingMode,"_",thisDrugable,"_",searchInactiveInts,sep="")        
 
 ifelse(!dir.exists(file.path(figure_folder,Figure_folder_storage_name)), dir.create(file.path(figure_folder,Figure_folder_storage_name)), FALSE)              
 figure_folder_of_current_script_settings = file.path(figure_folder,Figure_folder_storage_name)                                                                             
 figure_folder_of_current_script_settings_ = paste(figure_folder_of_current_script_settings,"/",sep="")
 
 
-drugScores_folder_storage_name = paste("drugScores_based_on__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,"_",searchInactiveInts,sep="")        
+drugScores_folder_storage_name = paste("drugScores_based_on__",applylinkActivityQuantileThreshold__storing_text,groupingMode,"_",thisDrugable,"_",searchInactiveInts,sep="")        
 
 ifelse(!dir.exists(file.path(drugScores_folder,drugScores_folder_storage_name)), dir.create(file.path(drugScores_folder,drugScores_folder_storage_name)), FALSE)              
 drugScores_folder_of_current_script_settings = file.path(drugScores_folder,drugScores_folder_storage_name)                                                                             
 drugScores_folder_of_current_script_settings_ = paste(drugScores_folder_of_current_script_settings,"/",sep="")
 
 
-phenotypeNws_folder_storage_name = paste("phenotypeNws_based_on__",applyLinkActivityThreshold__storing_text,groupingMode,"_",thisDrugable,"_",searchInactiveInts,sep="")        
+phenotypeNws_folder_storage_name = paste("phenotypeNws_based_on__",applylinkActivityQuantileThreshold__storing_text,groupingMode,"_",thisDrugable,"_",searchInactiveInts,sep="")        
 
 ifelse(!dir.exists(file.path(phenotypeNws_folder,phenotypeNws_folder_storage_name)), dir.create(file.path(phenotypeNws_folder,phenotypeNws_folder_storage_name)), FALSE)              
 phenotypeNws_folder_of_current_script_settings = file.path(phenotypeNws_folder,phenotypeNws_folder_storage_name)                                                                             
@@ -153,13 +162,13 @@ load("../../files/median_models/allMedianModels.RData")
 
 
 # *************************************************************************************************************************
-# *********** 1. Calculate Healthy, MS and drug phenotipic network and identify defective interactions
+# *********** 1. Calculate Healthy, MS and drug phenotypic network and identify defective interactions
 # *************************************************************************************************************************
 
 defectiveScores=calculateDefective(thisMode=groupingMode,
-                                   drugable=thisDrugable,
-                                   linkActivityThreshold_used=linkActivityThreshold,
-                                   applyLinkActivityThreshold_used = applyLinkActivityThreshold)
+                                   druggable=thisDrugable,
+                                   linkActivityQuantileThreshold_used=linkActivityQuantileThreshold,
+                                   applylinkActivityQuantileThreshold_used = applylinkActivityQuantileThreshold)
 #save plots
 # defectiveScores$scorePlot
 # ggsave(paste0(figure_folder,"scoreCumulativePlot",groupingMode,thisDrugable,".pdf"))
@@ -169,7 +178,7 @@ defectiveScores=calculateDefective(thisMode=groupingMode,
 
 H=defectiveScores$healthyNW
 MS=defectiveScores$MSuntreatedNw
-allDrugNws=defectiveScores$allDrugNws
+allDrugNws=defectiveScores$allDrugNws_allInts  #$allDrugNws
 #plotModel(H$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,nodeHeight=1))
 #plotModel(MS$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,nodeHeight=1))
 #plotModel(MS$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,nodeHeight=1))
@@ -199,13 +208,13 @@ length(which(annot2$Category=='RRMS' & annot2$condition=='Untreated')) + length(
 
 thisPhenotype='RRMS'
 Idx= which(annot2$Category==thisPhenotype & annot2$condition=='Untreated')
-thisNw= phenotypeNetwork(Idx, allMedianNetworks,model,mode=groupingMode,linkActivityThreshold=linkActivityThreshold,applyLinkActivityThreshold = applyLinkActivityThreshold)  
+thisNw= phenotypeNetwork(Idx, allMedianNetworks,model,mode=groupingMode,linkActivityQuantileThreshold=linkActivityQuantileThreshold,applylinkActivityQuantileThreshold = applylinkActivityQuantileThreshold)  
 
 write.table(thisNw$network,file=paste(phenotypeNws_folder_of_current_script_settings_,thisPhenotype,"_network.csv",sep=""),sep=",",row.names=T)
 
 thisPhenotype='PPMS'
 Idx= which(annot2$Category==thisPhenotype & annot2$condition=='Untreated')
-thisNw= phenotypeNetwork(Idx, allMedianNetworks,model,mode=groupingMode,linkActivityThreshold=linkActivityThreshold,applyLinkActivityThreshold = applyLinkActivityThreshold)  
+thisNw= phenotypeNetwork(Idx, allMedianNetworks,model,mode=groupingMode,linkActivityQuantileThreshold=linkActivityQuantileThreshold,applylinkActivityQuantileThreshold = applylinkActivityQuantileThreshold)  
   
 write.table(thisNw$network,paste(phenotypeNws_folder_of_current_script_settings_,thisPhenotype,"_network.csv",sep=""),sep=",",row.names=T)
 
@@ -214,11 +223,18 @@ write.table(thisNw$network,paste(phenotypeNws_folder_of_current_script_settings_
 # *********** Plot Healthy, MS, and drug phenotypic networks -->now in createNwFigure.R
 # *************************************************************************************************************************
 
+numDrugs=5
 
-drug=5     # 5 #**********select a drug here
+
+for(drug_no in 1:5){
+   
+   drug = drug_no
+
+
+#drug=1     # 5 #**********select a drug here
 #Gilenya=Fingolimod, Glatiramer=Copaxone
 phenotypes=c('Gilenya','IFNb','Copaxone','EGCG','Tysabri')
-numDrugs=5
+# numDrugs=5
 # #plot(allDrugNws[[drug]]$graph)
 
 
@@ -232,10 +248,10 @@ numDrugs=5
 # *********** 2. Select only active parts of nw above activity threshold, then turn into graph
 # *************************************************************************************************************************
 # Transform network into graph. Booleanize network if mode is mean
-drugNetwork=network2graph(allDrugNws[[drug]]$network,
+drugNetwork=network2graph(phenotypeNw = allDrugNws[[drug]]$network,
                           mode=groupingMode,
-                          linkActivityThreshold=linkActivityThreshold)  # Note: The function network2graph requires a Boolean logic network (using not rounded mean causes several wrong results). 
-                                                                        # Thus the option applyLinkActivityThreshold must be applyLinkActivityThreshold = 'no' and can not be chosen by the user (to prevent wrong results).     
+                          linkActivityQuantileThreshold = linkActivityQuantileThreshold)  # Note: The function network2graph requires a Boolean logic network (using not rounded mean causes several wrong results). 
+                                                                                          # Thus the option applylinkActivityQuantileThreshold must be applylinkActivityQuantileThreshold = 'no' and can not be chosen by the user (to prevent wrong results).     
 
 
 plotModel(drugNetwork$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,nodeHeight=1))
@@ -252,19 +268,24 @@ plotModel(drugNetwork$model,midas,graphvizParams=list(fontsize=35,nodeWidth=1,no
 dev.off()    
 
 
-#Note the difference between activity in network (grouping), co-drugability score, and "situation not ok"score, i.e. difference between grouping in H and D.
-#calculateDefective can work in "zero" scoring mode, identifying possibly inactive interactions with a non-positive co-drugability (groupingMode = median: score of 0 or -1; groupingMode = mean: score <= 0) where situation is not ok. 
+#Note the difference between activity in network (grouping), co-druggability score, and "situation not ok"score, i.e. difference between grouping in H and D.
+#calculateDefective can work in "zero" scoring mode, identifying possibly inactive interactions with a non-positive co-druggability (groupingMode = median: score of 0 or -1; groupingMode = mean: score <= 0) where situation is not ok. 
 # network2graph will cut such interactions out, thereby if we search that graph such interactions cannot be used. A rationale has been
 # discussed where it is interesting to use them. Therefore, before prediction of combination therapy, force activation of these interactions.
-# note:interactions with 0 scores and situation ok have been replaced by 1 in their score
+# note:interactions with 0 scores and situation ok have been replaced by 1 in their score (implemented in the source function calculateDefective.R)
 if(searchInactiveInts=="no"){
    
   warning(paste0("searching inactive ints: ",searchInactiveInts))
    
 } else if (searchInactiveInts=="yes"){
    
-  phenotypeScores=read.table(file=paste(drugScores_folder_of_current_script_settings_,phenotypes[drug],"_drugScores_defectiveInts.csv",sep=""),sep=",")
-
+   
+   if(groupingMode=='median'){
+      phenotypeScores=read.table(file=paste(drugScores_folder_of_current_script_settings_,phenotypes[drug],"_drugScores_defectiveInts.csv",sep=""),sep=",")
+   }
+   if(groupingMode=='mean'){
+      phenotypeScores=read.table(file=paste(drugScores_folder_of_current_script_settings_,phenotypes[drug],"_drugScores_withEpsilonRegion_defectiveInts.csv",sep=""),sep=",")
+   }
    
   interactions0Score=drugNetwork$network[which(names(drugNetwork$network) %in% rownames(phenotypeScores)[which(phenotypeScores==0)])]
   interactions0ScoreToReplace=names(which(interactions0Score==0))
@@ -278,7 +299,7 @@ if(searchInactiveInts=="no"){
   network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts[which(names(drugNetwork$network) %in% interactions0ScoreToReplace)]=1 #replace activity by 1
   network_OFFdefectiveInts_ModifiedTo_ONdefectiveInts[which(names(drugNetwork$network) %in% interactionsNegativeScoreToReplace)]=1 #replace activity by 1
   
-  for(ii in 1:length(interactions0ScoreToReplace)){
+  for(ii in seq_along(interactions0ScoreToReplace)){
      
      print(warning(paste0("(" , ii , ")  " , interactions0ScoreToReplace[ii]," defective inactive (OFF) interaction replaced with activity=1 (ON).\n")))
      
@@ -290,7 +311,7 @@ if(searchInactiveInts=="no"){
   
   
   
-  for(iii in 1:length(interactionsNegativeScoreToReplace)){
+  for(iii in seq_along(interactionsNegativeScoreToReplace)){
      
      print(warning(paste0("(" , iii , ")  " , interactionsNegativeScoreToReplace[iii]," defective inactive (OFF) interaction replaced with activity=1 (ON).\n")))
 
@@ -394,27 +415,29 @@ combinationExperiments=matrix(ncol=4,nrow=0)
 colnames(combinationExperiments)=c('Reaction','Stimulus','Readout','drugScore')
 
 
-for(indexInts in 1:length(presentTopInts)){
+for(indexInts in seq_along(presentTopInts)){
    
 link=presentTopInts[indexInts]
 matrixPaths=makeMatrixPathStimSignal(drugNetwork$graph,link)
 numCombinations=length(AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]])
 Stimuli[which(matrixPaths==1,arr.ind=T)[,2]]
 
-experimentsThisInteraction=matrix(nrow=numCombinations,ncol=4)
-experimentsThisInteraction[,1]=rep(link,numCombinations)
-experimentsThisInteraction[,2]=Stimuli[which(matrixPaths==1,arr.ind=T)[,2]]
-experimentsThisInteraction[,3]=AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]]
-experimentsThisInteraction[,4]=rep(defectiveScores$defectiveInts[[drug]][link],numCombinations) 
-
-
-
-# experimentsThisInteraction=data.frame(Reaction=rep(link,numCombinations),
-#                                       Stimulus=Stimuli[which(matrixPaths==1,arr.ind=T)[,2]],
-#                                       Readout=AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]],
-#                                       drugScoreInteraction=rep(defectiveScores$defectiveInts[[drug]][indexInts],numCombinations) 
-#                             )
-combinationExperiments=rbind(combinationExperiments,experimentsThisInteraction)
+   if(numCombinations>0){
+      experimentsThisInteraction=matrix(nrow=numCombinations,ncol=4)
+      experimentsThisInteraction[,1]=rep(link,numCombinations)
+      experimentsThisInteraction[,2]=Stimuli[which(matrixPaths==1,arr.ind=T)[,2]]
+      experimentsThisInteraction[,3]=AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]]
+      experimentsThisInteraction[,4]=rep(defectiveScores$defectiveInts[[drug]][link],numCombinations) 
+      
+      
+      
+      # experimentsThisInteraction=data.frame(Reaction=rep(link,numCombinations),
+      #                                       Stimulus=Stimuli[which(matrixPaths==1,arr.ind=T)[,2]],
+      #                                       Readout=AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]],
+      #                                       drugScoreInteraction=rep(defectiveScores$defectiveInts[[drug]][indexInts],numCombinations) 
+      #                             )
+      combinationExperiments=rbind(combinationExperiments,experimentsThisInteraction)
+   }
 #aheatmap(matrixPaths,Rowv=NA,Colv=NA)
 }
 
@@ -422,7 +445,7 @@ drugName=phenotypes[drug]
 
 
 #write.csv(combinationExperiments,file=paste("/Users/marti/Desktop/figuresCombiMS/combinations/",drugName,thisDrugable,searchInactiveInts,groupingMode,".csv",sep=""))
-write.csv(combinationExperiments,file=paste(drugScores_folder_of_current_script_settings_,drugName,"_combinationExperiments.csv",sep=""))
+write.csv(combinationExperiments,file=paste(drugScores_folder_of_current_script_settings_,drugName,"_combinationExperiments_ON_DefectiveInts.csv",sep=""))
 
 
 
@@ -455,29 +478,31 @@ if(searchInactiveInts == "yes"){
    colnames(combinationExperiments__ONandOFF_DefectiveInts)=c('Reaction','Stimulus','Readout','drugScore','Boolean network activity','Group network activity')
    
    
-   for(indexInts in 1:length(ONandOFF_TopInts)){
+   for(indexInts in seq_along(ONandOFF_TopInts)){
       
       link=ONandOFF_TopInts[indexInts]
       matrixPaths=makeMatrixPathStimSignal(drugNetwork$graph_OFFdefectiveInts_ModifiedTo_ONdefectiveInts,link)
       numCombinations=length(AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]])
       Stimuli[which(matrixPaths==1,arr.ind=T)[,2]]
       
-      experimentsThisInteraction=matrix(nrow=numCombinations,ncol=6)
-      experimentsThisInteraction[,1]=rep(link,numCombinations)
-      experimentsThisInteraction[,2]=Stimuli[which(matrixPaths==1,arr.ind=T)[,2]]
-      experimentsThisInteraction[,3]=AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]]
-      experimentsThisInteraction[,4]=rep(defectiveScores$defectiveInts[[drug]][link],numCombinations) 
-      experimentsThisInteraction[,5]=rep(drugNetwork$network[link],numCombinations) 
-      experimentsThisInteraction[,6]=rep(defectiveScores$allDrugNws[[drug]]$network[link],numCombinations) 
-      
-      
-      
-      # experimentsThisInteraction=data.frame(Reaction=rep(link,numCombinations),
-      #                                       Stimulus=Stimuli[which(matrixPaths==1,arr.ind=T)[,2]],
-      #                                       Readout=AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]],
-      #                                       drugScoreInteraction=rep(defectiveScores$defectiveInts[[drug]][indexInts],numCombinations) 
-      #                             )
-      combinationExperiments__ONandOFF_DefectiveInts=rbind(combinationExperiments__ONandOFF_DefectiveInts,experimentsThisInteraction)
+      if(numCombinations>0){
+         experimentsThisInteraction=matrix(nrow=numCombinations,ncol=6)
+         experimentsThisInteraction[,1]=rep(link,numCombinations)
+         experimentsThisInteraction[,2]=Stimuli[which(matrixPaths==1,arr.ind=T)[,2]]
+         experimentsThisInteraction[,3]=AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]]
+         experimentsThisInteraction[,4]=rep(defectiveScores$defectiveInts[[drug]][link],numCombinations) 
+         experimentsThisInteraction[,5]=rep(drugNetwork$network[link],numCombinations) 
+         experimentsThisInteraction[,6]=rep(defectiveScores$allDrugNws_allInts[[drug]]$network[link],numCombinations) 
+         
+         
+         
+         # experimentsThisInteraction=data.frame(Reaction=rep(link,numCombinations),
+         #                                       Stimulus=Stimuli[which(matrixPaths==1,arr.ind=T)[,2]],
+         #                                       Readout=AllReadouts[which(matrixPaths==1,arr.ind=T)[,1]],
+         #                                       drugScoreInteraction=rep(defectiveScores$defectiveInts[[drug]][indexInts],numCombinations) 
+         #                             )
+         combinationExperiments__ONandOFF_DefectiveInts=rbind(combinationExperiments__ONandOFF_DefectiveInts,experimentsThisInteraction)
+      }
       #aheatmap(matrixPaths,Rowv=NA,Colv=NA)
 }
 
@@ -519,5 +544,9 @@ if(searchInactiveInts == "yes"){
 # *********** test each group against each other - careful with the interpretation, as it should be one group against all others
 # *************************************************************************************************************************
 #see pathDrugTargetsFinal.R
+
+
+} # end for(drug_no in 1:numDrugs){
+
 
 print("Script finished.")
