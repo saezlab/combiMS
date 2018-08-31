@@ -25,8 +25,8 @@
 
 network2graph<-function(phenotypeNw,
                         mode='mean',
-                        linkActivityThreshold=0.5){   # Note: The function network2graph requires a Boolean logic network (using not rounded mean causes several wrong results). 
-                                                      # Thus the option applyLinkActivityThreshold must be applyLinkActivityThreshold = 'no' and can not be chosen by the user (to prevent wrong results).     
+                        linkActivityQuantileThreshold=0.75){   # Note: The function network2graph requires a Boolean logic network (using not rounded mean causes several wrong results). 
+                                                               # Thus the option applylinkActivityQuantileThreshold must be applylinkActivityQuantileThreshold = 'no' and can not be chosen by the user (to prevent wrong results).     
    
 
   # *************************************************************************************************************************
@@ -45,10 +45,11 @@ network2graph<-function(phenotypeNw,
     #phenotypeNw=apply(allMedianNetworks[IndexPatients,],2,mean)
     #if mode=mean, select only active part (apply 0.5 activation threshold)
     
-    phenotypeNw[which(phenotypeNw>=linkActivityThreshold)]=1
-    phenotypeNw[which(phenotypeNw<linkActivityThreshold)]=0
+    phenotypeNw[which(phenotypeNw > quantile(phenotypeNw, probs = linkActivityQuantileThreshold))]=1
+    phenotypeNw[which(phenotypeNw <= quantile(phenotypeNw, probs = linkActivityQuantileThreshold))]=0
     
-    warning(paste0('The results of the function network2graph are generated using the Boolean version of the network (rounded mean values) based on the chosen linkActivityThreshold.\n'))
+    
+    warning(paste0('The results of the function network2graph are generated using the Boolean version of the network (rounded mean values) based on the chosen linkActivityQuantileThreshold.\n'))
     
     
   } else (stop("Wrong mode. Mean or median required"))
