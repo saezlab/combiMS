@@ -156,7 +156,9 @@ calculateDefective=function(thisMode='mean',
      #distance
      HD=H$network-MSuntreatedNw$network
      
-     
+     absHD = abs(HD)
+     thisPhenotype = "AbsDiff_Healthy_MSuntreated"
+     write.table(absHD,file=paste0(phenotypeNws_folder_of_current_script_settings_,thisPhenotype,"_network.csv"),sep=",",row.names=T)
      
      
      # *************************************************************************************************************************
@@ -589,6 +591,9 @@ calculateDefective=function(thisMode='mean',
      #distance
      HD=H$network-MSuntreatedNw$network
      
+     absHD = abs(HD)
+     thisPhenotype = "AbsDiff_Healthy_MSuntreated"
+     write.table(absHD,file=paste0(phenotypeNws_folder_of_current_script_settings_,thisPhenotype,"_network.csv"),sep=",",row.names=T)
      
      
      
