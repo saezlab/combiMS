@@ -57,24 +57,54 @@ phenotypeNws_folder='../../files/group_models'
 # ***********select algorythm options
 # *************************************************************************************************************************
 
+# -------------------------------------------------------------------------------------------------------------------------
+# FINAL CombiMS selected algorythm options: -------------------------------------------------------------------------------
+
+# groupingMode='mean'     # 2 groupingMode options are possible: 'mean' or 'median'
+# 
+# linkActivityQuantileThreshold=0.75           # Define only 'strong active' model interactions as activ, 
+#                                              # by requiring that either the healthy or the MS untreated or the drug treated mean activity level of the respective model interaction 
+#                                              # is larger than the chosen quantile threshold level
+# 
+# applylinkActivityQuantileThreshold ='no'     # applylinkActivityQuantileThreshold ='no' can be used to produce a non-weighted network for plotting and graph search
+#                                              # The option applylinkActivityQuantileThreshold is only used for grouping mode mean, as in the median model it is not necessary
+#                                              # 
+#                                              # applylinkActivityQuantileThreshold ='yes' leads to rounded mean values based on the choosen linkActivityQuantileThreshold
+# 
+# 
+# thisDrugable="zero"     # 2 thisDrugable options are possible: "zero" or "negative"
+#                         # "zero": defectiveInts are interactions with a drugScore equal or smaller than 0 (drugScore <= 0)
+#                         # "negative": defectiveInts are only interactions with a negative drugScore (drugScore < 0)
+#                         
+# searchInactiveInts="yes"
+
+# -------------------------------------------------------------------------------------------------------------------------
+
+
+
 
 groupingMode='mean'     # 2 groupingMode options are possible: 'mean' or 'median'
 
 linkActivityQuantileThreshold=0.75           # Define only 'strong active' model interactions as activ, 
-                                             # by requiring that either the healthy or the MS untreated or the drug treated mean activity level of the respective model interaction 
-                                             # is larger than the chosen quantile threshold level
+# by requiring that either the healthy or the MS untreated or the drug treated mean activity level of the respective model interaction 
+# is larger than the chosen quantile threshold level
 
 applylinkActivityQuantileThreshold ='no'     # applylinkActivityQuantileThreshold ='no' can be used to produce a non-weighted network for plotting and graph search
-                                             # The option applylinkActivityQuantileThreshold is only used for grouping mode mean, as in the median model it is not necessary
-                                             # 
-                                             # applylinkActivityQuantileThreshold ='yes' leads to rounded mean values based on the choosen linkActivityQuantileThreshold
+# The option applylinkActivityQuantileThreshold is only used for grouping mode mean, as in the median model it is not necessary
+# 
+# applylinkActivityQuantileThreshold ='yes' leads to rounded mean values based on the choosen linkActivityQuantileThreshold
 
 
 thisDrugable="zero"     # 2 thisDrugable options are possible: "zero" or "negative"
-                        # "zero": defectiveInts are interactions with a drugScore equal or smaller than 0 (drugScore <= 0)
-                        # "negative": defectiveInts are only interactions with a negative drugScore (drugScore < 0)
-                        
+# "zero": defectiveInts are interactions with a drugScore equal or smaller than 0 (drugScore <= 0)
+# "negative": defectiveInts are only interactions with a negative drugScore (drugScore < 0)
+
 searchInactiveInts="yes"
+
+
+
+
+
 
 
 
