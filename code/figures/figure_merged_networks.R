@@ -19,7 +19,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 # load results from statistical test
 load('../../files/statistics/all_groups_wilcoxon_results.RData') # c(2.95, 2.25, 1.15, 1, .5), y = c(.3, .3, .5, 2, 2)
 
-ann_text <- data.frame(log.p.value = c(.5, 1.15, 2.95, 1, 2.25), y = c(2, .5, .3, 2, .3), lab = c('EGCG', 'FTY', 'IFNb', 'GA', 'NTZ'), 
+ann_text <- data.frame(log.p.value = c(.5, 1.15, 2.95, 1, 2.25), y = c(5, .5, .25, 3, .3), lab = c('EGCG', 'FTY', 'IFNb', 'GA', 'NTZ'), 
                        interaction_in_model=c('none', 'none', 'none', 'none', 'none'),
                        group = factor(c('EGCG', 'FTY', 'IFNb', 'GA', 'NTZ'), levels = c('EGCG', 'FTY', 'IFNb', 'GA', 'NTZ')))
 all_groups$group = factor(all_groups$group, levels=c('EGCG', 'FTY', 'IFNb', 'GA', 'NTZ'))
