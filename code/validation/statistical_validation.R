@@ -108,7 +108,7 @@ names(ListPhosphos)  <- DonorsWithPhospho
 # Convert pkn into igraph object and find all possible Stimulus-Readout pairs
 # #####################################################################################################################################
 
-pknmodel = readSIF('../../files/model/combiMSplaneCUT.sif')
+pknmodel = readSIF('../../files/model/combiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED.sif')
 cnolist = readMIDAS('../../data/phosphos_normalised/CH003.csv')
 cnolist = makeCNOlist(cnolist, subfield = FALSE)
 
@@ -123,8 +123,10 @@ find_model_interactions = function(group){
                          "EGCG"='EGCG',
                          "NTZ"='Tysabri')
   group = name_conversion[[group]]
-  model_group = read.csv(paste0('../../files/group_models/', group, 'median.csv'))
-  edges = pknmodel$interMat[,row.names(model_group)[which(model_group$x == 1)]]
+  fn <- paste0('../../files/group_models/phenotypeNws_based_on__linkActivityQuantileThreshold_0_75_NOTroundedRealNumber_mean_zero_yes/', group, '_CUTnetwork.csv')
+  model_group <- read.csv(fn, stringsAsFactors = FALSE)
+  model.edges <- paste0(ifelse(model_group$V2 == -1, '!', ''), model_group$V1, '=', model_group$V3)
+  edges = pknmodel$interMat[,model.edges]
   adjacency = matrix(0, nrow(edges), nrow(edges))
   for(i in 1:ncol(edges)){
     startIdx = which(edges[, i]==-1)
