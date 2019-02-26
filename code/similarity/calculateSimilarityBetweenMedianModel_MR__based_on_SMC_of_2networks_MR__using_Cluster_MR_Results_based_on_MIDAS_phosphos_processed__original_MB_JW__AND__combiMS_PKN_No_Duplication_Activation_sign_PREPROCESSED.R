@@ -46,7 +46,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 # setwd('~/Documents/combiMS/code/similarity/')
 
 #source("./newJaccard.R")              # MR modified
-source("../utils/SMC_of_2networks_MR.R")     # MR modified
+source("../utils/SMC_of_2networks.R")     # MR modified
 
 
 
@@ -77,7 +77,7 @@ load(paste("../../files/median_models/", Results_storage_name__median_models ,"/
 
 
 # compute pairwise similarity 
-similarityMatrix = sapply(unname(row.names(allMedianNetworks)), function(x){sapply(unname(row.names(allMedianNetworks)), function(y){return(SMC_of_2networks_MR(allMedianNetworks[x,], allMedianNetworks[y,]))})})  # MR modified
+similarityMatrix = sapply(unname(row.names(allMedianNetworks)), function(x){sapply(unname(row.names(allMedianNetworks)), function(y){return(SMC_of_2networks(allMedianNetworks[x,], allMedianNetworks[y,]))})})  # MR modified
 diag(similarityMatrix) = NA
 
 # save similarity Matrix
