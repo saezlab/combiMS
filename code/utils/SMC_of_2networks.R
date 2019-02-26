@@ -20,7 +20,7 @@
 
 
 
-SMC_of_2networks_MR <- function(bString_network1, bString_network2) {     
+SMC_of_2networks <- function(bString_network1, bString_network2) {     
    
    sum(bString_network1 == bString_network2) / length(bString_network1)
    
