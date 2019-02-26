@@ -875,6 +875,32 @@ calculateDefective=function(thisMode='mean',
      ggsave(a, file=paste(drugScores_folder_of_current_script_settings_,'plot_NumDefective.pdf',sep=""), width = 4, height = 3)
      
      
+     numDefectiveDF_2 = numDefectiveDF
+     numDefectiveDF_2$Drug = c("FTY","IFNb","GA","EGCG","NTZ")
+     #To prevent ggplot2 from reordering alphabetically the labels according to the factors, which are alphabetical
+     #We specify that the factors need to be ordered as they already are
+     numDefectiveDF_2$Drug=factor(numDefectiveDF_2$Drug,levels=numDefectiveDF_2$Drug)
+     
+     numDefectiveDF_2$Color = c("#57AB27","#612158","#BDCD00" ,"#0098A1","#7A6FAC")
+     
+     a_2=ggplot(data=numDefectiveDF_2,aes(Drug,NumDefective,fill=Drug))+
+        geom_bar(stat='identity',alpha=1)+
+        scale_fill_manual(values=numDefectiveDF_2$Color, guide=FALSE) +
+        labs(y = 'Number of \nco-druggable interactions', x = "")+
+        coord_flip()+
+        scale_x_discrete(limits = rev(levels(numDefectiveDF_2$Drug)))+
+        scale_y_continuous(expand = c(0, 0),breaks = c(0,4,8,12))+
+        #
+        theme_bw()+
+        theme(axis.text=element_text(size=10),axis.title=element_text(size=10))+
+        theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())+
+        theme(panel.border = element_blank(),axis.line = element_line(colour = "black"))
+     
+     
+     ggsave(a_2, file=paste(drugScores_folder_of_current_script_settings_,'plot_NumDefective_rotated.pdf',sep=""), width = 2.5, height = 2)
+     
+     
+     
      #   #*******plot histogram of num defective by drug
      #   c=ggplot(data=phenotypeScores,aes(Score,fill=Drug))+geom_histogram(position='dodge',alpha=.5)
      #   c=c +theme_bw() +  theme(axis.text.x = element_text(angle = 90, hjust = 1))
@@ -994,6 +1020,111 @@ calculateDefective=function(thisMode='mean',
      
      
      
+     
+     
+     
+     
+     
+     
+     
+     b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_CoDrug=ggplot()+
+        #geom_bar(data=phenotypeScores_CoDrug_NonCoDrug_StrongActiveInts,aes(Interactions,Score_CoDrug_NonCoDrug,fill=Drug),stat='identity',alpha=1)+
+        geom_bar(data=subset(phenotypeScores_CoDrug_NonCoDrug_StrongActiveInts,Score_CoDrug_NonCoDrug ==1),aes(Interactions,CoDruggable,fill=Drug),stat='identity',alpha=1)+
+        #
+        geom_bar(data=subset(phenotypeScores_CoDrug_NonCoDrug_StrongActiveInts,Score_CoDrug_NonCoDrug ==(-1)),aes(Interactions,(-1)*Score_CoDrug_NonCoDrug,fill=Drug),stat='identity',alpha=1)+
+        scale_fill_manual(values=c("#57AB27","#612158","#BDCD00" ,"#0098A1","#7A6FAC"), guide=FALSE)+
+        # geom_rect(data=data.frame(xmin=-Inf, xmax=Inf, ymin=-Inf,ymax=0),
+        #           aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="orangered", alpha=0.5)+
+        # geom_rect(data=data.frame(xmin=-Inf, xmax=Inf, ymin=0,ymax=Inf),
+        #           aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="gray50", alpha=0.25)+
+        # geom_bar(data=phenotypeScores_CoDrug_NonCoDrug_StrongActiveInts,aes(Interactions,Score_CoDrug_NonCoDrug,fill=Drug),stat='identity',alpha=1)+
+        #geom_hline(yintercept = 0)+
+        # scale_fill_manual(values=c("#57AB27","#612158","#BDCD00" ,"#0098A1","#7A6FAC"), guide=FALSE)+
+        labs(x = "Model interactions", y = 'Co-druggable')+
+        scale_y_continuous(expand = c(0, 0), limits = c(0, numDrugs))
+     
+     #geom_rect(fill = 'red', xmin = -Inf, xmax = Inf, ymin =0, ymax = Inf, alpha =0.05)
+     #remove background, rotate labels
+     b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_CoDrug=b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_CoDrug +
+                                                      theme_bw() +  
+                                                      theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust=0.5))+
+                                                      theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())+
+                                                      theme(panel.border = element_blank(),axis.line = element_line(colour = "black"))
+                                                  
+     
+     
+     #print(b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_CoDrug)
+     
+     ggsave(b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_CoDrug, file=paste(drugScores_folder_of_current_script_settings_,'plot_x_Ints_y_AllDrugs_CoDruggable_StrongActiveInts.pdf',sep=""), width = 10.5, height = 3.5)
+     
+     
+     
+     
+     b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_xCoDrug_x=ggplot()+
+        #geom_bar(data=phenotypeScores_CoDrug_NonCoDrug_StrongActiveInts,aes(Interactions,Score_CoDrug_NonCoDrug,fill=Drug),stat='identity',alpha=1)+
+        #geom_bar(data=subset(phenotypeScores_CoDrug_NonCoDrug_StrongActiveInts,Score_CoDrug_NonCoDrug ==1),aes(Interactions,CoDruggable,fill=Drug),stat='identity',alpha=1)+
+        #
+        geom_bar(data=subset(phenotypeScores_CoDrug_NonCoDrug_StrongActiveInts,Score_CoDrug_NonCoDrug ==(-1)),aes(Interactions,(-1)*Score_CoDrug_NonCoDrug,fill=Drug),stat='identity',alpha=1)+
+        scale_fill_manual(values=c("#57AB27","#612158","#BDCD00" ,"#0098A1","#7A6FAC"), guide=FALSE)+
+        # geom_rect(data=data.frame(xmin=-Inf, xmax=Inf, ymin=-Inf,ymax=0),
+        #           aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="orangered", alpha=0.5)+
+        # geom_rect(data=data.frame(xmin=-Inf, xmax=Inf, ymin=0,ymax=Inf),
+        #           aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="gray50", alpha=0.25)+
+        # geom_bar(data=phenotypeScores_CoDrug_NonCoDrug_StrongActiveInts,aes(Interactions,Score_CoDrug_NonCoDrug,fill=Drug),stat='identity',alpha=1)+
+        #geom_hline(yintercept = 0)+
+        # scale_fill_manual(values=c("#57AB27","#612158","#BDCD00" ,"#0098A1","#7A6FAC"), guide=FALSE)+
+        labs(x = "Model interactions", y = 'Co-druggable')+
+        scale_y_continuous(expand = c(0, 0), limits = c(0, numDrugs))
+     
+     #geom_rect(fill = 'red', xmin = -Inf, xmax = Inf, ymin =0, ymax = Inf, alpha =0.05)
+     #remove background, rotate labels
+     b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_xCoDrug=b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_xCoDrug_x +
+        theme_bw() +  
+        theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust=0.5))+
+        theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())+
+        theme(panel.border = element_blank(),axis.line = element_line(colour = "black"))
+     
+     
+     
+     #print(b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_CoDrug)
+     
+     ggsave(b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_xCoDrug, file=paste(drugScores_folder_of_current_script_settings_,'plot_x_ONLYCoDruggableInts_y_AllDrugs_CoDruggable_StrongActiveInts.pdf',sep=""), width = 10.5, height = 3.5)
+     
+     
+     
+     b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_NonCoDrug=ggplot()+
+        #geom_bar(data=phenotypeScores_CoDrug_NonCoDrug_StrongActiveInts,aes(Interactions,Score_CoDrug_NonCoDrug,fill=Drug),stat='identity',alpha=1)+
+        geom_bar(data=subset(phenotypeScores_CoDrug_NonCoDrug_StrongActiveInts,Score_CoDrug_NonCoDrug ==1),aes(Interactions,Score_CoDrug_NonCoDrug,fill=Drug),stat='identity',alpha=1)+
+        scale_fill_manual(values=c("#57AB27","#612158","#BDCD00" ,"#0098A1","#7A6FAC"), guide=FALSE)+
+        # geom_rect(data=data.frame(xmin=-Inf, xmax=Inf, ymin=-Inf,ymax=0),
+        #           aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="orangered", alpha=0.5)+
+        # geom_rect(data=data.frame(xmin=-Inf, xmax=Inf, ymin=0,ymax=Inf),
+        #           aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="gray50", alpha=0.25)+
+        # geom_bar(data=phenotypeScores_CoDrug_NonCoDrug_StrongActiveInts,aes(Interactions,Score_CoDrug_NonCoDrug,fill=Drug),stat='identity',alpha=1)+
+        #geom_hline(yintercept = 0)+
+        #geom_vline(xintercept = -1)+
+        # scale_fill_manual(values=c("#57AB27","#612158","#BDCD00" ,"#0098A1","#7A6FAC"), guide=FALSE)+
+        labs(x = "Model interactions", y = 'Non-co-druggable')+
+        scale_y_continuous(expand = c(0, 0), limits = c(0, numDrugs))
+        
+
+     #geom_rect(fill = 'red', xmin = -Inf, xmax = Inf, ymin =0, ymax = Inf, alpha =0.05)
+     #remove background, rotate labels
+     b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_NonCoDrug=b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_NonCoDrug + 
+                                                         theme_bw() +  
+                                                         theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust=0.5))+
+                                                         theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())+
+                                                         theme(panel.border = element_blank(),axis.line = element_line(colour = "black"))
+     #print(b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_NonCoDrug)
+     
+     ggsave(b_CoDrug_NonCoDrug_StrongActiveInts__ONLY_NonCoDrug, file=paste(drugScores_folder_of_current_script_settings_,'plot_x_Ints_y_AllDrugs_NonCoDruggable_StrongActiveInts.pdf',sep=""), width = 10.5, height = 3.5)
+     
+     
+     
+     
+     
+     
+ 
      
      
      
