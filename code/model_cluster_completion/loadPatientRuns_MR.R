@@ -1,64 +1,16 @@
-
-#loadPatientRuns_MR.R
-
-
-
-
 # For a single patient, merge cluster jobs until 10 successful cluster jobs have been concatenated
 # Called by completePatientsFinal.R
 # Marti Bernardo-Faura
 # June 2015
 
 
-
-
-
-
-
-
-# with some notes added by 
+# Small initialization change by 
 # Melanie Rinas
 # November 2017
 
-# AND the following modification
-#    # AllNwsPatient=matrix(ncol=numInteractions)    # original
-# AllNwsPatient= c()                                 # MR modified reason: 
-# initialization using matrix(ncol=numInteractions) creates a NA line 
-# which is later the first line in networksToAdd$AllNwsPatient
-# because of AllNwsPatient=rbind(AllNwsPatient,network$Opt$stringsTol)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# # START - MR inserted 
-# 
-# 
-# # for testing
-# 
-# patient_name = "CH003"
-# runsNeededPatient = 10
-# numInteractions = 186
-# networks_for_Re_Completion = "/Users/melanie/Documents/GitHub/combiMS-master_MR/files/Cluster_MR/Results/OptCombiMSclusterFork10_MR__using_MIDAS_phosphos_processed__original_MB_JW__AND__optimization_fct__gaBinaryT1__with_set_seed_number/CombiMS_rerun_all_donors/"
-# 
-# # END - MR inserted 
-# 
-
-
-
-
-loadPatientRuns_MR=function(patient_name,runsNeededPatient,numInteractions,networks_for_Re_Completion){
+loadPatientRuns=function(patient_name,runsNeededPatient,numInteractions,networks_for_Re_Completion){
    
    
    
@@ -76,11 +28,7 @@ loadPatientRuns_MR=function(patient_name,runsNeededPatient,numInteractions,netwo
    cat(patient_name,sep="\n")
    
    
-   # AllNwsPatient=matrix(ncol=numInteractions)
-   AllNwsPatient= c()                                 # MR modified reason: 
-                                                      # initialization using matrix(ncol=numInteractions) creates a NA line 
-                                                      # which is later the first line in networksToAdd$AllNwsPatient
-                                                      # because of AllNwsPatient=rbind(AllNwsPatient,network$Opt$stringsTol)
+   AllNwsPatient= c()                                 
    
    
    NwsInRuns=vector()
