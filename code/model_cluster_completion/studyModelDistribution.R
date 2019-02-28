@@ -40,7 +40,7 @@ solutionsAllRunsPatient=list.files(networks_folder,pattern="*.RData",full.names=
 #***********************************************************************
 data_folder="../../data/phosphos_processed/"
 patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-model_path="../../files/model/combiMSplane.sif"
+model_path="../../files/model/combiMS_PKN_No_Duplication_Activation_sign.sif"
 fileName=patientData[1]
 
 midas=CNOlist(paste(data_folder,fileName,sep=""))
