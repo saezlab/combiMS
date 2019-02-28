@@ -8,22 +8,17 @@
 # Jakob Wirbel, June 2017
 
 
-# with some notes added by 
+# Some notes and minor changes by 
 # Melanie Rinas
 # November 2017
-
-
-# One small "error " in the original script detected:
-# numInteractions=length(model$reacID)     needs to be uncommented as needed 
 
 
 # Set working directory
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 library(CellNOptR)
-source("./loadPatientRuns_MR.R")   # MR modified
-#source("./calculateScore_MR.R")   # MR modified
-source("../utils/calculateScore_MR.R")                                  # MR modified
+source("./loadPatientRuns.R")  
+source("../utils/calculateScore.R")                                
 source("./bindTwoRuns.R")
 source("./checkNwsAndScores.R")
 #******************************************************************
@@ -35,11 +30,11 @@ third_folder="../../files/cluster/9th10hReltol005/results/"
 fourth_folder="../../files/cluster/9thB/OnePatient/"
 all_folders=c(first_folder,second_folder,third_folder,fourth_folder)
 #***********************************************************************
-# *************** preprocess model
+# *************** load preprocessed model
 #***********************************************************************
 data_folder="../../data/phosphos_processed/"
 patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-model_path="../../files/model/combiMSplaneCUT.sif"
+model_path="../../files/model/combiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED.sif"
 fileName=patientData[grep("IB068",patientData)]
 
 midas=CNOlist(paste(data_folder,fileName,sep=""))
@@ -47,7 +42,7 @@ model=readSIF(model_path)
 sprintf("*********Before preprocessing:  %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
 
 # model=preprocessing(midas,model,expansion=FALSE)
-numInteractions=length(model$reacID)                    # MR modified
+numInteractions=length(model$reacID)                    
 # sprintf("*********After compressing: %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
 
 # initBstring=rep(1,length(model$reacID))
@@ -79,7 +74,7 @@ for (i in 1:total_pat_complete){
   runsNeededPatient=10
   networks_folder=all_folders[runs]
   cat("-------------------------------------------------loading patient",patientToComplete,"***run ",runs,"\n")
-  networks_first_run=loadPatientRuns_MR(patientToComplete,runsNeededPatient,numInteractions,networks_folder)
+  networks_first_run=loadPatientRuns(patientToComplete,runsNeededPatient,numInteractions,networks_folder)
   
   if(is.na(networks_first_run$AllNwsPatient[1,1])){
     cat("there is a weird NA line, cause unknown. Remove!","\n")
@@ -89,7 +84,7 @@ for (i in 1:total_pat_complete){
   #Check if removing first NA line messed up
   recalculated_score=vector()
   for (j in 1:2){
-    recalculated_score[j]=calculateScore_MR(model,midas,bString=networks_first_run$AllNwsPatient[j,])$score
+    recalculated_score[j]=calculateScore(model,midas,bString=networks_first_run$AllNwsPatient[j,])$score
   }
   checkNwsAndScores(networks_first_run,recalculated_score)
   
@@ -102,7 +97,7 @@ for (i in 1:total_pat_complete){
     
     networks_folder=all_folders[runs]
     cat("*****************loading patient",patientToComplete,"***run ",runs,"\n")
-    networks_additional=loadPatientRuns_MR(patient_name=patientToComplete,
+    networks_additional=loadPatientRuns(patient_name=patientToComplete,
                                         runsNeededPatient=runsNeededPatient,
                                         numInteractions=numInteractions,
                                         networks_for_Re_Completion=networks_folder)
@@ -111,7 +106,7 @@ for (i in 1:total_pat_complete){
     #however, if repeated it is then fine
     
     if(dim(networks_additional$AllNwsPatient)[1]==0){
-      networks_additional=loadPatientRuns_MR(patient_name=patientToComplete,
+      networks_additional=loadPatientRuns(patient_name=patientToComplete,
                                           runsNeededPatient=runsNeededPatient,
                                           numInteractions=numInteractions,
                                           networks_for_Re_Completion=networks_folder)
@@ -127,7 +122,7 @@ for (i in 1:total_pat_complete){
     #Check if removing first NA line messed up 
     recalculated_score=vector()
     for (j in 1:2){
-      recalculated_score[j]=calculateScore_MR(model,midas,bString=networks_additional$AllNwsPatient[j,])$score
+      recalculated_score[j]=calculateScore(model,midas,bString=networks_additional$AllNwsPatient[j,])$score
     }
     checkNwsAndScores(networks_additional,recalculated_score)
     
