@@ -1,37 +1,16 @@
 
-
-# mergeModels_MR
-
-
-Results_storage_name = "OptCombiMSclusterFork10_MR__using_MIDAS_phosphos_processed__original_MB_JW__AND__combiMSplaneCUT__postCellNOptRupdate090318"  # MR inserted
-
-save_results_of_current_script=T
-
-# with some notes
-# AND
-# important modifications 
-# AND
-# ERROR correction
-#                  regarding the indices shifts for the calculation of
-#                           one_patientDF$avg_score[i]=mean(scores_one_run,na.rm=T)          # 3 of one_patientDF
-#                           one_patientDF$best_score[i]=min(scores_one_run,na.rm=T)          # 5 of one_patientDF
-# AND
-# DonorBestNetworks calculation and storing
-
-
-# 
-# 
-# by 
-# Melanie Rinas
-# November 2017
-
-
-
 # Function to create a single model from all solutions found within relative tolerance of the best model for a given patient
 # (-) For a given patient, take a subset of models within reltol. Then clean the non unique.
 # (-) For each patient, calculate a single network (i.e. the mean and the median), and keep stats such as error, num of networks within reltol
 # (-) Merge all single models (each one for a patient) into one structure of networks
 # Created by Marti Bernardo-Faura, final version July 2015
+
+
+# Some modifications regarding avg_score and DonorBestNetworks calculation and storing
+# Adaption of paths, SIF file, initializations of objects
+# by Melanie Rinas, November 2017
+
+
 
 #library(reshape2)
 #library(ggplot2)
@@ -41,29 +20,23 @@ library(CellNOptR)
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 
-#source("../utils/calculateScore.R")
-source("../utils/calculateScore_MR.R")                                  # MR modified
-
-
+source("../utils/calculateScore.R")                                
 # source("/Users/marti/Documents/r/combiMS/edgeContribution2.R")
 # source("/Users/marti/Documents/r/combiMS/loadPatientRuns.R")
 
 #***********************************************************************
 # *************** preprocess model
 #***********************************************************************
-data_folder="../../data/phosphos_processed__original_MB_JW/"             # MR modified
-
-
+data_folder="../../data/phosphos_processed/"
 patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-model_path="../../files/model/combiMSplaneCUT.sif"
-#model_path="../../files/model/combiMS_rerun_whole_pkn_preprocessed_MR_211117.sif"                        # MR modified
+model_path="../../files/combiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED.sif"
 
 fileName=patientData[1]
 
 midas=CNOlist(paste(data_folder,fileName,sep=""))
 model=readSIF(model_path)  
 #sprintf("*********Before preprocessing:  %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
-sprintf("********* The used model has  %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))                                        # MR modified
+sprintf("********* The used model has  %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))                                       
 
 
 # model=preprocessing(midas,model,expansion=FALSE)
@@ -93,46 +66,14 @@ numInteractions=length(model$reacID)
 
 
 
-# START MR modified
+sub_dir__Results_model_merging = "../../files/model_merging"
 
-files_Results_folder = "../../files/Results"
-
-sub_dir__Results_single_model_optimization = file.path(files_Results_folder,"Results_single_model_optimization")
-
-sub_dir__Results_single_model_optimization__completePatientsFinal_MR = file.path(sub_dir__Results_single_model_optimization,Results_storage_name)
+sub_dir__Results_median_models = "../../files/median_models"
 
 
 
 
-files_Results_model_merging_MR_folder = "../../files/model_merging_MR"
-
-ifelse(!dir.exists(file.path(files_Results_model_merging_MR_folder,Results_storage_name)), dir.create(file.path(files_Results_model_merging_MR_folder,Results_storage_name)), FALSE)
-sub_dir__Results_model_merging_MR__current_script = file.path(files_Results_model_merging_MR_folder,Results_storage_name)
-
-
-
-files_Results_median_models_MR_folder = "../../files/median_models_MR"
-
-ifelse(!dir.exists(file.path(files_Results_median_models_MR_folder,Results_storage_name)), dir.create(file.path(files_Results_median_models_MR_folder,Results_storage_name)), FALSE)
-sub_dir__Results_median_models_MR__current_script = file.path(files_Results_median_models_MR_folder,Results_storage_name)
-
-
-# END MR modified
-
-
-
-
-
-
-
-
-
-
-
-
-# networks_folder="../../files/all_solutions_models/"
-networks_folder= sub_dir__Results_single_model_optimization__completePatientsFinal_MR  # MR modified
-
+networks_folder="../../files/all_solutions_models/"
 totalPatients=list.files(networks_folder,pattern="*.RData",full.names=FALSE)
 totalPatientsSimple=sapply(totalPatients, function(x){
   strsplit(x,"\\.")[[1]][1]
@@ -141,10 +82,9 @@ totalPatientsSimple=sapply(totalPatients, function(x){
 num_patients=length(totalPatients)
 #num_patients=3
 allMedianNetworks=matrix(nrow=num_patients,ncol=numInteractions)          
-DonorBestNetworks=list()           # MR modified
+DonorBestNetworks=list()           
 
 medianNetworkErrors=list()
-#meanNetworkErrors=list()                                                     # MR modified for testing
 
 allMeanNetworks=matrix(nrow=num_patients,ncol=numInteractions)                         
 total_patientDF=data.frame(name=character(),
@@ -156,18 +96,6 @@ total_patientDF=data.frame(name=character(),
                            nws_new_reltol=vector(),
                            convergence=character())
 
-
-
-total_patientDF__with_wrong_results=data.frame(name=character(),   # MR inserted
-                                               num_nws=vector(mode="numeric"),
-                                               avg_score=vector(mode="numeric"),
-                                               wrong_avg_score=vector(mode="numeric"),
-                                               total_nws=vector(),
-                                               best_score=vector(),
-                                               wrong_best_score=vector(),
-                                               merged_model_score=vector(),
-                                               nws_new_reltol=vector(),
-                                               convergence=character())
 
 
 
@@ -190,7 +118,7 @@ for(index in 1:num_patients){
   
   cat("----------loading patient",totalPatients[index],"\n")
   # load(paste0(networks_folder,totalPatients[index])) # this loads PatientResults
-  load(paste(networks_folder,totalPatients[index],sep="/")) # this loads PatientResults         # MR modified
+  load(paste(networks_folder,totalPatients[index],sep="/")) # this loads PatientResults        
   
   
   # this is not necessary since i use completePatientsFinal.R
@@ -209,8 +137,7 @@ for(index in 1:num_patients){
   # check that the num networks matches the scores
   if (! dim(PatientResults$AllNwsPatient)[1] == length(PatientResults$AllScores)){
     cat("***************************************************************************","\n")
-    #cat("dim networks does not macth num scores!!","\n")
-    cat("dim networks does not match num scores!!","\n")   # MR modified
+    cat("dim networks does not macth num scores!!","\n")
   }
   
   
@@ -232,7 +159,7 @@ for(index in 1:num_patients){
     ModelsInTol=PatientResults$AllNwsPatient[which(PatientResults$AllScores<scoreTol),]
     
     
-    # START MR modified
+
     if(length(which(PatientResults$AllScores<scoreTol)) == 1){
       
       ModelsInTol = as.matrix(t(ModelsInTol))              # tranform vector to matrix 
@@ -241,23 +168,7 @@ for(index in 1:num_patients){
     
     
     
-    # clean repeated networks to keep only unique
-    # 
-    # test that unique function is keeping unique rows and not columns
-    # 
-    # > Mat
-    # [,1] [,2] [,3]
-    # [1,]    1    2    3
-    # [2,]    1    2    3
-    # [3,]   10    2    3
-    # > unique(Mat)
-    # [,1] [,2] [,3]
-    # [1,]    1    2    3
-    # [2,]   10    2    3
-    # 
-    # 
-    
-    # END MR modified
+   
     
     unique_nws=unique(ModelsInTol)
     if(!dim(ModelsInTol)[1]==dim(unique_nws)[1]){           # command is the same as: if(!(dim(ModelsInTol)[1]==dim(unique_nws)[1])){
@@ -285,7 +196,7 @@ for(index in 1:num_patients){
     midas=CNOlist(paste(data_folder,fileName,sep=""))
     cat("calculating score of median network, data is",fileName,"\n")    
     # medianNetworkErrors[[index]]=calculateScore(model,midas,bString=medianNw)      
-    medianNetworkErrors[[index]]=calculateScore_MR(model,midas,bString=medianNw)      # MR modified
+    medianNetworkErrors[[index]]=calculateScore(model,midas,bString=medianNw)     
     
     # create 3rd structure: 1 mean network 
     cat("calculating average of interactions","\n")
@@ -294,8 +205,7 @@ for(index in 1:num_patients){
     
     #     # 4th structure:error for mean ns
     #cat("calculating score of median network","\n")
-    #meanNetworkErrors[[index]]=calculateScore_MR(model,midas,bString=meanNw)     # MR modified for testing
-    
+
     # create 4th structure: stats for sanity check, e.g. are num networks (in each run) and error related?
     cat("calculating number of networks per run","\n")
     one_patientDF=data.frame(name=character(length=10),
@@ -316,40 +226,10 @@ for(index in 1:num_patients){
     one_patientDF$nws_new_reltol=rep(nws_new_reltol,10)                          # 7 of one_patientDF
     
     
-    # START MR modified
+
     
     
-    ##############################
-    ## START MB original version:
-    ## ##############################
-    # #for all networks in one run calculate average error and best error
-    # run_start_index=1
-    # run_end_index=PatientResults$NwsInRuns[1]
-    # i=1
-    # cat("calculating avg score for each run","\n")
-    # cat("calculating best score for each run","\n")
-    # 
-    # while (i <=num_success_runs){
-    #    scores_one_run=PatientResults$AllScores[run_start_index:run_end_index]
-    #    one_patientDF$avg_score[i]=mean(scores_one_run,na.rm=T)          # 3 of one_patientDF
-    #    one_patientDF$best_score[i]=min(scores_one_run,na.rm=T)          # 5 of one_patientDF
-    #    
-    #    #move indexes
-    #    run_start_index=run_start_index+PatientResults$NwsInRuns[i]
-    #    run_end_index=run_end_index+PatientResults$NwsInRuns[i]
-    #    i=i+1
-    #    
-    # }
-    # 
-    ##############################
-    ## END MB original version:
-    ## ##############################
-    
-    
-    
-    
-    
-    
+
     
     
     
@@ -379,48 +259,11 @@ for(index in 1:num_patients){
     
     
     
-    
-    
-    
-    
-    
-    
-    # #for all networks in one run calculate average error and best error
-    # 
-    one_patientDF__with_wrong_avg_score_AND_wrong_best_score = one_patientDF
-    
-    run_start_index__MB=1
-    run_end_index__MB=PatientResults$NwsInRuns[1]
-    ii=1
-    cat("calculating avg score for each run using MB's method","\n")
-    cat("calculating best score for each run using MB's method","\n")
-    
-    while (ii <=num_success_runs){
-      scores_one_run__MB=PatientResults$AllScores[run_start_index__MB:run_end_index__MB]
-      one_patientDF__with_wrong_avg_score_AND_wrong_best_score$wrong_avg_score[ii]=mean(scores_one_run__MB,na.rm=T)          # 3 of one_patientDF
-      one_patientDF__with_wrong_avg_score_AND_wrong_best_score$wrong_best_score[ii]=min(scores_one_run__MB,na.rm=T)          # 5 of one_patientDF
-      
-      #move indexes
-      run_start_index__MB=run_start_index__MB+PatientResults$NwsInRuns[ii]
-      run_end_index__MB=run_end_index__MB+PatientResults$NwsInRuns[ii]
-      ii=ii+1
-      
-    }
-    
-    
-    
-    
-    
-    
-    # END MR modified
-    
-    
     total_patientDF=rbind(total_patientDF,one_patientDF) #concatenate this with total
-    total_patientDF__with_wrong_results=rbind(total_patientDF__with_wrong_results,one_patientDF__with_wrong_avg_score_AND_wrong_best_score) # MR inserted
-    
+
   }
   
-  # START MR modified
+ 
   
   
   # create 5th structure: best networks (best of best with min score)
@@ -428,16 +271,16 @@ for(index in 1:num_patients){
   
   if(length(which(PatientResults$AllScores==min(PatientResults$AllScores)))==1){
     
-    DonorBestNetworks[[index]] = PatientResults$AllNwsPatient[which(PatientResults$AllScores==min(PatientResults$AllScores)),]    # MR modified
+    DonorBestNetworks[[index]] = PatientResults$AllNwsPatient[which(PatientResults$AllScores==min(PatientResults$AllScores)),]   
     
   }else{
-    DonorBestNetworks[[index]] = unique(PatientResults$AllNwsPatient[which(PatientResults$AllScores==min(PatientResults$AllScores)),])    # MR modified
+    DonorBestNetworks[[index]] = unique(PatientResults$AllNwsPatient[which(PatientResults$AllScores==min(PatientResults$AllScores)),])    
   }
   
   
   
   
-  # END MR modified
+ 
   
   
 }
@@ -446,34 +289,31 @@ if(dim(total_patientDF)[1]!=1690){stop("Hey!! Not all patients were added, is IB
 
 
 
-if(save_results_of_current_script ==T){
-  
-  
-  
+
   #***********************************************************************
   # *************** save all models and metadata structures
   #***********************************************************************
   rownames(allMedianNetworks)=totalPatientsSimple
   colnames(allMedianNetworks)=model$reacID
-  #save(allMedianNetworks,file="../../files/median_models_MR/allMedianModels.RData")
-  save(allMedianNetworks,file=file.path(sub_dir__Results_median_models_MR__current_script,"allMedianModels.RData"))            # MR modified
+  #save(allMedianNetworks,file="../../files/median_models/allMedianModels.RData")
+  save(allMedianNetworks,file=file.path(sub_dir__Results_median_models,"allMedianModels.RData"))            
   
   
   rownames(allMeanNetworks)=totalPatientsSimple
   colnames(allMeanNetworks)=model$reacID
-  #save(allMeanNetworks,file="../../files/median_models_MR/allMeanModels.RData")
-  save(allMeanNetworks,file=file.path(sub_dir__Results_median_models_MR__current_script,"allMeanModels.RData"))            # MR modified
+  #save(allMeanNetworks,file="../../files/median_models/allMeanModels.RData")
+  save(allMeanNetworks,file=file.path(sub_dir__Results_median_models,"allMeanModels.RData"))          
   
   
   names(medianNetworkErrors)=totalPatientsSimple
-  #save(medianNetworkErrors,file="../../files/median_models_MR/allErrors.RData")
-  save(medianNetworkErrors,file=file.path(sub_dir__Results_median_models_MR__current_script,"allErrors.RData"))            # MR modified
+  #save(medianNetworkErrors,file="../../files/median_models/allErrors.RData")
+  save(medianNetworkErrors,file=file.path(sub_dir__Results_median_models,"allErrors.RData"))         
   
   
   
   names(DonorBestNetworks)=totalPatientsSimple
-  #save(DonorBestNetworks,file="../../files/median_models_MR/DonorBestNetworks.RData")
-  save(DonorBestNetworks,file=file.path(sub_dir__Results_median_models_MR__current_script,"DonorBestNetworks.RData"))            # MR modified
+  #save(DonorBestNetworks,file="../../files/median_models/DonorBestNetworks.RData")
+  save(DonorBestNetworks,file=file.path(sub_dir__Results_median_models,"DonorBestNetworks.RData"))          
   
   
   
@@ -495,39 +335,18 @@ if(save_results_of_current_script ==T){
   
   
   
-  
-  # START MR inserted
-  
-  # *************** calculate best score across runs
-  #patient_names=unique(total_patientDF$name)
-  for (ii in 1:length(patient_names)){
-    all_best_scores__MB=vector(mode="numeric",length=10)
-    all_best_scores__MB=total_patientDF__with_wrong_results$wrong_best_score[which(total_patientDF__with_wrong_results$name==patient_names[ii])]
-    total_patientDF__with_wrong_results$wrong_best_of_bests[which(total_patientDF__with_wrong_results$name==patient_names[ii])]=rep(min(all_best_scores__MB),10)
-  }
-  # ************** add an identifier for runs
-  #run_id=c("1","2","3","4","5","6","7","8","9","10")
-  #for (ii in 1:length(patient_names)){
-  # total_patientDF__with_wrong_results$run_id[which(total_patientDF__with_wrong_results$name==patient_names[ii])]=run_id
-  #}
-  
-  total_patientDF__with_wrong_results$best_of_bests = total_patientDF$best_of_bests     # MR inserted
-  total_patientDF__with_wrong_results$run_id = total_patientDF$run_id                    # MR inserted
-  
-  
-  # END MR inserted
+ 
   
   
   
   
-  # save(total_patientDF,file="../../files/model_merging_MR/statsModels.RData")
-  save(total_patientDF,file=file.path(sub_dir__Results_model_merging_MR__current_script,"statsModels.RData"))            # MR modified
-  save(total_patientDF__with_wrong_results,file=file.path(sub_dir__Results_model_merging_MR__current_script,"statsModels__with_wrong_results.RData"))            # MR modified
-  
-  
-  
-  
-}
+  # save(total_patientDF,file="../../files/model_merging/statsModels.RData")
+  save(total_patientDF,file=file.path(sub_dir__Results_model_merging,"statsModels.RData"))           
 
-print("Script finished!")   # MR inserted
+  
+  
+  
+
+
+print("Script finished!")   
 
