@@ -4,6 +4,13 @@
 # this script loads a similarity matrix which was calculated for each patient in the cluster using calculateSimilarityBetweenMedianCluster.R
 # the similarities were merged into one single structure using mergeSimilarityMatrix.R
 # Marti July 2015
+# 
+# 
+# 
+# 
+# Modified to only consider the unique part of the (symmetric) similarityMatrix
+# Melanie Rinas 2019
+
 # *************************
 #apclusterPatients<-function(Models){
   
@@ -44,7 +51,9 @@
   # ************************************ 
   # create dataframe of similarities to plot
   # ************************************
-  #similarityMatrix[lower.tri(similarityMatrix,diag=F)]=NA
+  similarityMatrix[lower.tri(similarityMatrix,diag=F)]=NA
+  #similarityMatrix_unique[lower.tri(similarityMatrix_unique,diag=F)]=NA                      
+
   sim_df=melt(similarityMatrix)
   sim_df$Group=rep(F,dim(similarityMatrix)[1])
   sim_df$GroupSim=rep(F,dim(similarityMatrix)[1])
