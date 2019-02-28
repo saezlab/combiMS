@@ -52,7 +52,7 @@ normaliseSimp=function(taula,HillCoef=2){
    
 
    
-    noiseProt=intersect(which(pvalueGreater>=0.05),which(pvalueLess>=0.05))    
+   noiseProt=intersect(which(pvalueGreater>=0.05),which(pvalueLess>=0.05))    
 
    
    #************** plot proteins that are negatively and not significantly phospho
