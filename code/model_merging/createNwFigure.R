@@ -53,8 +53,8 @@ length(which(annot2$Category=='RRMS' & annot2$condition=='Untreated')) + length(
 # ************load model and midas for annotation
 # **************************************************
 patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-full_model_path='../../files/model/combiMSplane.sif'
-model_path='../../files/model/combiMSplaneCUT.sif'
+full_model_path='../../files/model/combiMS_PKN_No_Duplication_Activation_sign.sif'
+model_path='../../files/model/combiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED.sif'
 fileName=patientData[1]
 midas=CNOlist(paste(data_folder,fileName,sep=""))
 model=readSIF(model_path)
