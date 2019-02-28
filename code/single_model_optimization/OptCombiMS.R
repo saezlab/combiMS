@@ -44,8 +44,7 @@ OptCombiMS = function(fileName){
   # *************************************************
   # ************load compressed model
   # **************************************************
-  model_path='../../files/model/combiMSplaneCUT.sif'
-  #full_model_path='/Users/marti/Documents/R/combiMS/combiMSplane.sif'
+  model_path='../../files/model/combiMS_PKN_No_Duplication_Activation_sign_PREPROCESSED.sif'
   model=readSIF(model_path)
   numInteractions=length(model$reacID)
 
