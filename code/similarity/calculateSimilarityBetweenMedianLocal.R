@@ -2,6 +2,11 @@
 # This scripts loads the results of loadAllModelsPlaneNW2.R,
 # which is the concatenation of all networks solutions within 5% reltol for 
 # the runs that did not crush out of 10 attempts per patient
+# 
+# 
+# # Adapted for directory structure of the GitHub project by Melanie Rinas in 2019
+
+# 
 #***********************************************************************
 
 # Use relative paths instead of absolut paths for the files
@@ -11,7 +16,7 @@ setwd('~/Documents/combiMS/code/similarity/')
 
 library(pryr)
 
-source("./newJaccard.R")
+source("../utils/SMC_of_2networks.R")   
 
 argsJob= commandArgs(trailingOnly=TRUE)
 
@@ -35,7 +40,7 @@ patientTwo=apply(PatientResults$AllNwsPatient, 2, median)
 # *************** calculate similarity
 #***********************************************************************
 
-distanceModels=jaccNello(patientOne,patientTwo)
+distanceModels=SMC_of_2networks(patientOne,patientTwo)
 
 patientPair=paste0(patientOneOriginal,"_",patientTwoOriginal,".RData")
 cat("----------saving similarity for",patientPair,"\n")
