@@ -38,6 +38,12 @@ Results_storage_name__median_models = "median_models__based_on__SIFcombiMS_PKN_N
 # This scripts loads the results of loadAllModelsPlaneNW2.R,
 # which is the concatenation of all networks solutions within 5% reltol for 
 # the runs that did not crush out of 10 attempts per patient
+# 
+# by Marti Bernardo-Faura.
+# 
+# 
+# 
+# adapted by Melanie Rinas, December 2017
 #***********************************************************************
 
 # Use relative paths instead of absolut paths for the files
