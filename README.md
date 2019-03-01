@@ -1,11 +1,12 @@
 # combiMS
 
-Code and analysis results for the combiMS project.
+Data, code and analysis results of the CombiMS project.
 
-For more information, please visit the [website](http://combims.eu/) of the project. This project was supported by the European Union Seventh Framework Programme (FP7/2007-2) under grant agreement No. 305397.
+For more information, please visit the [website](https://cordis.europa.eu/project/rcn/106479/factsheet/en) of the project. This project was supported by the European Union Seventh Framework Programme (FP7/2007-2) under grant agreement No. 305397 and the European Sys4MS project (Horizon2020: Eracosysmed: ID-43).
 
 The analysis results compiled here are presented in the following publication:
-> Bernardo-Faura, M. et al, Prediction of combination therapy based on perturbation modeling of the multiple sclerosis signaling network, submitted 2017.
+Bernardo-Faura, M. et al, Prediction of combination therapies based on topological modeling of the immune signaling network in Multiple Sclerosis, [bioRxiv 541458](https://www.biorxiv.org/content/10.1101/541458v1) and under submission, 2019
+
 
 ## Workflow of the Project
 
@@ -22,6 +23,6 @@ Distributed under the GNU GPLv3 License. See accompanying file [LICENSE.txt](htt
 
 ## Requirements
 
-The scripts collected in this repository are written in [R 3.4.0 (2017-04-21) -- "You Stupid Darkness"](https://cran.r-project.org/) and were run in [RStudio Version 0.99.893](https://www.rstudio.com) and on the Cluster of the [Rheinisch-Westfälische Technische Hochschule Aachen](https://www.rwth-aachen.de/), which uses Centos 7.3 and the LSF job scheduling system version 9.1.3.0.
+The scripts collected in this repository are written in [R 3.4.0 (2017-04-21)](https://cran.r-project.org/) and were run in [RStudio Version 0.99.893](https://www.rstudio.com) and on the Cluster of the [Rheinisch-Westfälische Technische Hochschule Aachen](https://www.rwth-aachen.de/), which uses Centos 7.3 and the LSF job scheduling system version 9.1.3.0.
 
 The [CellNOptR](https://saezlab.github.io/cellnopt/) packages to fit the signaling models for each individual patient was used in version 1.22.0.
