@@ -77,40 +77,9 @@ calculateDefective=function(thisMode='mean',
   phenotypeNws_folder_of_current_script_settings_ = paste(phenotypeNws_folder_of_current_script_settings,"/",sep="")
   
   
-  # *************************************************************************************************************************
-  # ***********load anotation
-  #*************************************************************************************************************************
-  
-  # ************load anotation to map patients to groups
-#   data_folder="/Users/marti/Documents/ebi/combiMS/data/phosphosMergedAbsMax/processed/normalized/secondRoundProcessedMidas/"
-#   filenames=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-#   annot=read.csv("/Users/marti/Documents/R/combiMS/modelling/annot169pat_v2.csv",header=TRUE,dec=".",check.names=TRUE, stringsAsFactors=FALSE)
-#   numPat=length(filenames)
-#   filenames2=filenames
-#   for (j in 1:numPat){
-#     filenames2[j]=strsplit(filenames[j],"\\.")[[1]][1]
-#   }
-  
-  # ************load model and midas for annotation
-#   patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-#   model_path="/Users/marti/Documents/R/combiMS/combiMSplane.sif"
-#   fileName=patientData[1]
-#   midas=CNOlist(paste(data_folder,fileName,sep=""))
-#   model=readSIF(model_path)  
-#   sprintf("*********Before preprocessing:  %s nodes and %s reactions",length(model$namesSpecies),length(model$reacID))
-#   model=preprocessing(midas,model,expansion=FALSE)
+
   numInteractions=length(model$reacID)
-#   warning(paste0("After compressing: ",length(model$namesSpecies)," nodes, ", numInteractions," reactions"))
-  
-  
-  #writeSIF(model,file="/Users/marti/Documents/R/combiMS/preprocessedModelCombi.sif")
-  
-  # *************************************************************************************************************************
-  # ***********load predicted networks
-  # *************************************************************************************************************************
-  
-#   load("/Users/marti/Documents/R/combiMS/cluster/analysis/fivePerHundredThousTol2/allMedianModels.RData")
-  
+
   
   
   
