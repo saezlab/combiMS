@@ -5,6 +5,8 @@
 # Marti Bernardo-Faura
 
 # minor changed for github repository by Jakob Wirbel, July 2017
+# 
+# minor changed for github repository by Melanie Rinas, 2019
 
 # *************************************************************************************************************************
 # ***********determine if a stimulus connects to signals through predicted interactions
@@ -21,7 +23,7 @@ makeMatrixPathStimSignal<-function(graphGroup,link){
   
   # ************load model and midas for annotation
   patientData=list.files(data_folder,pattern="*.csv",full.names=FALSE)
-  model_path="../../files/model/combiMSplane.sif"
+  model_path="../../files/model/combiMS_PKN_No_Duplication_Activation_sign.sif"
   fileName=patientData[1]
   midas=CNOlist(paste(data_folder,fileName,sep=""))
   model=readSIF(model_path)  
