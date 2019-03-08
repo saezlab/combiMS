@@ -131,7 +131,7 @@ normaliseSimp=function(taula,HillCoef=2){
             
             if(taula2[i,noiseProt[j]]>=(-1) && taula2[i,noiseProt[j]]<=1 && !is.na(taula2[i,noiseProt[j]])){                  
 
-               taula2[,noiseProt[j]]=0} else if ( (taula2[i,noiseProt[j]]<(-1) || taula2[i,noiseProt[j]]>1) && !is.na(taula2[i,positiveProt[j]])){
+               taula2[,noiseProt[j]]=0} else if ( (taula2[i,noiseProt[j]]<(-1) || taula2[i,noiseProt[j]]>1 || is.na(taula2[i,noiseProt[j]])) && !is.na(taula2[i,positiveProt[j]])){
                   taula2[,noiseProt[j]]=NA
                }
             
