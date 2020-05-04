@@ -18,7 +18,7 @@ library(ggsignif)
 # Use relative paths instead of absolut paths for the files
 # in Rstudio
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-
+setwd("~/GITtrunk/combiMS/code/figures/")
 # ###########################################################################################################
 # Load and clean annotation data
 # ###########################################################################################################
@@ -60,7 +60,10 @@ library(vegan)
 library(matrixStats)
 
 
-### Discarded attempt for figure 3B where we compared subsets of the data to untreated 
+#Calculate similarity between all donors within a given group and the 
+#MEAN group network. This includes the untreated ms patients, whose distance
+#is calculataed against the given subgroup, not the untreated mean network
+
 
 df.annot <- annot %>% 
   as_tibble() %>% 
@@ -86,6 +89,9 @@ for (x in unique(df.annot$Group)){
                          transmute(group=x, jacc=jacc, type=type,
                                    id=ID, id.group=Group))
 }
+
+### Discarded attempt for figure 3B where we compared subsets of the data to untreated 
+
 g <- df.plot %>% 
   ggplot(aes(x=group, y=jacc, fill=type)) + 
   geom_boxplot(outlier.shape = NA) + 
@@ -99,21 +105,29 @@ ggsave(g, filename = '~/Desktop/sim_test_1.pdf',
 
 # new Figure 3
 
-library(ggpubr)
+library(ggpubr) #necessary for p-value
+
+# calculate within distances, i.e. all patients against mean group models
 x <- df.plot %>% 
   filter(group%in%c('EGCG', 'FTY', "GA", 'IFNb', 'NTZ', "Healthy")) %>%
   filter(group==id.group | id.group=='Untreated')
 
+# calculate all distances between all patients. This will be the grey "all" bar
 dist.mat <- vegdist(allMeanNetworks, method='jaccard', binary=FALSE)
 temp <- as.matrix(dist.mat)
 diag(temp) <- NA
 temp[upper.tri(temp)] <- NA
 
+# transform "all" distances into a tibble so that it can be included to the 
+# the tible we already have
+#after creating y, confirm that x and y look the same so that they can be joined togeher
+
 y <- temp %>% 
   as_tibble(rownames = 'id') %>% 
   pivot_longer(-id, names_to = 'id2', values_to = 'jacc') %>% 
   filter(!is.na(jacc)) %>% 
-  transmute(id=id, jacc=jacc, type='all', group='all', id.group='all')
+  transmute(id=id, jacc=jacc, type='All', group='All', id.group='All')
+
 
 symnum.args <-list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1), 
                     symbols = c("****", "***", "**", "*", "ns"))
@@ -123,7 +137,7 @@ g <- bind_rows(x,y) %>%
                          type=="Different"~'Untreated MS', TRUE~'All')) %>% 
   mutate(type2=factor(type2, levels = c('All', "Healthy",
                                         "Treatment", "Untreated MS"))) %>% 
-  mutate(group=factor(group, levels = c('Healthy', "all", 
+  mutate(group=factor(group, levels = c('Healthy', "All", 
                                         'EGCG', 'FTY', 'GA', 
                                         'NTZ', 'IFNb'))) %>%
   ggplot(aes(x=group, y=jacc, fill=type2)) + 
@@ -138,7 +152,7 @@ g <- bind_rows(x,y) %>%
                         name='Donor') + 
     theme_bw() + ylab('Jaccard distance') + 
     xlab('') + 
-    theme(panel.grid.major.x = element_blank()) + 
+    theme(panel.grid = element_blank(),panel.border = element_blank(),axis.line = element_line()) + 
     stat_compare_means(method='wilcox.test', 
                        aes(label = ..p.signif..))
 ggsave(g, filename = '~/Desktop/new_figure_3b.pdf',
